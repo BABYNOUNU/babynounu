@@ -1,0 +1,3 @@
+ npx nest generate module app/consegna/agency &&
+  npx nest generate controller app/consegna/agency &&
+  npx nest generate service app/consegna/agency
