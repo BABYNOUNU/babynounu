@@ -13,6 +13,11 @@ exports.SginUpAuthDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 class SginUpAuthDto {
+    fullname;
+    slug;
+    email;
+    password;
+    role;
 }
 exports.SginUpAuthDto = SginUpAuthDto;
 __decorate([
@@ -59,4 +64,3 @@ __decorate([
     (0, class_validator_1.IsString)({ message: 'Ce champs est requis' }),
     __metadata("design:type", Object)
 ], SginUpAuthDto.prototype, "role", void 0);
-//# sourceMappingURL=signUp.dto.js.map

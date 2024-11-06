@@ -16,6 +16,15 @@ const role_model_1 = require("../role/models/role.model");
 const nounu_model_1 = require("../nounu/models/nounu.model");
 const abonnement_model_1 = require("../abonnement/models/abonnement.model");
 let User = class User {
+    id;
+    slug;
+    email;
+    password;
+    access_token;
+    parent;
+    nounu;
+    abonnement;
+    role;
 };
 exports.User = User;
 __decorate([
@@ -57,4 +66,3 @@ __decorate([
 exports.User = User = __decorate([
     (0, typeorm_1.Entity)()
 ], User);
-//# sourceMappingURL=user.model.js.map

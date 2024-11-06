@@ -13,6 +13,10 @@ exports.SettingServiceTypes = void 0;
 const parent_setting_model_1 = require("../../parent/models/parent_setting.model");
 const typeorm_1 = require("typeorm");
 let SettingServiceTypes = class SettingServiceTypes {
+    id;
+    slug;
+    name;
+    parent;
 };
 exports.SettingServiceTypes = SettingServiceTypes;
 __decorate([
@@ -34,4 +38,3 @@ __decorate([
 exports.SettingServiceTypes = SettingServiceTypes = __decorate([
     (0, typeorm_1.Entity)()
 ], SettingServiceTypes);
-//# sourceMappingURL=setting_service_type.model.js.map

@@ -16,6 +16,7 @@ exports.ParentService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("typeorm");
 let ParentService = class ParentService {
+    ParentsRepository;
     constructor(ParentsRepository) {
         this.ParentsRepository = ParentsRepository;
     }
@@ -46,4 +47,3 @@ exports.ParentService = ParentService = __decorate([
     __param(0, (0, common_1.Inject)('PARENT_REPOSITORY')),
     __metadata("design:paramtypes", [typeorm_1.Repository])
 ], ParentService);
-//# sourceMappingURL=parent.service.js.map

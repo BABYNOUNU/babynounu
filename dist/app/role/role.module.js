@@ -22,4 +22,3 @@ exports.RoleModule = RoleModule = __decorate([
         providers: [role_service_1.RoleService, ...role_1.RoleProviders]
     })
 ], RoleModule);
-//# sourceMappingURL=role.module.js.map

@@ -9,4 +9,3 @@ exports.UserProviders = [
         inject: ['DATA_SOURCE'],
     },
 ];
-//# sourceMappingURL=user.providers.js.map

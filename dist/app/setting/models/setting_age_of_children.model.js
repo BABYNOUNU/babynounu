@@ -14,6 +14,11 @@ const nounu_setting_model_1 = require("../../nounu/models/nounu_setting.model");
 const parent_setting_model_1 = require("../../parent/models/parent_setting.model");
 const typeorm_1 = require("typeorm");
 let settingAgeOfChildren = class settingAgeOfChildren {
+    id;
+    slug;
+    name;
+    parent;
+    nounu;
 };
 exports.settingAgeOfChildren = settingAgeOfChildren;
 __decorate([
@@ -39,4 +44,3 @@ __decorate([
 exports.settingAgeOfChildren = settingAgeOfChildren = __decorate([
     (0, typeorm_1.Entity)()
 ], settingAgeOfChildren);
-//# sourceMappingURL=setting_age_of_children.model.js.map

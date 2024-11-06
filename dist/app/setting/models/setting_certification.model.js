@@ -13,6 +13,10 @@ exports.settingCertifications = void 0;
 const nounu_setting_model_1 = require("../../nounu/models/nounu_setting.model");
 const typeorm_1 = require("typeorm");
 let settingCertifications = class settingCertifications {
+    id;
+    slug;
+    name;
+    nounu;
 };
 exports.settingCertifications = settingCertifications;
 __decorate([
@@ -34,4 +38,3 @@ __decorate([
 exports.settingCertifications = settingCertifications = __decorate([
     (0, typeorm_1.Entity)()
 ], settingCertifications);
-//# sourceMappingURL=setting_certification.model.js.map

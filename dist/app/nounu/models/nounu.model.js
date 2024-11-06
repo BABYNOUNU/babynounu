@@ -15,6 +15,22 @@ const user_model_1 = require("../../user/user.model");
 const typeorm_1 = require("typeorm");
 const nounu_setting_model_1 = require("./nounu_setting.model");
 let Nounus = class Nounus {
+    id;
+    fullname;
+    media;
+    old;
+    phone;
+    adresse;
+    year_experience;
+    hourly_rate;
+    monthly_rate;
+    pricing_flexibility;
+    confirmed_verification;
+    setting;
+    user;
+    createdAt;
+    updatedAt;
+    deletedAt;
 };
 exports.Nounus = Nounus;
 __decorate([
@@ -84,4 +100,3 @@ __decorate([
 exports.Nounus = Nounus = __decorate([
     (0, typeorm_1.Entity)()
 ], Nounus);
-//# sourceMappingURL=nounu.model.js.map

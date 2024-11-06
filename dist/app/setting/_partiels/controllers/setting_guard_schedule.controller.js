@@ -18,6 +18,8 @@ const swagger_1 = require("@nestjs/swagger");
 const general_service_1 = require("../general.service");
 const typeorm_1 = require("typeorm");
 let SettingGuardScheduleController = class SettingGuardScheduleController {
+    settingGeneraleService;
+    settingGuardSchedulesRepository;
     constructor(settingGeneraleService, settingGuardSchedulesRepository) {
         this.settingGeneraleService = settingGeneraleService;
         this.settingGuardSchedulesRepository = settingGuardSchedulesRepository;
@@ -68,4 +70,3 @@ exports.SettingGuardScheduleController = SettingGuardScheduleController = __deco
     __param(1, (0, common_1.Inject)('SETTING_GUARD_SCHEDULE_REPOSITORY')),
     __metadata("design:paramtypes", [general_service_1.SettingGeneraleService, typeorm_1.Repository])
 ], SettingGuardScheduleController);
-//# sourceMappingURL=setting_guard_schedule.controller.js.map

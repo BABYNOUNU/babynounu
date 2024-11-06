@@ -20,4 +20,3 @@ exports.AbonnementModule = AbonnementModule = __decorate([
         providers: [abonnement_service_1.AbonnementService, abonnement_1.Abonnement]
     })
 ], AbonnementModule);
-//# sourceMappingURL=abonnement.module.js.map

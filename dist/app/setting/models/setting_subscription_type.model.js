@@ -13,6 +13,10 @@ exports.settingSubscriptionTypes = void 0;
 const abonnement_model_1 = require("../../abonnement/models/abonnement.model");
 const typeorm_1 = require("typeorm");
 let settingSubscriptionTypes = class settingSubscriptionTypes {
+    id;
+    slug;
+    name;
+    abonnement;
 };
 exports.settingSubscriptionTypes = settingSubscriptionTypes;
 __decorate([
@@ -34,4 +38,3 @@ __decorate([
 exports.settingSubscriptionTypes = settingSubscriptionTypes = __decorate([
     (0, typeorm_1.Entity)()
 ], settingSubscriptionTypes);
-//# sourceMappingURL=setting_subscription_type.model.js.map

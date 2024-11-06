@@ -9,4 +9,3 @@ exports.RoleProviders = [
         inject: ['DATA_SOURCE'],
     },
 ];
-//# sourceMappingURL=role.js.map

@@ -14,4 +14,3 @@ exports.PaiementController = PaiementController;
 exports.PaiementController = PaiementController = __decorate([
     (0, common_1.Controller)('paiement')
 ], PaiementController);
-//# sourceMappingURL=paiement.controller.js.map

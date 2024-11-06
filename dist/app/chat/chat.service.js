@@ -16,6 +16,7 @@ exports.ChatService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("typeorm");
 let ChatService = class ChatService {
+    messageRepository;
     constructor(messageRepository) {
         this.messageRepository = messageRepository;
     }
@@ -33,4 +34,3 @@ exports.ChatService = ChatService = __decorate([
     __param(0, (0, common_1.Inject)('CHAT_REPOSITORY')),
     __metadata("design:paramtypes", [typeorm_1.Repository])
 ], ChatService);
-//# sourceMappingURL=chat.service.js.map

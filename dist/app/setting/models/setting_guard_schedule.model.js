@@ -14,6 +14,11 @@ const nounu_setting_model_1 = require("../../nounu/models/nounu_setting.model");
 const parent_setting_model_1 = require("../../parent/models/parent_setting.model");
 const typeorm_1 = require("typeorm");
 let SettingGuardSchedules = class SettingGuardSchedules {
+    id;
+    slug;
+    name;
+    parent;
+    nounu;
 };
 exports.SettingGuardSchedules = SettingGuardSchedules;
 __decorate([
@@ -39,4 +44,3 @@ __decorate([
 exports.SettingGuardSchedules = SettingGuardSchedules = __decorate([
     (0, typeorm_1.Entity)()
 ], SettingGuardSchedules);
-//# sourceMappingURL=setting_guard_schedule.model.js.map

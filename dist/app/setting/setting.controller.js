@@ -26,4 +26,3 @@ exports.SettingController = SettingController = __decorate([
     (0, swagger_1.ApiTags)('Setting'),
     (0, common_1.Controller)('setting')
 ], SettingController);
-//# sourceMappingURL=setting.controller.js.map

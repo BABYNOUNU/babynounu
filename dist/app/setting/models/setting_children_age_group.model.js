@@ -12,6 +12,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.settingChildrenAgeGroup = void 0;
 const typeorm_1 = require("typeorm");
 let settingChildrenAgeGroup = class settingChildrenAgeGroup {
+    id;
+    slug;
+    name;
 };
 exports.settingChildrenAgeGroup = settingChildrenAgeGroup;
 __decorate([
@@ -29,4 +32,3 @@ __decorate([
 exports.settingChildrenAgeGroup = settingChildrenAgeGroup = __decorate([
     (0, typeorm_1.Entity)()
 ], settingChildrenAgeGroup);
-//# sourceMappingURL=setting_children_age_group.model.js.map

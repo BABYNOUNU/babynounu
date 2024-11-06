@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const role_service_1 = require("./role.service");
 let RoleController = class RoleController {
+    roleService;
     constructor(roleService) {
         this.roleService = roleService;
     }
@@ -82,4 +83,3 @@ exports.RoleController = RoleController = __decorate([
     (0, common_1.Controller)('role'),
     __metadata("design:paramtypes", [role_service_1.RoleService])
 ], RoleController);
-//# sourceMappingURL=role.controller.js.map

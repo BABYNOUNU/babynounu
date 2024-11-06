@@ -15,6 +15,13 @@ const setting_subscription_type_model_1 = require("../../setting/models/setting_
 const user_model_1 = require("../../user/user.model");
 const typeorm_1 = require("typeorm");
 let Abonnements = class Abonnements {
+    id;
+    paiement;
+    type;
+    user;
+    createdAt;
+    updatedAt;
+    deletedAt;
 };
 exports.Abonnements = Abonnements;
 __decorate([
@@ -54,4 +61,3 @@ __decorate([
 exports.Abonnements = Abonnements = __decorate([
     (0, typeorm_1.Entity)()
 ], Abonnements);
-//# sourceMappingURL=abonnement.model.js.map

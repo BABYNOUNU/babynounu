@@ -22,4 +22,3 @@ exports.SettingGeneraleService = SettingGeneraleService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [])
 ], SettingGeneraleService);
-//# sourceMappingURL=general.service.js.map

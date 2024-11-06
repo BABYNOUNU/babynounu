@@ -9,4 +9,3 @@ exports.SettingProviders = [
         inject: ['DATA_SOURCE'],
     },
 ];
-//# sourceMappingURL=setting.js.map

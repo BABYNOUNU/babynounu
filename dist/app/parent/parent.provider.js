@@ -9,4 +9,3 @@ exports.ParentProviders = [
         inject: ['DATA_SOURCE'],
     },
 ];
-//# sourceMappingURL=parent.provider.js.map

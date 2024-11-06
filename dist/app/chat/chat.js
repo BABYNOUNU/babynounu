@@ -9,4 +9,3 @@ exports.ChatProviders = [
         inject: ['DATA_SOURCE'],
     },
 ];
-//# sourceMappingURL=chat.js.map

@@ -19,6 +19,7 @@ const signIn_dto_1 = require("./dto/signIn.dto");
 const signUp_dto_1 = require("./dto/signUp.dto");
 const swagger_1 = require("@nestjs/swagger");
 let AuthController = class AuthController {
+    AuthService;
     constructor(AuthService) {
         this.AuthService = AuthService;
     }
@@ -71,4 +72,3 @@ exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])
 ], AuthController);
-//# sourceMappingURL=auth.controller.js.map

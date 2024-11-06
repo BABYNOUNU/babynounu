@@ -14,4 +14,3 @@ exports.Parent = Parent;
 exports.Parent = Parent = __decorate([
     (0, common_1.Injectable)()
 ], Parent);
-//# sourceMappingURL=parent.js.map

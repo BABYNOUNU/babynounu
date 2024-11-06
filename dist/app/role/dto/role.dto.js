@@ -13,6 +13,8 @@ exports.RoleDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 class RoleDto {
+    slug;
+    name;
 }
 exports.RoleDto = RoleDto;
 __decorate([
@@ -32,4 +34,3 @@ __decorate([
     (0, class_validator_1.IsEmail)(),
     __metadata("design:type", String)
 ], RoleDto.prototype, "name", void 0);
-//# sourceMappingURL=role.dto.js.map

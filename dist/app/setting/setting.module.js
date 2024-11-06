@@ -24,4 +24,3 @@ exports.SettingModule = SettingModule = __decorate([
         providers: [setting_service_1.SettingService, ...setting_1.SettingProviders, general_service_1.SettingGeneraleService]
     })
 ], SettingModule);
-//# sourceMappingURL=setting.module.js.map

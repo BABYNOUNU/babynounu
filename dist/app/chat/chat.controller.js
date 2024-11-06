@@ -14,4 +14,3 @@ exports.ChatController = ChatController;
 exports.ChatController = ChatController = __decorate([
     (0, common_1.Controller)('chat')
 ], ChatController);
-//# sourceMappingURL=chat.controller.js.map

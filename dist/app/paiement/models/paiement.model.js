@@ -13,6 +13,22 @@ exports.Paiements = void 0;
 const abonnement_model_1 = require("../../abonnement/models/abonnement.model");
 const typeorm_1 = require("typeorm");
 let Paiements = class Paiements {
+    id;
+    transaction;
+    amount;
+    customer_name;
+    customer_surname;
+    customer_email;
+    customer_phone_number;
+    customer_address;
+    customer_city;
+    customer_country;
+    customer_state;
+    customer_zip_code;
+    abonnement;
+    createdAt;
+    updatedAt;
+    deletedAt;
 };
 exports.Paiements = Paiements;
 __decorate([
@@ -82,4 +98,3 @@ __decorate([
 exports.Paiements = Paiements = __decorate([
     (0, typeorm_1.Entity)()
 ], Paiements);
-//# sourceMappingURL=paiement.model.js.map

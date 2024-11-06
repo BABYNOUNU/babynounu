@@ -14,4 +14,3 @@ exports.NounuController = NounuController;
 exports.NounuController = NounuController = __decorate([
     (0, common_1.Controller)('nounu')
 ], NounuController);
-//# sourceMappingURL=nounu.controller.js.map

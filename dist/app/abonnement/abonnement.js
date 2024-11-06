@@ -14,4 +14,3 @@ exports.Abonnement = Abonnement;
 exports.Abonnement = Abonnement = __decorate([
     (0, common_1.Injectable)()
 ], Abonnement);
-//# sourceMappingURL=abonnement.js.map

@@ -19,6 +19,13 @@ const setting_localization_model_1 = require("../../setting/models/setting_local
 const nounu_model_1 = require("./nounu.model");
 const setting_certification_model_1 = require("../../setting/models/setting_certification.model");
 let NounuSettings = class NounuSettings {
+    id;
+    nounu;
+    specific_skills;
+    language;
+    guard_schedule;
+    localization;
+    certification;
 };
 exports.NounuSettings = NounuSettings;
 __decorate([
@@ -62,4 +69,3 @@ __decorate([
 exports.NounuSettings = NounuSettings = __decorate([
     (0, typeorm_1.Entity)()
 ], NounuSettings);
-//# sourceMappingURL=nounu_setting.model.js.map

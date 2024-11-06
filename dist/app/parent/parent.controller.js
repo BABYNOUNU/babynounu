@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const parent_service_1 = require("./parent.service");
 let ParentController = class ParentController {
+    parentService;
     constructor(parentService) {
         this.parentService = parentService;
     }
@@ -73,4 +74,3 @@ exports.ParentController = ParentController = __decorate([
     (0, common_1.Controller)('parent'),
     __metadata("design:paramtypes", [parent_service_1.ParentService])
 ], ParentController);
-//# sourceMappingURL=parent.controller.js.map

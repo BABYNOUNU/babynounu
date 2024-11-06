@@ -13,6 +13,8 @@ exports.SginInAuthDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 class SginInAuthDto {
+    email;
+    password;
 }
 exports.SginInAuthDto = SginInAuthDto;
 __decorate([
@@ -32,4 +34,3 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], SginInAuthDto.prototype, "password", void 0);
-//# sourceMappingURL=signIn.dto.js.map

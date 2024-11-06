@@ -14,6 +14,14 @@ const typeorm_1 = require("typeorm");
 const parent_setting_model_1 = require("../../parent/models/parent_setting.model");
 const nounu_setting_model_1 = require("../../nounu/models/nounu_setting.model");
 let SettingSpecificSkills = class SettingSpecificSkills {
+    id;
+    slug;
+    name;
+    parent;
+    nounu;
+    createdAt;
+    updatedAt;
+    deletedAt;
 };
 exports.SettingSpecificSkills = SettingSpecificSkills;
 __decorate([
@@ -51,4 +59,3 @@ __decorate([
 exports.SettingSpecificSkills = SettingSpecificSkills = __decorate([
     (0, typeorm_1.Entity)()
 ], SettingSpecificSkills);
-//# sourceMappingURL=setting_specific_skill.model.js.map

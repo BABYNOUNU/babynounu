@@ -20,4 +20,3 @@ exports.MediaModule = MediaModule = __decorate([
         providers: [media_service_1.MediaService, media_1.Media]
     })
 ], MediaModule);
-//# sourceMappingURL=media.module.js.map

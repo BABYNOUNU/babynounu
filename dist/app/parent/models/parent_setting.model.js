@@ -19,6 +19,18 @@ const setting_specific_skill_model_1 = require("../../setting/models/setting_spe
 const setting_language_model_1 = require("../../setting/models/setting_language.model");
 const setting_localization_model_1 = require("../../setting/models/setting_localization.model");
 let ParentSettings = class ParentSettings {
+    id;
+    parent;
+    age_of_children;
+    guard_schedule;
+    specific_need;
+    specific_skills;
+    language;
+    localization;
+    work_area;
+    createdAt;
+    updatedAt;
+    deletedAt;
 };
 exports.ParentSettings = ParentSettings;
 __decorate([
@@ -86,4 +98,3 @@ __decorate([
 exports.ParentSettings = ParentSettings = __decorate([
     (0, typeorm_1.Entity)()
 ], ParentSettings);
-//# sourceMappingURL=parent_setting.model.js.map

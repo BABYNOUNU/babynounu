@@ -14,4 +14,3 @@ exports.AbonnementController = AbonnementController;
 exports.AbonnementController = AbonnementController = __decorate([
     (0, common_1.Controller)('abonnement')
 ], AbonnementController);
-//# sourceMappingURL=abonnement.controller.js.map

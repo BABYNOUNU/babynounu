@@ -5,7 +5,7 @@ import { User } from '../user/user.model';
 import { SginInAuthDto } from './dto/signIn.dto';
 import { SginUpAuthDto } from './dto/signUp.dto';
 import { SlugUtils } from 'src/utils/slug.utils';
-import * as bcrypt from 'bcrypt';
+import * as bcryptjs from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { Roles } from '../role/models/role.model';
 
@@ -42,7 +42,7 @@ export class AuthService {
     }
 
     // PASSWORD HASH
-    signUpBody.password = await bcrypt.hash(signUpBody.password, 10);
+    signUpBody.password = await bcryptjs.hash(signUpBody.password, 10);
 
     // CREATE NEW USER
     const newUser = this.userRepository.create({
@@ -76,7 +76,7 @@ export class AuthService {
     }
 
     // CHECK IF PASSWORD IS CORRECT
-    const isPasswordCorrect = await bcrypt.compare(
+    const isPasswordCorrect = await bcryptjs.compare(
       signInBody.password,
       user.password,
     );

@@ -14,6 +14,16 @@ const nounu_model_1 = require("../../nounu/models/nounu.model");
 const parent_model_1 = require("../../parent/models/parent.model");
 const typeorm_1 = require("typeorm");
 let Medias = class Medias {
+    id;
+    url;
+    size;
+    type;
+    is_profile;
+    is_banner;
+    is_galery;
+    is_document;
+    media_parent;
+    media_nounu;
 };
 exports.Medias = Medias;
 __decorate([
@@ -59,4 +69,3 @@ __decorate([
 exports.Medias = Medias = __decorate([
     (0, typeorm_1.Entity)()
 ], Medias);
-//# sourceMappingURL=media.model.js.map

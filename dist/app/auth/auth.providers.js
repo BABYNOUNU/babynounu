@@ -9,4 +9,3 @@ exports.AuthProviders = [
         inject: ['DATA_SOURCE'],
     },
 ];
-//# sourceMappingURL=auth.providers.js.map

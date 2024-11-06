@@ -23,4 +23,3 @@ exports.ParentModule = ParentModule = __decorate([
         providers: [parent_service_1.ParentService, parent_1.Parent, ...parent_provider_1.ParentProviders]
     })
 ], ParentModule);
-//# sourceMappingURL=parent.module.js.map

@@ -16,9 +16,12 @@ exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("typeorm");
 const slug_utils_1 = require("../../utils/slug.utils");
-const bcrypt = require("bcrypt");
+const bcryptjs = require("bcryptjs");
 const jwt_1 = require("@nestjs/jwt");
 let AuthService = class AuthService {
+    userRepository;
+    roleRepository;
+    jwtService;
     constructor(userRepository, roleRepository, jwtService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
@@ -36,7 +39,7 @@ let AuthService = class AuthService {
         if (!isRole) {
             throw new common_1.BadRequestException('The role enter not exists');
         }
-        signUpBody.password = await bcrypt.hash(signUpBody.password, 10);
+        signUpBody.password = await bcryptjs.hash(signUpBody.password, 10);
         const newUser = this.userRepository.create({
             slug: signUpBody.slug,
             email: signUpBody.email,
@@ -61,7 +64,7 @@ let AuthService = class AuthService {
         if (!user) {
             throw new common_1.BadRequestException('User not found');
         }
-        const isPasswordCorrect = await bcrypt.compare(signInBody.password, user.password);
+        const isPasswordCorrect = await bcryptjs.compare(signInBody.password, user.password);
         if (!isPasswordCorrect) {
             throw new common_1.BadRequestException('Password is incorrect');
         }
@@ -94,4 +97,3 @@ exports.AuthService = AuthService = __decorate([
         typeorm_1.Repository,
         jwt_1.JwtService])
 ], AuthService);
-//# sourceMappingURL=auth.service.js.map

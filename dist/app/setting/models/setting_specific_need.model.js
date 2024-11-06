@@ -13,6 +13,10 @@ exports.SettingSpecificNeed = void 0;
 const parent_setting_model_1 = require("../../parent/models/parent_setting.model");
 const typeorm_1 = require("typeorm");
 let SettingSpecificNeed = class SettingSpecificNeed {
+    id;
+    slug;
+    name;
+    parent;
 };
 exports.SettingSpecificNeed = SettingSpecificNeed;
 __decorate([
@@ -34,4 +38,3 @@ __decorate([
 exports.SettingSpecificNeed = SettingSpecificNeed = __decorate([
     (0, typeorm_1.Entity)()
 ], SettingSpecificNeed);
-//# sourceMappingURL=setting_specific_need.model.js.map

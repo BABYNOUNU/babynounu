@@ -18,6 +18,7 @@ const user_service_1 = require("./user.service");
 const auh_guard_1 = require("../auth/auh.guard");
 const swagger_1 = require("@nestjs/swagger");
 let UserController = class UserController {
+    userService;
     constructor(userService) {
         this.userService = userService;
     }
@@ -93,4 +94,3 @@ exports.UserController = UserController = __decorate([
     (0, common_1.Controller)('users'),
     __metadata("design:paramtypes", [user_service_1.UserService])
 ], UserController);
-//# sourceMappingURL=user.controller.js.map

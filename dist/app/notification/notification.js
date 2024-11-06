@@ -14,4 +14,3 @@ exports.Notification = Notification;
 exports.Notification = Notification = __decorate([
     (0, common_1.Injectable)()
 ], Notification);
-//# sourceMappingURL=notification.js.map

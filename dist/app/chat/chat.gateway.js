@@ -17,6 +17,8 @@ const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
 const chat_service_1 = require("./chat.service");
 let ChatGateway = class ChatGateway {
+    chatService;
+    server;
     constructor(chatService) {
         this.chatService = chatService;
     }
@@ -62,4 +64,3 @@ exports.ChatGateway = ChatGateway = __decorate([
     (0, websockets_1.WebSocketGateway)({ cors: true }),
     __metadata("design:paramtypes", [chat_service_1.ChatService])
 ], ChatGateway);
-//# sourceMappingURL=chat.gateway.js.map

@@ -20,4 +20,3 @@ exports.NotificationModule = NotificationModule = __decorate([
         providers: [notification_service_1.NotificationService, notification_1.Notification]
     })
 ], NotificationModule);
-//# sourceMappingURL=notification.module.js.map

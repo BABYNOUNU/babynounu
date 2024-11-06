@@ -12,6 +12,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Settings = void 0;
 const typeorm_1 = require("typeorm");
 let Settings = class Settings {
+    id;
+    createdAt;
+    updatedAt;
+    deletedAt;
 };
 exports.Settings = Settings;
 __decorate([
@@ -33,4 +37,3 @@ __decorate([
 exports.Settings = Settings = __decorate([
     (0, typeorm_1.Entity)()
 ], Settings);
-//# sourceMappingURL=setting.model.js.map

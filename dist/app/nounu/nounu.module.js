@@ -20,4 +20,3 @@ exports.NounuModule = NounuModule = __decorate([
         providers: [nounu_service_1.NounuService, nounu_1.Nounu]
     })
 ], NounuModule);
-//# sourceMappingURL=nounu.module.js.map

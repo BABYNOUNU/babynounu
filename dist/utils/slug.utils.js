@@ -36,4 +36,3 @@ class SlugUtils {
     }
 }
 exports.SlugUtils = SlugUtils;
-//# sourceMappingURL=slug.utils.js.map

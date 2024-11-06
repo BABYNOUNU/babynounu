@@ -16,6 +16,7 @@ exports.RoleService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("typeorm");
 let RoleService = class RoleService {
+    roleRepository;
     constructor(roleRepository) {
         this.roleRepository = roleRepository;
     }
@@ -51,4 +52,3 @@ exports.RoleService = RoleService = __decorate([
     __param(0, (0, common_1.Inject)('ROLE_REPOSITORY')),
     __metadata("design:paramtypes", [typeorm_1.Repository])
 ], RoleService);
-//# sourceMappingURL=role.service.js.map

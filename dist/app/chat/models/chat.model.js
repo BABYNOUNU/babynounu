@@ -12,6 +12,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatMessages = void 0;
 const typeorm_1 = require("typeorm");
 let ChatMessages = class ChatMessages {
+    id;
+    sender;
+    content;
+    room;
+    createdAt;
+    updatedAt;
+    deletedAt;
 };
 exports.ChatMessages = ChatMessages;
 __decorate([
@@ -45,4 +52,3 @@ __decorate([
 exports.ChatMessages = ChatMessages = __decorate([
     (0, typeorm_1.Entity)()
 ], ChatMessages);
-//# sourceMappingURL=chat.model.js.map

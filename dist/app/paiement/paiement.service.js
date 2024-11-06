@@ -14,4 +14,3 @@ exports.PaiementService = PaiementService;
 exports.PaiementService = PaiementService = __decorate([
     (0, common_1.Injectable)()
 ], PaiementService);
-//# sourceMappingURL=paiement.service.js.map

@@ -14,6 +14,11 @@ const nounu_setting_model_1 = require("../../nounu/models/nounu_setting.model");
 const parent_setting_model_1 = require("../../parent/models/parent_setting.model");
 const typeorm_1 = require("typeorm");
 let SettingLanguages = class SettingLanguages {
+    id;
+    slug;
+    name;
+    parent;
+    nounu;
 };
 exports.SettingLanguages = SettingLanguages;
 __decorate([
@@ -39,4 +44,3 @@ __decorate([
 exports.SettingLanguages = SettingLanguages = __decorate([
     (0, typeorm_1.Entity)()
 ], SettingLanguages);
-//# sourceMappingURL=setting_language.model.js.map

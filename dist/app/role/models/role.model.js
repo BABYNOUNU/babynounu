@@ -13,6 +13,10 @@ exports.Roles = void 0;
 const typeorm_1 = require("typeorm");
 const user_model_1 = require("../../user/user.model");
 let Roles = class Roles {
+    id;
+    slug;
+    name;
+    user;
 };
 exports.Roles = Roles;
 __decorate([
@@ -34,4 +38,3 @@ __decorate([
 exports.Roles = Roles = __decorate([
     (0, typeorm_1.Entity)()
 ], Roles);
-//# sourceMappingURL=role.model.js.map
