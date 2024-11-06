@@ -1,0 +1,1 @@
+{"version":3,"file":"parent.provider.js","sourceRoot":"","sources":["../../../src/app/parent/parent.provider.ts"],"names":[],"mappings":";;;AACA,wDAAgD;AAEnC,QAAA,eAAe,GAAG;IAC7B;QACE,OAAO,EAAE,mBAAmB;QAC5B,UAAU,EAAE,CAAC,UAAsB,EAAE,EAAE,CAAC,UAAU,CAAC,aAAa,CAAC,sBAAO,CAAC;QACzE,MAAM,EAAE,CAAC,aAAa,CAAC;KACxB;CACF,CAAC"}

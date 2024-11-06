@@ -1,3 +1,15 @@
- npx nest generate module app/consegna/agency &&
-  npx nest generate controller app/consegna/agency &&
-  npx nest generate service app/consegna/agency
+mkdir ./src/app/abonnement &&
+npx nest generate module app/abonnement --no-spec &&
+npx nest generate controller app/abonnement --no-spec &&
+npx nest generate service app/abonnement --no-spec &&
+npx nest generate provider app/abonnement --no-spec &&
+mkdir ./src/app/abonnement/models &&
+mkdir ./src/app/abonnement/dto &&
+touch ./src/app/abonnement/models/abonnement.model.ts
+
+git init
+git add ./
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/Dolubux/njia-backend-app.git
+git push -u origin main

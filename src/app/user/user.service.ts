@@ -18,10 +18,17 @@ export class UserService {
     return this.userRepository.find();
   }
 
-  async createUser(data: { name: string; email: string }): Promise<User> {
+  async createUser(data: { fullname: string; email: string }): Promise<User> {
     const newUser = this.userRepository.create({
       email: data.email,
-      name: data.name,
+    });
+
+    return await this.userRepository.save(newUser);
+  }
+
+  async updateUser(data: { fullname: string; email: string }): Promise<User> {
+    const newUser = this.userRepository.create({
+      email: data.email,
     });
 
     return await this.userRepository.save(newUser);
@@ -30,5 +37,9 @@ export class UserService {
   async deleteUser(where: any) {
     this.userRepository.delete({ id: where });
     return { message: 'User deleted' };
+  }
+
+  loggedUser() {
+    return { message: 'User is connected', status: true };
   }
 }
