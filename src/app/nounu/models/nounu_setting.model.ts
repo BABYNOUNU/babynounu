@@ -1,6 +1,6 @@
 import { Parents } from 'src/app/parent/models/parent.model';
 import { Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { settingAgeOfChildren } from '../../setting/models/setting_age_of_children.model';
+import { SettingAgeOfChildren } from '../../setting/models/setting_age_of_children.model';
 import { SettingGuardSchedules } from '../../setting/models/setting_guard_schedule.model';
 import { SettingSpecificNeed } from '../../setting/models/setting_specific_need.model';
 import { SettingSpecificSkills } from '../../setting/models/setting_specific_skill.model';
@@ -18,7 +18,7 @@ export class NounuSettings {
   @OneToMany(() => Nounus, (nounu) => nounu.setting, { onDelete: 'CASCADE' })
   nounu: Nounus;
 
-  @ManyToOne(() => settingAgeOfChildren, (AOC) => AOC.nounu, {
+  @ManyToOne(() => SettingAgeOfChildren, (AOC) => AOC.nounu, {
     onDelete: 'CASCADE',
   })
   specific_skills: SettingSpecificSkills;

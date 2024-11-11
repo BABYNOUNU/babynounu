@@ -1,6 +1,7 @@
+import { animationFrameScheduler } from 'rxjs';
 import { DataSource } from 'typeorm';
 
-const isProd:boolean = true
+const isProd:boolean = false
 const ProdDatabase = (dbProd:string, dbTest:string) => {
   return isProd ? dbProd : dbTest;
 }

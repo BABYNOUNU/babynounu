@@ -42,10 +42,10 @@ __decorate([
     __metadata("design:type", parent_model_1.Parents)
 ], ParentSettings.prototype, "parent", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => setting_age_of_children_model_1.settingAgeOfChildren, (AOC) => AOC.parent, {
+    (0, typeorm_1.ManyToOne)(() => setting_age_of_children_model_1.SettingAgeOfChildren, (AOC) => AOC.parent, {
         onDelete: 'CASCADE',
     }),
-    __metadata("design:type", setting_age_of_children_model_1.settingAgeOfChildren)
+    __metadata("design:type", setting_age_of_children_model_1.SettingAgeOfChildren)
 ], ParentSettings.prototype, "age_of_children", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => setting_guard_schedule_model_1.SettingGuardSchedules, (GS) => GS.parent, {

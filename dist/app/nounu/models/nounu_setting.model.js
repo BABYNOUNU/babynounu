@@ -37,7 +37,7 @@ __decorate([
     __metadata("design:type", nounu_model_1.Nounus)
 ], NounuSettings.prototype, "nounu", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => setting_age_of_children_model_1.settingAgeOfChildren, (AOC) => AOC.nounu, {
+    (0, typeorm_1.ManyToOne)(() => setting_age_of_children_model_1.SettingAgeOfChildren, (AOC) => AOC.nounu, {
         onDelete: 'CASCADE',
     }),
     __metadata("design:type", setting_specific_skill_model_1.SettingSpecificSkills)

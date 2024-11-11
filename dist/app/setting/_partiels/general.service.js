@@ -11,10 +11,73 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SettingGeneraleService = void 0;
 const common_1 = require("@nestjs/common");
+const slug_utils_1 = require("../../../utils/slug.utils");
 let SettingGeneraleService = class SettingGeneraleService {
     constructor() { }
+    async Verify_slug(Repository, { slug }) {
+        const IsSlugExist = await Repository.findOne({
+            where: { slug },
+        });
+        if (!IsSlugExist) {
+            throw new common_1.BadRequestException({ message: 'Setting slug not exist' });
+        }
+    }
     async settings(Repository) {
         return await Repository.find();
+    }
+    async setting(Repository, { slug }) {
+        return await Repository.find({ where: { slug: slug } });
+    }
+    async createSetting(Repository, { createSettingBody }) {
+        const IsNameExist = await Repository.findOne({
+            where: { name: createSettingBody.name.toLowerCase() },
+        });
+        if (IsNameExist) {
+            throw new common_1.BadRequestException({ message: 'Setting name already exist' });
+        }
+        createSettingBody.slug = await new slug_utils_1.SlugUtils().all(createSettingBody.name, Repository);
+        const newSetting = Repository.create({
+            slug: createSettingBody.slug,
+            name: createSettingBody.name,
+            description: createSettingBody.description,
+        });
+        const settingSave = await Repository.save(newSetting);
+        if (!settingSave) {
+            throw new common_1.BadRequestException({ message: 'Setting not created' });
+        }
+        return {
+            setting: {
+                ...settingSave,
+            },
+        };
+    }
+    async updateSetting(Repository, { updateSettingBody }, { slug }) {
+        await this.Verify_slug(Repository, { slug });
+        const updateSetting = await Repository.update({ slug }, {
+            name: updateSettingBody.name,
+            description: updateSettingBody.description,
+        });
+        if (!updateSetting.affected) {
+            throw new common_1.BadRequestException({ message: 'Setting not updated' });
+        }
+        return {
+            setting: {
+                ...(await Repository.findOne({ where: { slug: slug } })),
+            },
+        };
+    }
+    async deleteSetting(Repository, { slug }) {
+        await this.Verify_slug(Repository, { slug });
+        const deleteSetting = await Repository.delete({ slug });
+        if (!deleteSetting.affected) {
+            throw new common_1.BadRequestException({ message: 'Setting not deleted' });
+        }
+        return {
+            setting: {
+                slug,
+                message: 'Setting deleted',
+            },
+        };
     }
 };
 exports.SettingGeneraleService = SettingGeneraleService;

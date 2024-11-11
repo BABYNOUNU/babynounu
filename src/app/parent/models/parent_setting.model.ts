@@ -1,6 +1,6 @@
 import { Parents } from 'src/app/parent/models/parent.model';
 import { CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { settingAgeOfChildren } from '../../setting/models/setting_age_of_children.model';
+import { SettingAgeOfChildren } from '../../setting/models/setting_age_of_children.model';
 import { SettingGuardSchedules } from '../../setting/models/setting_guard_schedule.model';
 import { SettingSpecificNeed } from '../../setting/models/setting_specific_need.model';
 import { SettingSpecificSkills } from '../../setting/models/setting_specific_skill.model';
@@ -15,10 +15,10 @@ export class ParentSettings {
   @OneToMany(() => Parents, (parent) => parent.setting, { onDelete: 'CASCADE' })
   parent: Parents;
 
-  @ManyToOne(() => settingAgeOfChildren, (AOC) => AOC.parent, {
+  @ManyToOne(() => SettingAgeOfChildren, (AOC) => AOC.parent, {
     onDelete: 'CASCADE',
   })
-  age_of_children: settingAgeOfChildren;
+  age_of_children: SettingAgeOfChildren;
 
   @ManyToOne(() => SettingGuardSchedules, (GS) => GS.parent, {
     onDelete: 'CASCADE',

@@ -1,5 +1,5 @@
 import { Medias } from 'src/app/media/models/media.model';
-import { settingAgeOfChildren } from 'src/app/setting/models/setting_age_of_children.model';
+import { SettingAgeOfChildren } from 'src/app/setting/models/setting_age_of_children.model';
 import { SettingGuardSchedules } from 'src/app/setting/models/setting_guard_schedule.model';
 import { SettingSpecificNeed } from 'src/app/setting/models/setting_specific_need.model';
 import { User } from 'src/app/user/user.model';

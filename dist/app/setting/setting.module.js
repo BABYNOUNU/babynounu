@@ -14,13 +14,14 @@ const setting_guard_schedule_controller_1 = require("./_partiels/controllers/set
 const database_module_1 = require("../../database/database.module");
 const general_service_1 = require("./_partiels/general.service");
 const setting_1 = require("./setting");
+const setting_age_of_children_controller_1 = require("./_partiels/controllers/setting_age_of_children.controller");
 let SettingModule = class SettingModule {
 };
 exports.SettingModule = SettingModule;
 exports.SettingModule = SettingModule = __decorate([
     (0, common_1.Module)({
         imports: [database_module_1.DatabaseModule],
-        controllers: [setting_controller_1.SettingController, setting_guard_schedule_controller_1.SettingGuardScheduleController],
+        controllers: [setting_controller_1.SettingController, setting_guard_schedule_controller_1.SettingGuardScheduleController, setting_age_of_children_controller_1.SettingAgeOfChildrenController],
         providers: [setting_service_1.SettingService, ...setting_1.SettingProviders, general_service_1.SettingGeneraleService]
     })
 ], SettingModule);

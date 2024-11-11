@@ -8,7 +8,7 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
 } from 'typeorm';
-import { settingAgeOfChildren } from './setting_age_of_children.model';
+import { SettingAgeOfChildren } from './setting_age_of_children.model';
 import { SettingGuardSchedules } from './setting_guard_schedule.model';
 import { SettingSpecificNeed } from './setting_specific_need.model';
 import { SettingSpecificSkills } from './setting_specific_skill.model';
