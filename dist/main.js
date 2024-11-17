@@ -25,7 +25,7 @@ async function bootstrap() {
         .setVersion('1.0')
         .addServer('http://localhost:3000/', 'Local environment')
         .addServer('https://staging.yourapi.com/', 'Staging')
-        .addServer('https://production.yourapi.com/', 'Production')
+        .addServer('https://api.babynounu.com/', 'Production')
         .addTag('Baby Nounu')
         .build();
     const document = swagger_1.SwaggerModule.createDocument(app, options);
