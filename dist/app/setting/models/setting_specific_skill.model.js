@@ -17,6 +17,7 @@ let SettingSpecificSkills = class SettingSpecificSkills {
     id;
     slug;
     name;
+    description;
     parent;
     nounu;
     createdAt;
@@ -36,6 +37,10 @@ __decorate([
     (0, typeorm_1.Column)('varchar', { length: 255, unique: false, nullable: false }),
     __metadata("design:type", String)
 ], SettingSpecificSkills.prototype, "name", void 0);
+__decorate([
+    (0, typeorm_1.Column)('text', { nullable: true }),
+    __metadata("design:type", String)
+], SettingSpecificSkills.prototype, "description", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => parent_setting_model_1.ParentSettings, (PS) => PS.specific_skills, { cascade: true }),
     __metadata("design:type", parent_setting_model_1.ParentSettings)

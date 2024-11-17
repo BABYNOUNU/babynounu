@@ -4,6 +4,7 @@ export declare class SettingSpecificSkills {
     id: string;
     slug: string;
     name: string;
+    description: string;
     parent: ParentSettings;
     nounu: NounuSettings;
     createdAt: Date;

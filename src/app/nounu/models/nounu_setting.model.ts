@@ -5,9 +5,9 @@ import { SettingGuardSchedules } from '../../setting/models/setting_guard_schedu
 import { SettingSpecificNeed } from '../../setting/models/setting_specific_need.model';
 import { SettingSpecificSkills } from '../../setting/models/setting_specific_skill.model';
 import { SettingLanguages } from '../../setting/models/setting_language.model';
-import { settingLocalization } from '../../setting/models/setting_localization.model';
+import { SettingLocalization } from '../../setting/models/setting_localization.model';
 import { Nounus } from './nounu.model';
-import { settingCertifications } from 'src/app/setting/models/setting_certification.model';
+import { SettingCertifications } from 'src/app/setting/models/setting_certification.model';
 
 @Entity()
 export class NounuSettings {
@@ -33,13 +33,13 @@ export class NounuSettings {
   })
   guard_schedule: SettingGuardSchedules;
 
-  @ManyToOne(() => settingLocalization, (SN) => SN.nounu, {
+  @ManyToOne(() => SettingLocalization, (SN) => SN.nounu, {
     onDelete: 'CASCADE',
   })
-  localization: settingLocalization;
+  localization: SettingLocalization;
 
-  @ManyToOne(() => settingCertifications, (SN) => SN.nounu, {
+  @ManyToOne(() => SettingCertifications, (SC) => SC.nounu , {
     onDelete: 'CASCADE',
   })
-  certification: settingCertifications[];
+  certification: SettingCertifications[];
 }

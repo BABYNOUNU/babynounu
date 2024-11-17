@@ -17,6 +17,7 @@ let SettingLanguages = class SettingLanguages {
     id;
     slug;
     name;
+    description;
     parent;
     nounu;
 };
@@ -33,6 +34,10 @@ __decorate([
     (0, typeorm_1.Column)('varchar', { length: 255, unique: false, nullable: false }),
     __metadata("design:type", String)
 ], SettingLanguages.prototype, "name", void 0);
+__decorate([
+    (0, typeorm_1.Column)('text', { nullable: true }),
+    __metadata("design:type", String)
+], SettingLanguages.prototype, "description", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => parent_setting_model_1.ParentSettings, (SU) => SU.language, { cascade: true }),
     __metadata("design:type", parent_setting_model_1.ParentSettings)

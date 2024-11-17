@@ -36,7 +36,7 @@ export class AuthService {
     }
 
     // Checked if role exist
-    const isRole = await this.roleRepository.findOne({ where: { id: signUpBody.role?.toLocaleString() } })
+    const isRole = await this.roleRepository.findOne({ where: { id: signUpBody.role } })
     if (!isRole) {
       throw new BadRequestException('The role enter not exists');
     }

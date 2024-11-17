@@ -20,6 +20,7 @@ async function bootstrap() {
     }));
     const options = new swagger_1.DocumentBuilder()
         .setTitle('Your Api Bady Nounu')
+        .addBearerAuth()
         .setDescription('Your API description')
         .setVersion('1.0')
         .addServer('http://localhost:3000/', 'Local environment')

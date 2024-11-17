@@ -16,12 +16,13 @@ let Roles = class Roles {
     id;
     slug;
     name;
+    description;
     user;
 };
 exports.Roles = Roles;
 __decorate([
-    (0, typeorm_1.PrimaryGeneratedColumn)('uuid'),
-    __metadata("design:type", String)
+    (0, typeorm_1.PrimaryGeneratedColumn)(),
+    __metadata("design:type", Number)
 ], Roles.prototype, "id", void 0);
 __decorate([
     (0, typeorm_1.Column)('varchar', { length: 255, unique: true, nullable: true }),
@@ -31,6 +32,10 @@ __decorate([
     (0, typeorm_1.Column)('varchar', { length: 255, unique: false, nullable: false }),
     __metadata("design:type", Object)
 ], Roles.prototype, "name", void 0);
+__decorate([
+    (0, typeorm_1.Column)('text', { nullable: true }),
+    __metadata("design:type", String)
+], Roles.prototype, "description", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => user_model_1.User, (user) => user.role, { onDelete: 'CASCADE' }),
     __metadata("design:type", user_model_1.User)

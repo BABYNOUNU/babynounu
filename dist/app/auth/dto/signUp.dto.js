@@ -61,6 +61,7 @@ __decorate([
         example: '1',
         required: true
     }),
-    (0, class_validator_1.IsString)({ message: 'Ce champs est requis' }),
-    __metadata("design:type", Object)
+    (0, class_validator_1.IsNotEmpty)({ message: 'Ce champ est requis' }),
+    (0, class_validator_1.IsNumber)({}, { message: 'Ce champ doit être un nombre' }),
+    __metadata("design:type", Number)
 ], SginUpAuthDto.prototype, "role", void 0);

@@ -1,9 +1,10 @@
 import { Repository } from 'typeorm';
 import { User } from './user.model';
-export declare class UserService {
+import { SettingGeneraleService } from '../setting/_partiels/general.service';
+export declare class UserService extends SettingGeneraleService {
     private userRepository;
     constructor(userRepository: Repository<User>);
-    user(userWhereUniqueInput: any): Promise<User | null>;
+    user(slug: any): Promise<User | null>;
     users(): Promise<User[]>;
     createUser(data: {
         fullname: string;

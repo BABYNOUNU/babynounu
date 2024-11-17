@@ -18,6 +18,7 @@ const swagger_1 = require("@nestjs/swagger");
 const general_service_1 = require("../general.service");
 const typeorm_1 = require("typeorm");
 const setting_dto_1 = require("../../dto/setting.dto");
+const auh_guard_1 = require("../../../auth/auh.guard");
 let SettingGuardScheduleController = class SettingGuardScheduleController {
     settingGeneraleService;
     settingGuardSchedulesRepository;
@@ -78,6 +79,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], SettingGuardScheduleController.prototype, "DeleteSetting", null);
 exports.SettingGuardScheduleController = SettingGuardScheduleController = __decorate([
+    (0, common_1.UseGuards)(auh_guard_1.JwtAuthGuard),
     (0, swagger_1.ApiTags)('Setting Guard Schedule'),
     (0, common_1.Controller)('setting/guard_schedule'),
     __param(1, (0, common_1.Inject)('SETTING_GUARD_SCHEDULE_REPOSITORY')),

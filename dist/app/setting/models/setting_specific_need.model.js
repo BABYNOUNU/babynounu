@@ -16,6 +16,7 @@ let SettingSpecificNeed = class SettingSpecificNeed {
     id;
     slug;
     name;
+    description;
     parent;
 };
 exports.SettingSpecificNeed = SettingSpecificNeed;
@@ -31,6 +32,10 @@ __decorate([
     (0, typeorm_1.Column)('varchar', { length: 255, unique: false, nullable: false }),
     __metadata("design:type", String)
 ], SettingSpecificNeed.prototype, "name", void 0);
+__decorate([
+    (0, typeorm_1.Column)('text', { nullable: true }),
+    __metadata("design:type", String)
+], SettingSpecificNeed.prototype, "description", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => parent_setting_model_1.ParentSettings, (SU) => SU.specific_need, { cascade: true }),
     __metadata("design:type", parent_setting_model_1.ParentSettings)

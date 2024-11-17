@@ -4,6 +4,7 @@ export declare class SettingLanguages {
     id: string;
     slug: string;
     name: string;
+    description: string;
     parent: ParentSettings;
     nounu: NounuSettings;
 }

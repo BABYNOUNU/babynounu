@@ -15,15 +15,24 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("typeorm");
-let UserService = class UserService {
+const general_service_1 = require("../setting/_partiels/general.service");
+let UserService = class UserService extends general_service_1.SettingGeneraleService {
     userRepository;
     constructor(userRepository) {
+        super();
         this.userRepository = userRepository;
     }
-    async user(userWhereUniqueInput) {
-        return this.userRepository.findOne({
-            where: userWhereUniqueInput,
+    async user(slug) {
+        this.Verify_slug(this.userRepository, slug, "User");
+        const IsUserExist = await this.userRepository.findOne({
+            where: { slug },
         });
+        if (!IsUserExist) {
+            throw new common_1.BadRequestException({ message: 'user not exist in database' });
+        }
+        return {
+            ...IsUserExist
+        };
     }
     async users() {
         return this.userRepository.find();

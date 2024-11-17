@@ -18,6 +18,9 @@ export class SettingSpecificSkills {
   @Column('varchar', { length: 255, unique: false, nullable: false })
   name: string;
 
+  @Column('text', { nullable: true })
+  description: string;
+
   @OneToMany(() => ParentSettings, (PS) => PS.specific_skills, { cascade: true})
   parent: ParentSettings
 

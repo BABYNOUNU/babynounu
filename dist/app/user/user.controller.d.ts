@@ -11,7 +11,7 @@ export declare class UserController {
         message: string;
         status: boolean;
     };
-    GetUser(id: string): Promise<import("./user.model").User>;
+    GetUser(slug: string): Promise<import("./user.model").User>;
     CreateUser(userBody: UserBody): Promise<import("./user.model").User>;
     UpdateUser(userBody: UserBody): Promise<import("./user.model").User>;
     DeleteUser(id: string): Promise<{

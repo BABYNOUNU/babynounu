@@ -1,14 +1,19 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { Roles } from './models/role.model';
 import { Repository } from 'typeorm';
 import { RoleBody } from './types/role.type';
+import { SlugUtils } from 'src/utils/slug.utils';
+import { SettingGeneraleService } from '../setting/_partiels/general.service';
+import { RoleDto } from './dto/role.dto';
 
 @Injectable()
-export class RoleService {
+export class RoleService extends SettingGeneraleService {
   constructor(
     @Inject('ROLE_REPOSITORY')
     private readonly roleRepository: Repository<Roles>,
-  ) {}
+  ) {
+    super()
+  }
 
   async role(roleWhereUniqueInput: any): Promise<Roles | null> {
     return this.roleRepository.findOne({
@@ -20,25 +25,80 @@ export class RoleService {
     return this.roleRepository.find();
   }
 
-  async createRole(data: RoleBody): Promise<Roles> {
-    const newRoles = this.roleRepository.create({
-      slug: data.slug,
-      name: data.name,
+  async createRole(createRoleBody: RoleDto): Promise<Roles> {
+    //Verify if role name exist
+    const IsNameExist = await this.roleRepository.findOne({
+      where: { name: createRoleBody.name },
     });
 
-    return await this.roleRepository.save(newRoles);
-  }
+    if (IsNameExist) {
+      throw new BadRequestException({ message: 'Role name already exist' });
+    }
 
-  async updateRole(data: RoleBody): Promise<Roles> {
-    const newRoles = this.roleRepository.create({
-      name: data.name,
+    createRoleBody.slug = await new SlugUtils().all(
+      createRoleBody.name,
+      this.roleRepository,
+    );
+
+    // CREATE NEW ROLE
+    const newRole = this.roleRepository.create({
+      slug: createRoleBody.slug,
+      name: createRoleBody.name,
+      description: createRoleBody.description,
     });
+    const roleSave = await this.roleRepository.save(newRole);
+    if (!roleSave) {
+      throw new BadRequestException({ message: 'Setting not created' });
+    }
 
-    return await this.roleRepository.save(newRoles);
+    // RETURN DATA USER CREATE
+    return {
+      ...roleSave,
+    };
   }
 
-  async deleteRole(where: any) {
-    this.roleRepository.delete({ id: where });
-    return { message: 'Roles deleted' };
+  async updateRole(updateRoleBody: RoleDto, {slug}): Promise<Roles> {
+    //Verify if setting slug exist
+    await this.Verify_slug(this.roleRepository, { slug });
+
+    // UPDATE SETTING
+    const updateRole = await this.roleRepository.update(
+      { slug },
+      {
+        name: updateRoleBody.name,
+        description: updateRoleBody.description,
+      },
+    );
+
+    if (!updateRole.affected) {
+      throw new BadRequestException({ message: 'Setting not updated' });
+    }
+
+    // RETURN DATA SETTING UPDATE
+    return {
+        ...(await this.roleRepository.findOne({ where: { slug: slug } })),
+    };
+  }
+
+  // Delete Setting
+  async deleteRole({slug}) {
+    //Verify if setting slug exist
+    await this.Verify_slug(this.roleRepository, { slug });
+
+    // DELETE SETTING
+    const deleteRole = await this.roleRepository.delete({ slug });
+
+    if (!deleteRole.affected) {
+      throw new BadRequestException({ message: 'Role not deleted' });
+    }
+
+    // RETURN DATA SETTING UPDATE
+    return {
+      setting: {
+        slug,
+        message: 'Role deleted',
+      },
+    };
+  
   }
 }

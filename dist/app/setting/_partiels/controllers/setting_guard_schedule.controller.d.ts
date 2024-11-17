@@ -6,20 +6,13 @@ export declare class SettingGuardScheduleController {
     private readonly settingGeneraleService;
     private readonly settingGuardSchedulesRepository;
     constructor(settingGeneraleService: SettingGeneraleService, settingGuardSchedulesRepository: Repository<SettingGuardSchedules>);
-    GetSettings(): Promise<SettingGuardSchedules[]>;
+    GetSettings(): Promise<any[]>;
     GetSetting(slug: string): Promise<any[]>;
     CreateSetting(settingGuardScheduleBody: SettingDto): Promise<{
         setting: any;
     }>;
     UpdateSetting(settingGuardScheduleBody: SettingDto, slug: string): Promise<{
-        setting: {
-            id: string;
-            slug: string;
-            name: string;
-            description: string;
-            parent: import("../../../parent/models/parent_setting.model").ParentSettings;
-            nounu: import("../../../nounu/models/nounu_setting.model").NounuSettings;
-        };
+        setting: any;
     }>;
     DeleteSetting(slug: string): Promise<{
         setting: {

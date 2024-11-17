@@ -5,7 +5,7 @@ import { SettingGuardSchedules } from '../../setting/models/setting_guard_schedu
 import { SettingSpecificNeed } from '../../setting/models/setting_specific_need.model';
 import { SettingSpecificSkills } from '../../setting/models/setting_specific_skill.model';
 import { SettingLanguages } from '../../setting/models/setting_language.model';
-import { settingLocalization } from '../../setting/models/setting_localization.model';
+import { SettingLocalization } from '../../setting/models/setting_localization.model';
 
 @Entity()
 export class ParentSettings {
@@ -40,15 +40,15 @@ export class ParentSettings {
   })
   language: SettingLanguages;
 
-  @ManyToOne(() => settingLocalization, (SN) => SN.parent, {
+  @ManyToOne(() => SettingLocalization, (SN) => SN.parent, {
     onDelete: 'CASCADE',
   })
-  localization: settingLocalization;
+  localization: SettingLocalization;
 
-  @ManyToOne(() => settingLocalization, (SN) => SN.parent, {
+  @ManyToOne(() => SettingLocalization, (SN) => SN.parent, {
     onDelete: 'CASCADE',
   })
-  work_area: settingLocalization[];
+  work_area: SettingLocalization[];
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

@@ -28,10 +28,8 @@ let UserController = class UserController {
     LoggedUser() {
         return this.userService.loggedUser();
     }
-    GetUser(id) {
-        return this.userService.user({
-            id: Number(id),
-        });
+    GetUser(slug) {
+        return this.userService.user(slug);
     }
     CreateUser(userBody) {
         return this.userService.createUser(userBody);
@@ -62,8 +60,8 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "LoggedUser", null);
 __decorate([
-    (0, common_1.Get)('/:id'),
-    __param(0, (0, common_1.Param)('id')),
+    (0, common_1.Get)('/:slug'),
+    __param(0, (0, common_1.Param)('slug')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)

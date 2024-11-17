@@ -16,6 +16,7 @@ let settingSubscriptionTypes = class settingSubscriptionTypes {
     id;
     slug;
     name;
+    description;
     abonnement;
 };
 exports.settingSubscriptionTypes = settingSubscriptionTypes;
@@ -31,6 +32,10 @@ __decorate([
     (0, typeorm_1.Column)('varchar', { length: 255, unique: false, nullable: false }),
     __metadata("design:type", String)
 ], settingSubscriptionTypes.prototype, "name", void 0);
+__decorate([
+    (0, typeorm_1.Column)('text', { nullable: true }),
+    __metadata("design:type", String)
+], settingSubscriptionTypes.prototype, "description", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => abonnement_model_1.Abonnements, (SU) => SU.type, { cascade: true }),
     __metadata("design:type", abonnement_model_1.Abonnements)

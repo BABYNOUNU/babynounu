@@ -1,12 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsString } from 'class-validator';
+import { Allow, IsEmail, IsString } from 'class-validator';
 
 export class RoleDto {
-  @ApiProperty({
-    example: 'admin-50254',
-    required: true,
-  })
-  @IsString()
+  
+  @Allow()
   slug: string;
 
   @ApiProperty({
@@ -14,6 +11,12 @@ export class RoleDto {
     required: true,
   })
   @IsString()
-  @IsEmail()
   name: string;
+
+  @ApiProperty({
+    example: "C'est le role Adminstrateur",
+    required: true,
+  })
+  @IsString()
+  description: string;
 }

@@ -10,21 +10,25 @@ import { SlugUtils } from 'src/utils/slug.utils';
 export class SettingGeneraleService {
   constructor() {}
 
-  private async Verify_slug(
+  protected async Verify_slug(
     Repository: Repository<any>,
     { slug }: { slug: string },
+    type?:string
   ) {
+
+    type = !type ? "Setting" : type
+
     //Verify if setting slug exist
     const IsSlugExist = await Repository.findOne({
       where: { slug },
     });
 
     if (!IsSlugExist) {
-      throw new BadRequestException({ message: 'Setting slug not exist' });
+      throw new BadRequestException({ message: type + ' slug not exist' });
     }
   }
 
-  async settings(Repository: Repository<SettingGuardSchedules>) {
+  async settings(Repository: Repository<any>) {
     return await Repository.find();
   }
 
@@ -72,7 +76,7 @@ export class SettingGeneraleService {
 
   // Update Setting
   async updateSetting(
-    Repository: Repository<SettingGuardSchedules>,
+    Repository: Repository<any>,
     { updateSettingBody }: { updateSettingBody: SettingDto },
     { slug }: { slug: string },
   ) {
@@ -102,7 +106,7 @@ export class SettingGeneraleService {
 
   // Delete Setting
   async deleteSetting(
-    Repository: Repository<SettingGuardSchedules>,
+    Repository: Repository<any>,
     { slug }: { slug: string },
   ) {
     //Verify if setting slug exist

@@ -3,5 +3,5 @@ export declare class SginUpAuthDto {
     slug: string;
     email: string;
     password: string;
-    role: string | number;
+    role: number;
 }

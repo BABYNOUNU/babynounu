@@ -14,6 +14,9 @@ export class SettingServiceTypes {
   @Column('varchar', { length: 255, unique: false, nullable: false })
   name: string;
 
+  @Column('text', { nullable: true })
+  description: string;
+
   @OneToMany(() => ParentSettings, (SU) => SU.guard_schedule, { cascade: true})
   parent: ParentSettings
 }

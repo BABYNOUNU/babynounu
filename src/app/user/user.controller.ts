@@ -40,11 +40,9 @@ export class UserController {
   }
 
   // Get Single User
-  @Get('/:id')
-  GetUser(@Param('id') id: string) {
-    return this.userService.user({
-      id: Number(id),
-    });
+  @Get('/:slug')
+  GetUser(@Param('slug') slug: string) {
+    return this.userService.user(slug);
   }
 
   // Create New User

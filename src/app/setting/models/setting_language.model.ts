@@ -16,6 +16,9 @@ export class SettingLanguages {
   @Column('varchar', { length: 255, unique: false, nullable: false })
   name: string;
 
+  @Column('text', { nullable: true })
+  description: string;
+
   @OneToMany(() => ParentSettings, (SU) => SU.language, { cascade: true})
   parent: ParentSettings
 

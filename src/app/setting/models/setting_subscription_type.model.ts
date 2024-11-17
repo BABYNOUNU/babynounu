@@ -16,6 +16,9 @@ export class settingSubscriptionTypes {
   @Column('varchar', { length: 255, unique: false, nullable: false })
   name: string;
 
+  @Column('text', { nullable: true })
+  description: string;
+
   @OneToMany(() => Abonnements, (SU) => SU.type, { cascade: true})
   abonnement: Abonnements
 

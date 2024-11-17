@@ -3,6 +3,8 @@ import {
   Allow,
   IS_LENGTH,
   IsEmail,
+  IsNotEmpty,
+  IsNumber,
   IsString,
   MinLength,
 } from 'class-validator';
@@ -44,6 +46,7 @@ export class SginUpAuthDto {
     example: '1',
     required: true
   })
-  @IsString({ message: 'Ce champs est requis' })
-  role: string | number;
+  @IsNotEmpty({ message: 'Ce champ est requis' })
+  @IsNumber({}, { message: 'Ce champ doit être un nombre' })
+  role: number;
 }

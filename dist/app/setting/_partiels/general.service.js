@@ -14,12 +14,13 @@ const common_1 = require("@nestjs/common");
 const slug_utils_1 = require("../../../utils/slug.utils");
 let SettingGeneraleService = class SettingGeneraleService {
     constructor() { }
-    async Verify_slug(Repository, { slug }) {
+    async Verify_slug(Repository, { slug }, type) {
+        type = !type ? "Setting" : type;
         const IsSlugExist = await Repository.findOne({
             where: { slug },
         });
         if (!IsSlugExist) {
-            throw new common_1.BadRequestException({ message: 'Setting slug not exist' });
+            throw new common_1.BadRequestException({ message: type + ' slug not exist' });
         }
     }
     async settings(Repository) {

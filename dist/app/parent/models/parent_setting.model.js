@@ -72,13 +72,13 @@ __decorate([
     __metadata("design:type", setting_language_model_1.SettingLanguages)
 ], ParentSettings.prototype, "language", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => setting_localization_model_1.settingLocalization, (SN) => SN.parent, {
+    (0, typeorm_1.ManyToOne)(() => setting_localization_model_1.SettingLocalization, (SN) => SN.parent, {
         onDelete: 'CASCADE',
     }),
-    __metadata("design:type", setting_localization_model_1.settingLocalization)
+    __metadata("design:type", setting_localization_model_1.SettingLocalization)
 ], ParentSettings.prototype, "localization", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => setting_localization_model_1.settingLocalization, (SN) => SN.parent, {
+    (0, typeorm_1.ManyToOne)(() => setting_localization_model_1.SettingLocalization, (SN) => SN.parent, {
         onDelete: 'CASCADE',
     }),
     __metadata("design:type", Array)

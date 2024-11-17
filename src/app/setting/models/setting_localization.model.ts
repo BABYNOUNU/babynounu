@@ -4,7 +4,7 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 
 @Entity()
-export class settingLocalization {
+export class SettingLocalization {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -13,6 +13,9 @@ export class settingLocalization {
 
   @Column('varchar', { length: 255, unique: false, nullable: false })
   name: string;
+
+  @Column('text', { nullable: true })
+  description: string;
 
   @OneToMany(() => ParentSettings, (SU) => SU.localization, { cascade: true })
   parent: ParentSettings;

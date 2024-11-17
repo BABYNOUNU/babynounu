@@ -7,13 +7,18 @@ import {
     Param,
     Patch,
     Post,
+    UseGuards,
   } from '@nestjs/common';
-  import { ApiTags } from '@nestjs/swagger';
+  import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
   import { SettingGeneraleService } from '../general.service';
   import { Repository } from 'typeorm';
   import { SettingDto } from '../../dto/setting.dto';
 import { SettingAgeOfChildren } from '../../models/setting_age_of_children.model';
+import { JwtAuthGuard } from 'src/app/auth/auh.guard';
   
+
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
   @ApiTags('Setting Age Of Children')
   @Controller('setting/age_of_children')
   export class SettingAgeOfChildrenController {

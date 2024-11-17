@@ -1,10 +1,11 @@
 import { Repository } from 'typeorm';
-import { SettingGuardSchedules } from '../models/setting_guard_schedule.model';
 import { SettingDto } from '../dto/setting.dto';
 export declare class SettingGeneraleService {
     constructor();
-    private Verify_slug;
-    settings(Repository: Repository<SettingGuardSchedules>): Promise<SettingGuardSchedules[]>;
+    protected Verify_slug(Repository: Repository<any>, { slug }: {
+        slug: string;
+    }, type?: string): Promise<void>;
+    settings(Repository: Repository<any>): Promise<any[]>;
     setting(Repository: Repository<any>, { slug }: {
         slug: string;
     }): Promise<any[]>;
@@ -13,21 +14,14 @@ export declare class SettingGeneraleService {
     }): Promise<{
         setting: any;
     }>;
-    updateSetting(Repository: Repository<SettingGuardSchedules>, { updateSettingBody }: {
+    updateSetting(Repository: Repository<any>, { updateSettingBody }: {
         updateSettingBody: SettingDto;
     }, { slug }: {
         slug: string;
     }): Promise<{
-        setting: {
-            id: string;
-            slug: string;
-            name: string;
-            description: string;
-            parent: import("../../parent/models/parent_setting.model").ParentSettings;
-            nounu: import("../../nounu/models/nounu_setting.model").NounuSettings;
-        };
+        setting: any;
     }>;
-    deleteSetting(Repository: Repository<SettingGuardSchedules>, { slug }: {
+    deleteSetting(Repository: Repository<any>, { slug }: {
         slug: string;
     }): Promise<{
         setting: {

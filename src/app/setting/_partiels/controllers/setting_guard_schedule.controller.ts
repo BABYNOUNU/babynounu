@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { SettingGuardSchedules } from '../../models/setting_guard_schedule.model';
@@ -14,6 +15,9 @@ import { SettingGeneraleService } from '../general.service';
 import { Repository } from 'typeorm';
 import { SettingDto } from '../../dto/setting.dto';
 
+import { JwtAuthGuard } from 'src/app/auth/auh.guard';
+
+@UseGuards(JwtAuthGuard)
 @ApiTags('Setting Guard Schedule')
 @Controller('setting/guard_schedule')
 export class SettingGuardScheduleController {

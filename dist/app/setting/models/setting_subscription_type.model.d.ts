@@ -3,5 +3,6 @@ export declare class settingSubscriptionTypes {
     id: string;
     slug: string;
     name: string;
+    description: string;
     abonnement: Abonnements;
 }

@@ -9,10 +9,10 @@ export class SettingDto {
   @IsString()
   name: string;
 
-  @ApiProperty({
-    example: 'setting-slug-0254',
-    required: true,
-  })
+  // @ApiProperty({
+  //   example: 'setting-slug-0254',
+  //   required: true,
+  // })
   @Allow()
   slug: string;
 

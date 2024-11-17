@@ -55,13 +55,13 @@ __decorate([
     __metadata("design:type", setting_guard_schedule_model_1.SettingGuardSchedules)
 ], NounuSettings.prototype, "guard_schedule", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => setting_localization_model_1.settingLocalization, (SN) => SN.nounu, {
+    (0, typeorm_1.ManyToOne)(() => setting_localization_model_1.SettingLocalization, (SN) => SN.nounu, {
         onDelete: 'CASCADE',
     }),
-    __metadata("design:type", setting_localization_model_1.settingLocalization)
+    __metadata("design:type", setting_localization_model_1.SettingLocalization)
 ], NounuSettings.prototype, "localization", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => setting_certification_model_1.settingCertifications, (SN) => SN.nounu, {
+    (0, typeorm_1.ManyToOne)(() => setting_certification_model_1.SettingCertifications, (SC) => SC.nounu, {
         onDelete: 'CASCADE',
     }),
     __metadata("design:type", Array)

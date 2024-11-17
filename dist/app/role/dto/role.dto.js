@@ -15,14 +15,11 @@ const class_validator_1 = require("class-validator");
 class RoleDto {
     slug;
     name;
+    description;
 }
 exports.RoleDto = RoleDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({
-        example: 'admin-50254',
-        required: true,
-    }),
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.Allow)(),
     __metadata("design:type", String)
 ], RoleDto.prototype, "slug", void 0);
 __decorate([
@@ -31,6 +28,13 @@ __decorate([
         required: true,
     }),
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsEmail)(),
     __metadata("design:type", String)
 ], RoleDto.prototype, "name", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: "C'est le role Adminstrateur",
+        required: true,
+    }),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], RoleDto.prototype, "description", void 0);

@@ -9,26 +9,31 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.settingChildrenAgeGroup = void 0;
+exports.SettingChildrenAgeGroup = void 0;
 const typeorm_1 = require("typeorm");
-let settingChildrenAgeGroup = class settingChildrenAgeGroup {
+let SettingChildrenAgeGroup = class SettingChildrenAgeGroup {
     id;
     slug;
+    description;
     name;
 };
-exports.settingChildrenAgeGroup = settingChildrenAgeGroup;
+exports.SettingChildrenAgeGroup = SettingChildrenAgeGroup;
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)('uuid'),
     __metadata("design:type", String)
-], settingChildrenAgeGroup.prototype, "id", void 0);
+], SettingChildrenAgeGroup.prototype, "id", void 0);
 __decorate([
     (0, typeorm_1.Column)('varchar', { length: 255, unique: true, nullable: true }),
     __metadata("design:type", String)
-], settingChildrenAgeGroup.prototype, "slug", void 0);
+], SettingChildrenAgeGroup.prototype, "slug", void 0);
+__decorate([
+    (0, typeorm_1.Column)('text', { nullable: true }),
+    __metadata("design:type", String)
+], SettingChildrenAgeGroup.prototype, "description", void 0);
 __decorate([
     (0, typeorm_1.Column)('varchar', { length: 255, unique: false, nullable: false }),
     __metadata("design:type", String)
-], settingChildrenAgeGroup.prototype, "name", void 0);
-exports.settingChildrenAgeGroup = settingChildrenAgeGroup = __decorate([
+], SettingChildrenAgeGroup.prototype, "name", void 0);
+exports.SettingChildrenAgeGroup = SettingChildrenAgeGroup = __decorate([
     (0, typeorm_1.Entity)()
-], settingChildrenAgeGroup);
+], SettingChildrenAgeGroup);

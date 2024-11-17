@@ -16,6 +16,7 @@ exports.RoleController = void 0;
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const role_service_1 = require("./role.service");
+const role_dto_1 = require("./dto/role.dto");
 let RoleController = class RoleController {
     roleService;
     constructor(roleService) {
@@ -24,19 +25,19 @@ let RoleController = class RoleController {
     GetRoles() {
         return this.roleService.roles();
     }
-    GetRole(id) {
+    GetRole(slug) {
         return this.roleService.role({
-            id: Number(id),
+            slug: Number(slug),
         });
     }
     CreateRole(roleBody) {
         return this.roleService.createRole(roleBody);
     }
-    UpdateRole(roleBody) {
-        return this.roleService.updateRole(roleBody);
+    UpdateRole(roleBody, slug) {
+        return this.roleService.updateRole(roleBody, { slug });
     }
-    DeleteRole(id) {
-        return this.roleService.deleteRole(id);
+    DeleteRole(slug) {
+        return this.roleService.deleteRole({ slug });
     }
 };
 exports.RoleController = RoleController;
@@ -51,29 +52,56 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], RoleController.prototype, "GetRoles", null);
 __decorate([
-    (0, common_1.Get)('/:id'),
-    __param(0, (0, common_1.Param)('id')),
+    (0, common_1.Get)('/:slug'),
+    __param(0, (0, common_1.Param)('slug')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], RoleController.prototype, "GetRole", null);
 __decorate([
     (0, common_1.Post)('/create'),
+    (0, swagger_1.ApiResponse)({
+        status: 201,
+        description: 'The record has been successfully created.',
+    }),
+    (0, swagger_1.ApiBody)({
+        type: role_dto_1.RoleDto,
+        description: 'Json structure for register object',
+    }),
+    (0, common_1.UsePipes)(new common_1.ValidationPipe({
+        transform: true,
+        whitelist: true,
+        forbidNonWhitelisted: true
+    })),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [role_dto_1.RoleDto]),
     __metadata("design:returntype", void 0)
 ], RoleController.prototype, "CreateRole", null);
 __decorate([
-    (0, common_1.Patch)('/update/:id'),
+    (0, common_1.Patch)('/update/:slug'),
+    (0, swagger_1.ApiResponse)({
+        status: 201,
+        description: 'The record has been successfully created.',
+    }),
+    (0, swagger_1.ApiBody)({
+        type: role_dto_1.RoleDto,
+        description: 'Json structure for register object',
+    }),
+    (0, common_1.UsePipes)(new common_1.ValidationPipe({
+        transform: true,
+        whitelist: true,
+        forbidNonWhitelisted: true
+    })),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Param)('slug')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [role_dto_1.RoleDto, String]),
     __metadata("design:returntype", void 0)
 ], RoleController.prototype, "UpdateRole", null);
 __decorate([
-    (0, common_1.Delete)('/delete/:id'),
-    __param(0, (0, common_1.Param)('id')),
+    (0, common_1.Delete)('/delete/:slug'),
+    __param(0, (0, common_1.Param)('slug')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)

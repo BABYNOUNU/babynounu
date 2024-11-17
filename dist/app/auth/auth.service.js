@@ -35,7 +35,7 @@ let AuthService = class AuthService {
         if (user) {
             throw new common_1.BadRequestException('User already exists');
         }
-        const isRole = await this.roleRepository.findOne({ where: { id: signUpBody.role?.toLocaleString() } });
+        const isRole = await this.roleRepository.findOne({ where: { id: signUpBody.role } });
         if (!isRole) {
             throw new common_1.BadRequestException('The role enter not exists');
         }

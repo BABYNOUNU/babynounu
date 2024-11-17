@@ -1,17 +1,32 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { User } from './user.model';
+import { SettingGeneraleService } from '../setting/_partiels/general.service';
 
 @Injectable()
-export class UserService {
+export class UserService extends SettingGeneraleService {
   constructor(
     @Inject('USER_REPOSITORY') private userRepository: Repository<User>,
-  ) {}
+  ) {
+    super()
+  }
 
-  async user(userWhereUniqueInput: any): Promise<User | null> {
-    return this.userRepository.findOne({
-      where: userWhereUniqueInput,
+  async user(slug: any): Promise<User | null> {
+
+    // Verify Slug
+    this.Verify_slug(this.userRepository, slug, "User")
+
+    const IsUserExist = await this.userRepository.findOne({
+      where: {slug},
     });
+
+    if(!IsUserExist){
+      throw new BadRequestException({ message: 'user not exist in database' });
+    }
+
+    return {
+      ...IsUserExist
+    }
   }
 
   async users(): Promise<User[]> {

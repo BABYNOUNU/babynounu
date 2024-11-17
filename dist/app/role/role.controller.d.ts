@@ -1,13 +1,16 @@
 import { RoleService } from './role.service';
-import { RoleBody } from './types/role.type';
+import { RoleDto } from './dto/role.dto';
 export declare class RoleController {
     private readonly roleService;
     constructor(roleService: RoleService);
     GetRoles(): Promise<import("./models/role.model").Roles[]>;
-    GetRole(id: string): Promise<import("./models/role.model").Roles>;
-    CreateRole(roleBody: RoleBody): Promise<import("./models/role.model").Roles>;
-    UpdateRole(roleBody: RoleBody): Promise<import("./models/role.model").Roles>;
-    DeleteRole(id: string): Promise<{
-        message: string;
+    GetRole(slug: string): Promise<import("./models/role.model").Roles>;
+    CreateRole(roleBody: RoleDto): Promise<import("./models/role.model").Roles>;
+    UpdateRole(roleBody: RoleDto, slug: string): Promise<import("./models/role.model").Roles>;
+    DeleteRole(slug: string): Promise<{
+        setting: {
+            slug: any;
+            message: string;
+        };
     }>;
 }

@@ -13,7 +13,7 @@ import { SettingGuardSchedules } from './setting_guard_schedule.model';
 import { SettingSpecificNeed } from './setting_specific_need.model';
 import { SettingSpecificSkills } from './setting_specific_skill.model';
 import { SettingLanguages } from './setting_language.model';
-import { settingLocalization } from './setting_localization.model';
+import { SettingLocalization } from './setting_localization.model';
 
 @Entity()
 export class Settings {
