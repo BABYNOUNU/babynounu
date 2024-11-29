@@ -11,12 +11,20 @@ const common_1 = require("@nestjs/common");
 const nounu_controller_1 = require("./nounu.controller");
 const nounu_service_1 = require("./nounu.service");
 const nounu_1 = require("./nounu");
+const database_module_1 = require("../../database/database.module");
+const platform_express_1 = require("@nestjs/platform-express");
 let NounuModule = class NounuModule {
 };
 exports.NounuModule = NounuModule;
 exports.NounuModule = NounuModule = __decorate([
     (0, common_1.Module)({
+        imports: [
+            database_module_1.DatabaseModule,
+            platform_express_1.MulterModule.register({
+                dest: './uploads',
+            }),
+        ],
         controllers: [nounu_controller_1.NounuController],
-        providers: [nounu_service_1.NounuService, nounu_1.Nounu]
+        providers: [nounu_service_1.NounuService, ...nounu_1.NounuProviders],
     })
 ], NounuModule);

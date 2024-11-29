@@ -18,7 +18,6 @@ export class SettingCertifications {
   @Column('text', { nullable: true })
   description: string;
 
-  @OneToMany(() => NounuSettings, (SU) => SU.certification, { cascade: true})
-  nounu: NounuSettings
+  
 
 }

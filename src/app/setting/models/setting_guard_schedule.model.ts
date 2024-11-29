@@ -22,6 +22,5 @@ export class SettingGuardSchedules {
   @OneToMany(() => ParentSettings, (SU) => SU.guard_schedule, { cascade: true})
   parent: ParentSettings
 
-  @OneToMany(() => NounuSettings, (NS) => NS.guard_schedule, { cascade: true})
-  nounu: NounuSettings
+ 
 }

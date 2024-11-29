@@ -23,7 +23,7 @@ export class AuthService {
   async signUp({ signUpBody }: { signUpBody: SginUpAuthDto }) {
     // SET SLUG
     signUpBody.slug = await new SlugUtils().slug(
-      signUpBody.fullname,
+      signUpBody.email,
       this.userRepository,
     );
 

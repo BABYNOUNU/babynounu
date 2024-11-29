@@ -24,9 +24,6 @@ export class SettingSpecificSkills {
   @OneToMany(() => ParentSettings, (PS) => PS.specific_skills, { cascade: true})
   parent: ParentSettings
 
-  @OneToMany(() => NounuSettings, (NS) => NS.specific_skills, { cascade: true})
-  nounu: NounuSettings
-
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 

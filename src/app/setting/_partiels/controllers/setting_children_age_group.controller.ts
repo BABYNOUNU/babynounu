@@ -9,7 +9,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { SettingGeneraleService } from '../general.service';
 import { Repository } from 'typeorm';
 import { SettingDto } from '../../dto/setting.dto';
@@ -17,7 +17,7 @@ import { SettingChildrenAgeGroup } from '../../models/setting_children_age_group
 
 import { JwtAuthGuard } from 'src/app/auth/auh.guard';
 
-@UseGuards(JwtAuthGuard)
+
 @ApiTags('Setting Children Age Group')
 @Controller('setting/children_age_group')
 export class SettingChildrenAgeGroupController {
@@ -44,6 +44,8 @@ export class SettingChildrenAgeGroupController {
   }
 
   // Create new Children Age Group
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Post('create')
   CreateSetting(@Body() settingGuardScheduleBody: SettingDto) {
     return this.settingGeneraleService.createSetting(
@@ -53,6 +55,8 @@ export class SettingChildrenAgeGroupController {
   }
 
   // Update Children Age Group existing
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Patch('update/:slug')
   UpdateSetting(
     @Body() settingGuardScheduleBody: SettingDto,
@@ -66,6 +70,8 @@ export class SettingChildrenAgeGroupController {
   }
 
   // Delete Children Age Group existing
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Delete('/delete/:slug')
   DeleteSetting(@Param('slug') slug: string) {
     return this.settingGeneraleService.deleteSetting(

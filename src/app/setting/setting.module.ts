@@ -13,6 +13,10 @@ import { SettingLanguageController } from './_partiels/controllers/setting_langu
 import { SettingSpecificNeedController } from './_partiels/controllers/setting_specific_need.controller';
 import { SettingLocalizationController } from './_partiels/controllers/setting_localization.controller';
 import { SettingSpecificSkillController } from './_partiels/controllers/setting_specific_skill.controller';
+import { SettingHousekeeperController } from './_partiels/controllers/setting_housekeeper.controller';
+import { SettingDesiredTimeController } from './_partiels/controllers/setting_desired_time.controller';
+import { SettingServiceFrequencyController } from './_partiels/controllers/setting_service_frequency.controller';
+import { SettingPaymentTermsController } from './_partiels/controllers/setting_payment_terms.controller';
 
 @Module({
   imports: [DatabaseModule],
@@ -26,7 +30,12 @@ import { SettingSpecificSkillController } from './_partiels/controllers/setting_
     SettingLanguageController,
     SettingSpecificNeedController,
     SettingLocalizationController,
-    SettingSpecificSkillController
+    SettingSpecificSkillController,
+    SettingHousekeeperController,
+    SettingDesiredTimeController,
+    SettingServiceTypeController,
+    SettingServiceFrequencyController,
+    SettingPaymentTermsController
   ],
   providers: [SettingService, ...SettingProviders, SettingGeneraleService],
 })

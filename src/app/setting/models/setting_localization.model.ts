@@ -20,6 +20,5 @@ export class SettingLocalization {
   @OneToMany(() => ParentSettings, (SU) => SU.localization, { cascade: true })
   parent: ParentSettings;
 
-  @OneToMany(() => NounuSettings, (NS) => NS.localization, { cascade: true})
-  nounu: NounuSettings
+  
 }

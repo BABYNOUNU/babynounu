@@ -21,7 +21,6 @@ export class SettingAgeOfChildren {
   @OneToMany(() => ParentSettings, (SU) => SU.age_of_children, { cascade: true})
   parent: ParentSettings
 
-  @OneToMany(() => NounuSettings, (NS) => NS.certification, { cascade: true})
-  nounu: NounuSettings
+  
 
 }

@@ -57,6 +57,8 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], SettingAgeOfChildrenController.prototype, "GetSetting", null);
 __decorate([
+    (0, common_1.UseGuards)(auh_guard_1.JwtAuthGuard),
+    (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.Post)('create'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -64,6 +66,8 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], SettingAgeOfChildrenController.prototype, "CreateSetting", null);
 __decorate([
+    (0, common_1.UseGuards)(auh_guard_1.JwtAuthGuard),
+    (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.Patch)('update/:slug'),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Param)('slug')),
@@ -72,6 +76,8 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], SettingAgeOfChildrenController.prototype, "UpdateSetting", null);
 __decorate([
+    (0, common_1.UseGuards)(auh_guard_1.JwtAuthGuard),
+    (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.Delete)('/delete/:slug'),
     __param(0, (0, common_1.Param)('slug')),
     __metadata("design:type", Function),
@@ -79,8 +85,6 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], SettingAgeOfChildrenController.prototype, "DeleteSetting", null);
 exports.SettingAgeOfChildrenController = SettingAgeOfChildrenController = __decorate([
-    (0, common_1.UseGuards)(auh_guard_1.JwtAuthGuard),
-    (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiTags)('Setting Age Of Children'),
     (0, common_1.Controller)('setting/age_of_children'),
     __param(1, (0, common_1.Inject)('SETTING_AGE_OF_CHILDREN_REPOSITORY')),

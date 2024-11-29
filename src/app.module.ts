@@ -13,6 +13,8 @@ import { NotificationModule } from './app/notification/notification.module';
 import { MediaModule } from './app/media/media.module';
 import { RoleModule } from './app/role/role.module';
 import { AbonnementModule } from './app/abonnement/abonnement.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 
 
@@ -21,6 +23,10 @@ import { AbonnementModule } from './app/abonnement/abonnement.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'), // Dossier accessible publiquement
+      serveRoot: '/uploads', // URL publique (http://localhost:3000/uploads)
+    }), 
     UserModule,
     AuthModule,
     ParentModule,

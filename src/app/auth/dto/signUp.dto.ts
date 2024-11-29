@@ -10,15 +10,7 @@ import {
 } from 'class-validator';
 
 export class SginUpAuthDto {
-  @ApiProperty({
-    example: 'Bill Pather',
-    required: true,
-  })
-  @IsString({ message: 'Ce champs est requis' })
-  @MinLength(3, {
-    message: 'le nom doit  être compris entre 3 et 10 caractéres',
-  })
-  fullname: string;
+
 
   @ApiProperty({
     example: 'bill-pather-9520',

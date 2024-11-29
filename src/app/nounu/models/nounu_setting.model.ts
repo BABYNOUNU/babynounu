@@ -14,32 +14,31 @@ export class NounuSettings {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  
-  @OneToMany(() => Nounus, (nounu) => nounu.setting, { onDelete: 'CASCADE' })
-  nounu: Nounus;
+  // @OneToMany(() => Nounus, (nounu) => nounu.setting, { onDelete: 'CASCADE' })
+  // nounu: Nounus;
 
-  @ManyToOne(() => SettingAgeOfChildren, (AOC) => AOC.nounu, {
-    onDelete: 'CASCADE',
-  })
-  specific_skills: SettingSpecificSkills;
+  // @ManyToOne(() => SettingLanguages, (SN) => SN.nounu, {
+  //   onDelete: 'CASCADE',
+  // })
+  // language: SettingLanguages;
 
-  @ManyToOne(() => SettingLanguages, (SN) => SN.nounu, {
-    onDelete: 'CASCADE',
-  })
-  language: SettingLanguages;
+  // @ManyToOne(() => SettingAgeOfChildren, (AOC) => AOC.nounu, {
+  //   onDelete: 'CASCADE',
+  // })
+  // specific_skills: SettingSpecificSkills;
 
-  @ManyToOne(() => SettingGuardSchedules, (AOC) => AOC.nounu, {
-    onDelete: 'CASCADE',
-  })
-  guard_schedule: SettingGuardSchedules;
+  // @ManyToOne(() => SettingGuardSchedules, (AOC) => AOC.nounu, {
+  //   onDelete: 'CASCADE',
+  // })
+  // guard_schedule: SettingGuardSchedules[];
 
-  @ManyToOne(() => SettingLocalization, (SN) => SN.nounu, {
-    onDelete: 'CASCADE',
-  })
-  localization: SettingLocalization;
+  // @ManyToOne(() => SettingLocalization, (SN) => SN.nounu, {
+  //   onDelete: 'CASCADE',
+  // })
+  // localization: SettingLocalization[];
 
-  @ManyToOne(() => SettingCertifications, (SC) => SC.nounu , {
-    onDelete: 'CASCADE',
-  })
-  certification: SettingCertifications[];
+  // @ManyToOne(() => SettingCertifications, (SC) => SC.nounu, {
+  //   onDelete: 'CASCADE',
+  // })
+  // certification?: SettingCertifications[];
 }

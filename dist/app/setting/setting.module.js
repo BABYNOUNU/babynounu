@@ -22,6 +22,10 @@ const setting_language_controller_1 = require("./_partiels/controllers/setting_l
 const setting_specific_need_controller_1 = require("./_partiels/controllers/setting_specific_need.controller");
 const setting_localization_controller_1 = require("./_partiels/controllers/setting_localization.controller");
 const setting_specific_skill_controller_1 = require("./_partiels/controllers/setting_specific_skill.controller");
+const setting_housekeeper_controller_1 = require("./_partiels/controllers/setting_housekeeper.controller");
+const setting_desired_time_controller_1 = require("./_partiels/controllers/setting_desired_time.controller");
+const setting_service_frequency_controller_1 = require("./_partiels/controllers/setting_service_frequency.controller");
+const setting_payment_terms_controller_1 = require("./_partiels/controllers/setting_payment_terms.controller");
 let SettingModule = class SettingModule {
 };
 exports.SettingModule = SettingModule;
@@ -38,7 +42,12 @@ exports.SettingModule = SettingModule = __decorate([
             setting_language_controller_1.SettingLanguageController,
             setting_specific_need_controller_1.SettingSpecificNeedController,
             setting_localization_controller_1.SettingLocalizationController,
-            setting_specific_skill_controller_1.SettingSpecificSkillController
+            setting_specific_skill_controller_1.SettingSpecificSkillController,
+            setting_housekeeper_controller_1.SettingHousekeeperController,
+            setting_desired_time_controller_1.SettingDesiredTimeController,
+            setting_service_type_controller_1.SettingServiceTypeController,
+            setting_service_frequency_controller_1.SettingServiceFrequencyController,
+            setting_payment_terms_controller_1.SettingPaymentTermsController
         ],
         providers: [setting_service_1.SettingService, ...setting_1.SettingProviders, general_service_1.SettingGeneraleService],
     })

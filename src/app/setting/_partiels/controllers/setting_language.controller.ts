@@ -9,7 +9,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { SettingGeneraleService } from '../general.service';
 import { Repository } from 'typeorm';
 import { SettingDto } from '../../dto/setting.dto';
@@ -17,7 +17,6 @@ import { SettingLanguages } from '../../models/setting_language.model';
 
 import { JwtAuthGuard } from 'src/app/auth/auh.guard';
 
-@UseGuards(JwtAuthGuard)
 @ApiTags('Setting Language')
 @Controller('setting/language')
 export class SettingLanguageController {
@@ -41,6 +40,8 @@ export class SettingLanguageController {
   }
 
   // Create new Language
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Post('create')
   CreateSetting(@Body() settingLanguageBody: SettingDto) {
     return this.settingGeneraleService.createSetting(
@@ -50,6 +51,8 @@ export class SettingLanguageController {
   }
 
   // Update Language existing
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Patch('update/:slug')
   UpdateSetting(
     @Body() settingLanguageBody: SettingDto,
@@ -63,6 +66,8 @@ export class SettingLanguageController {
   }
 
   // Delete Language existing
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Delete('/delete/:slug')
   DeleteSetting(@Param('slug') slug: string) {
     return this.settingGeneraleService.deleteSetting(

@@ -1,0 +1,31 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CreateNounuDto = void 0;
+class CreateNounuDto {
+    fullname;
+    old;
+    phone;
+    adresse;
+    year_experience;
+    hourly_rate;
+    monthly_rate;
+    reference_1;
+    reference_2;
+    reference_3;
+    biographie;
+    pricing_flexibility;
+    emergencie;
+    media;
+    setting;
+    user;
+    settingLanguages;
+    settingDesiredTimes;
+    settingLocalizations;
+    settingAgeOfChildrens;
+    settingCertifications;
+    settingAreaWorks;
+    settingSpecificSkills;
+    photo;
+    confirmed_identity;
+}
+exports.CreateNounuDto = CreateNounuDto;

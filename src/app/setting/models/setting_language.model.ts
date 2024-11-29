@@ -1,3 +1,4 @@
+import { Nounus } from 'src/app/nounu/models/nounu.model';
 import { NounuSettings } from 'src/app/nounu/models/nounu_setting.model';
 import { Parents } from 'src/app/parent/models/parent.model';
 import { ParentSettings } from 'src/app/parent/models/parent_setting.model';
@@ -22,6 +23,4 @@ export class SettingLanguages {
   @OneToMany(() => ParentSettings, (SU) => SU.language, { cascade: true})
   parent: ParentSettings
 
-  @OneToMany(() => NounuSettings, (NS) => NS.language, { cascade: true})
-  nounu: NounuSettings
 }

@@ -10,7 +10,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SettingGuardSchedules = void 0;
-const nounu_setting_model_1 = require("../../nounu/models/nounu_setting.model");
 const parent_setting_model_1 = require("../../parent/models/parent_setting.model");
 const typeorm_1 = require("typeorm");
 let SettingGuardSchedules = class SettingGuardSchedules {
@@ -19,7 +18,6 @@ let SettingGuardSchedules = class SettingGuardSchedules {
     name;
     description;
     parent;
-    nounu;
 };
 exports.SettingGuardSchedules = SettingGuardSchedules;
 __decorate([
@@ -42,10 +40,6 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => parent_setting_model_1.ParentSettings, (SU) => SU.guard_schedule, { cascade: true }),
     __metadata("design:type", parent_setting_model_1.ParentSettings)
 ], SettingGuardSchedules.prototype, "parent", void 0);
-__decorate([
-    (0, typeorm_1.OneToMany)(() => nounu_setting_model_1.NounuSettings, (NS) => NS.guard_schedule, { cascade: true }),
-    __metadata("design:type", nounu_setting_model_1.NounuSettings)
-], SettingGuardSchedules.prototype, "nounu", void 0);
 exports.SettingGuardSchedules = SettingGuardSchedules = __decorate([
     (0, typeorm_1.Entity)()
 ], SettingGuardSchedules);

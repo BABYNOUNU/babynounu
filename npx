@@ -1,11 +1,11 @@
-mkdir ./src/app/abonnement &&
-npx nest generate module app/abonnement --no-spec &&
-npx nest generate controller app/abonnement --no-spec &&
-npx nest generate service app/abonnement --no-spec &&
-npx nest generate provider app/abonnement --no-spec &&
-mkdir ./src/app/abonnement/models &&
-mkdir ./src/app/abonnement/dto &&
-touch ./src/app/abonnement/models/abonnement.model.ts
+mkdir ./src/app/upload &&
+npx nest generate module app/upload --no-spec &&
+npx nest generate controller app/upload --no-spec &&
+npx nest generate service app/upload --no-spec &&
+npx nest generate provider app/upload --no-spec &&
+mkdir ./src/app/upload/models &&
+mkdir ./src/app/upload/dto &&
+touch ./src/app/upload/models/upload.model.ts
 
 git init
 git add ./

@@ -9,6 +9,11 @@ import { SettingSpecificSkills } from './models/setting_specific_skill.model';
 import { SettingLanguages } from './models/setting_language.model';
 import { SettingLocalization } from './models/setting_localization.model';
 import { SettingServiceTypes } from './models/setting_service_type.model';
+import { SettingHousekeeper } from './models/setting_housekeeper.model';
+import { SettingServiceFrequency } from './models/setting_service_frequency.model';
+import { SettingDesiredTime } from './models/setting_desired_time.model';
+import { SettingPaymentTerms } from './models/setting_payment_terms.model';
+import { Roles } from '../role/models/role.model';
 
 
 export const SettingProviders = [
@@ -62,4 +67,35 @@ export const SettingProviders = [
       useFactory: (dataSource: DataSource) => dataSource.getRepository(SettingServiceTypes),
       inject: ['DATA_SOURCE'],
     },
+    {
+      provide: 'SETTING_HOUSEKEEPER_REPOSITORY',
+      useFactory: (dataSource: DataSource) => dataSource.getRepository(SettingHousekeeper),
+      inject: ['DATA_SOURCE'],
+    },
+    {
+      provide: 'SETTING_SERVICE_FREQUENCY_REPOSITORY',
+      useFactory: (dataSource: DataSource) => dataSource.getRepository(SettingServiceFrequency),
+      inject: ['DATA_SOURCE'],
+    },
+    {
+      provide: 'SETTING_DESIRE_TIMES_REPOSITORY',
+      useFactory: (dataSource: DataSource) => dataSource.getRepository(SettingDesiredTime),
+      inject: ['DATA_SOURCE'],
+    },
+    {
+      provide: 'SETTING_PAYMENT_TERMS_REPOSITORY',
+      useFactory: (dataSource: DataSource) => dataSource.getRepository(SettingPaymentTerms),
+      inject: ['DATA_SOURCE'],
+    },
+    {
+      provide: 'SETTING_PAYMENT_TERMS_REPOSITORY',
+      useFactory: (dataSource: DataSource) => dataSource.getRepository(SettingPaymentTerms),
+      inject: ['DATA_SOURCE'],
+    },
+    {
+      provide: 'ROLE_REPOSITORY',
+      useFactory: (dataSource: DataSource) => dataSource.getRepository(Roles),
+      inject: ['DATA_SOURCE'],
+    },
   ];
+  

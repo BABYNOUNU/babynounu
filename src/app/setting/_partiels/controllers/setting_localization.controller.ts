@@ -9,14 +9,13 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { SettingGeneraleService } from '../general.service';
 import { Repository } from 'typeorm';
 import { SettingDto } from '../../dto/setting.dto';
 import { SettingLocalization } from '../../models/setting_localization.model';
 import { JwtAuthGuard } from 'src/app/auth/auh.guard';
 
-@UseGuards(JwtAuthGuard)
 @ApiTags('Setting Localization')
 @Controller('setting/localization')
 export class SettingLocalizationController {
@@ -43,6 +42,8 @@ export class SettingLocalizationController {
   }
 
   // Create new Localization
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Post('create')
   CreateSetting(@Body() settingLocalizationBody: SettingDto) {
     return this.settingGeneraleService.createSetting(
@@ -52,6 +53,8 @@ export class SettingLocalizationController {
   }
 
   // Update Localization existing
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Patch('update/:slug')
   UpdateSetting(
     @Body() settingLocalizationBody: SettingDto,
@@ -65,6 +68,8 @@ export class SettingLocalizationController {
   }
 
   // Delete Localization existing
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Delete('/delete/:slug')
   DeleteSetting(@Param('slug') slug: string) {
     return this.settingGeneraleService.deleteSetting(

@@ -9,14 +9,14 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { SettingGeneraleService } from '../general.service';
 import { Repository } from 'typeorm';
 import { SettingDto } from '../../dto/setting.dto';
 import { SettingSpecificNeed } from '../../models/setting_specific_need.model';
 import { JwtAuthGuard } from 'src/app/auth/auh.guard';
 
-@UseGuards(JwtAuthGuard)
+
 @ApiTags('Setting Specific Need')
 @Controller('setting/specific_need')
 export class SettingSpecificNeedController {
@@ -43,6 +43,8 @@ export class SettingSpecificNeedController {
   }
 
   // Create new Specific Need
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Post('create')
   CreateSetting(@Body() settingSpecificNeedBody: SettingDto) {
     return this.settingGeneraleService.createSetting(
@@ -52,6 +54,8 @@ export class SettingSpecificNeedController {
   }
 
   // Update Specific Need existing
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Patch('update/:slug')
   UpdateSetting(
     @Body() settingSpecificNeedBody: SettingDto,
@@ -65,6 +69,8 @@ export class SettingSpecificNeedController {
   }
 
   // Delete Specific Need existing
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Delete('/delete/:slug')
   DeleteSetting(@Param('slug') slug: string) {
     return this.settingGeneraleService.deleteSetting(

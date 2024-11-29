@@ -9,14 +9,14 @@ import {
     Post,
     UseGuards,
   } from '@nestjs/common';
-  import { ApiTags } from '@nestjs/swagger';
+  import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
   import { SettingGeneraleService } from '../general.service';
   import { Repository } from 'typeorm';
   import { SettingDto } from '../../dto/setting.dto';
 import { SettingServiceTypes } from '../../models/setting_service_type.model';
 import { JwtAuthGuard } from 'src/app/auth/auh.guard';
   
-@UseGuards(JwtAuthGuard)
+
   @ApiTags('Setting Service Type')
   @Controller('setting/service_type')
   export class SettingServiceTypeController {
@@ -43,6 +43,8 @@ import { JwtAuthGuard } from 'src/app/auth/auh.guard';
     }
   
     // Create new Service Type
+    @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
     @Post('create')
     CreateSetting(@Body() settingServiceTypeBody: SettingDto) {
       return this.settingGeneraleService.createSetting(
@@ -52,6 +54,8 @@ import { JwtAuthGuard } from 'src/app/auth/auh.guard';
     }
   
     // Update Service Type existing
+    @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
     @Patch('update/:slug')
     UpdateSetting(
       @Body() settingServiceTypeBody: SettingDto,
@@ -65,6 +69,8 @@ import { JwtAuthGuard } from 'src/app/auth/auh.guard';
     }
   
     // Delete Service Type existing
+    @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
     @Delete('/delete/:slug')
     DeleteSetting(@Param('slug') slug: string) {
       return this.settingGeneraleService.deleteSetting(

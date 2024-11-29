@@ -10,6 +10,11 @@ const setting_specific_skill_model_1 = require("./models/setting_specific_skill.
 const setting_language_model_1 = require("./models/setting_language.model");
 const setting_localization_model_1 = require("./models/setting_localization.model");
 const setting_service_type_model_1 = require("./models/setting_service_type.model");
+const setting_housekeeper_model_1 = require("./models/setting_housekeeper.model");
+const setting_service_frequency_model_1 = require("./models/setting_service_frequency.model");
+const setting_desired_time_model_1 = require("./models/setting_desired_time.model");
+const setting_payment_terms_model_1 = require("./models/setting_payment_terms.model");
+const role_model_1 = require("../role/models/role.model");
 exports.SettingProviders = [
     {
         provide: 'SETTING_GUARD_SCHEDULE_REPOSITORY',
@@ -59,6 +64,36 @@ exports.SettingProviders = [
     {
         provide: 'SETTING_SERVICE_TYPE_REPOSITORY',
         useFactory: (dataSource) => dataSource.getRepository(setting_service_type_model_1.SettingServiceTypes),
+        inject: ['DATA_SOURCE'],
+    },
+    {
+        provide: 'SETTING_HOUSEKEEPER_REPOSITORY',
+        useFactory: (dataSource) => dataSource.getRepository(setting_housekeeper_model_1.SettingHousekeeper),
+        inject: ['DATA_SOURCE'],
+    },
+    {
+        provide: 'SETTING_SERVICE_FREQUENCY_REPOSITORY',
+        useFactory: (dataSource) => dataSource.getRepository(setting_service_frequency_model_1.SettingServiceFrequency),
+        inject: ['DATA_SOURCE'],
+    },
+    {
+        provide: 'SETTING_DESIRE_TIMES_REPOSITORY',
+        useFactory: (dataSource) => dataSource.getRepository(setting_desired_time_model_1.SettingDesiredTime),
+        inject: ['DATA_SOURCE'],
+    },
+    {
+        provide: 'SETTING_PAYMENT_TERMS_REPOSITORY',
+        useFactory: (dataSource) => dataSource.getRepository(setting_payment_terms_model_1.SettingPaymentTerms),
+        inject: ['DATA_SOURCE'],
+    },
+    {
+        provide: 'SETTING_PAYMENT_TERMS_REPOSITORY',
+        useFactory: (dataSource) => dataSource.getRepository(setting_payment_terms_model_1.SettingPaymentTerms),
+        inject: ['DATA_SOURCE'],
+    },
+    {
+        provide: 'ROLE_REPOSITORY',
+        useFactory: (dataSource) => dataSource.getRepository(role_model_1.Roles),
         inject: ['DATA_SOURCE'],
     },
 ];

@@ -28,7 +28,7 @@ let AuthService = class AuthService {
         this.jwtService = jwtService;
     }
     async signUp({ signUpBody }) {
-        signUpBody.slug = await new slug_utils_1.SlugUtils().slug(signUpBody.fullname, this.userRepository);
+        signUpBody.slug = await new slug_utils_1.SlugUtils().slug(signUpBody.email, this.userRepository);
         const user = await this.userRepository.findOne({
             where: { email: signUpBody.email },
         });

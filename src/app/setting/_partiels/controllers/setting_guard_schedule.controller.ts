@@ -9,7 +9,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { SettingGuardSchedules } from '../../models/setting_guard_schedule.model';
 import { SettingGeneraleService } from '../general.service';
 import { Repository } from 'typeorm';
@@ -17,7 +17,7 @@ import { SettingDto } from '../../dto/setting.dto';
 
 import { JwtAuthGuard } from 'src/app/auth/auh.guard';
 
-@UseGuards(JwtAuthGuard)
+
 @ApiTags('Setting Guard Schedule')
 @Controller('setting/guard_schedule')
 export class SettingGuardScheduleController {
@@ -44,6 +44,8 @@ export class SettingGuardScheduleController {
   }
 
   // Create new Parent
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Post('create')
   CreateSetting(@Body() settingGuardScheduleBody: SettingDto) {
     return this.settingGeneraleService.createSetting(
@@ -53,6 +55,8 @@ export class SettingGuardScheduleController {
   }
 
   // Update parent existing
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Patch('update/:slug')
   UpdateSetting(
     @Body() settingGuardScheduleBody: SettingDto,
@@ -66,6 +70,8 @@ export class SettingGuardScheduleController {
   }
 
   // Delete parent existing
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Delete('/delete/:slug')
   DeleteSetting(@Param('slug') slug: string) {
     return this.settingGeneraleService.deleteSetting(

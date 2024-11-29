@@ -13,24 +13,12 @@ exports.SginUpAuthDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 class SginUpAuthDto {
-    fullname;
     slug;
     email;
     password;
     role;
 }
 exports.SginUpAuthDto = SginUpAuthDto;
-__decorate([
-    (0, swagger_1.ApiProperty)({
-        example: 'Bill Pather',
-        required: true,
-    }),
-    (0, class_validator_1.IsString)({ message: 'Ce champs est requis' }),
-    (0, class_validator_1.MinLength)(3, {
-        message: 'le nom doit  être compris entre 3 et 10 caractéres',
-    }),
-    __metadata("design:type", String)
-], SginUpAuthDto.prototype, "fullname", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
         example: 'bill-pather-9520',

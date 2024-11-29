@@ -9,14 +9,14 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { SettingGeneraleService } from '../general.service';
 import { Repository } from 'typeorm';
 import { SettingDto } from '../../dto/setting.dto';
 import { SettingCertifications } from '../../models/setting_certification.model';
 import { JwtAuthGuard } from 'src/app/auth/auh.guard';
 
-@UseGuards(JwtAuthGuard)
+
 @ApiTags('Setting Certification')
 @Controller('setting/certification')
 export class SettingCertificationController {
@@ -43,6 +43,8 @@ export class SettingCertificationController {
   }
 
   // Create new Certification
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Post('create')
   CreateSetting(@Body() settingGuardScheduleBody: SettingDto) {
     return this.settingGeneraleService.createSetting(
@@ -52,6 +54,8 @@ export class SettingCertificationController {
   }
 
   // Update Certification existing
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Patch('update/:slug')
   UpdateSetting(
     @Body() settingGuardScheduleBody: SettingDto,
@@ -65,6 +69,8 @@ export class SettingCertificationController {
   }
 
   // Delete Certification existing
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Delete('/delete/:slug')
   DeleteSetting(@Param('slug') slug: string) {
     return this.settingGeneraleService.deleteSetting(

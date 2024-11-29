@@ -20,6 +20,8 @@ const notification_module_1 = require("./app/notification/notification.module");
 const media_module_1 = require("./app/media/media.module");
 const role_module_1 = require("./app/role/role.module");
 const abonnement_module_1 = require("./app/abonnement/abonnement.module");
+const serve_static_1 = require("@nestjs/serve-static");
+const path_1 = require("path");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -28,6 +30,10 @@ exports.AppModule = AppModule = __decorate([
         imports: [
             config_1.ConfigModule.forRoot({
                 isGlobal: true,
+            }),
+            serve_static_1.ServeStaticModule.forRoot({
+                rootPath: (0, path_1.join)(__dirname, '..', 'uploads'),
+                serveRoot: '/uploads',
             }),
             user_module_1.UserModule,
             auth_module_1.AuthModule,
