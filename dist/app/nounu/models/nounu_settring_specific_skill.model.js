@@ -28,7 +28,7 @@ __decorate([
     __metadata("design:type", nounu_model_1.Nounus)
 ], NounuSettingSpecificSkills.prototype, "nounu", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => setting_specific_skill_model_1.SettingSpecificSkills, (NS) => NS.id, { cascade: true }),
+    (0, typeorm_1.ManyToOne)(() => setting_specific_skill_model_1.SettingSpecificSkills, { cascade: true }),
     __metadata("design:type", setting_specific_skill_model_1.SettingSpecificSkills)
 ], NounuSettingSpecificSkills.prototype, "skill", void 0);
 exports.NounuSettingSpecificSkills = NounuSettingSpecificSkills = __decorate([

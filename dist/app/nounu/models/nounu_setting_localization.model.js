@@ -28,7 +28,7 @@ __decorate([
     __metadata("design:type", nounu_model_1.Nounus)
 ], NounuSettingLocalizations.prototype, "nounu", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => setting_localization_model_1.SettingLocalization, (NS) => NS.id, { cascade: true }),
+    (0, typeorm_1.ManyToOne)(() => setting_localization_model_1.SettingLocalization, { cascade: true }),
     __metadata("design:type", setting_localization_model_1.SettingLocalization)
 ], NounuSettingLocalizations.prototype, "loacalization", void 0);
 exports.NounuSettingLocalizations = NounuSettingLocalizations = __decorate([

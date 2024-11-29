@@ -17,6 +17,6 @@ export class NounuSettingLocalizations{
   @ManyToOne(() => Nounus, (nounu) => nounu.settingLocalizations, { cascade: true })
   nounu: Nounus;
 
-  @ManyToOne(() => SettingLocalization, (NS) => NS.id, { cascade: true })
+  @ManyToOne(() => SettingLocalization, { cascade: true })
   loacalization: SettingLocalization;
 }

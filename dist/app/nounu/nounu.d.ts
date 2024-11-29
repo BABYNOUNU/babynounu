@@ -8,8 +8,11 @@ import { NounuSettingAgeOfChildrens } from './models/nounu_setting_age_of_childr
 import { NounuSettingLocalizations } from './models/nounu_setting_localization.model';
 import { NounuSettingAreaWork } from './models/nounu_settring_area_work.model';
 import { NounuSettingDeriredTimes } from './models/nounu_setting_desired_time.model';
+import { SettingAgeOfChildren } from '../setting/models/setting_age_of_children.model';
+import { SettingLocalization } from '../setting/models/setting_localization.model';
 import { SettingCertifications } from '../setting/models/setting_certification.model';
 import { User } from '../user/user.model';
+import { SettingDesiredTime } from '../setting/models/setting_desired_time.model';
 import { SettingSpecificSkills } from '../setting/models/setting_specific_skill.model';
 export declare const NounuProviders: ({
     provide: string;
@@ -49,7 +52,19 @@ export declare const NounuProviders: ({
     inject: string[];
 } | {
     provide: string;
+    useFactory: (dataSource: DataSource) => import("typeorm").Repository<SettingAgeOfChildren>;
+    inject: string[];
+} | {
+    provide: string;
+    useFactory: (dataSource: DataSource) => import("typeorm").Repository<SettingLocalization>;
+    inject: string[];
+} | {
+    provide: string;
     useFactory: (dataSource: DataSource) => import("typeorm").Repository<SettingCertifications>;
+    inject: string[];
+} | {
+    provide: string;
+    useFactory: (dataSource: DataSource) => import("typeorm").Repository<SettingDesiredTime>;
     inject: string[];
 } | {
     provide: string;

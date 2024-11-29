@@ -10,6 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SettingDesiredTime = void 0;
+const nounu_setting_desired_time_model_1 = require("../../nounu/models/nounu_setting_desired_time.model");
 const parent_setting_model_1 = require("../../parent/models/parent_setting.model");
 const typeorm_1 = require("typeorm");
 let SettingDesiredTime = class SettingDesiredTime {
@@ -18,6 +19,7 @@ let SettingDesiredTime = class SettingDesiredTime {
     name;
     description;
     parent;
+    nounuSettingAreaWork;
 };
 exports.SettingDesiredTime = SettingDesiredTime;
 __decorate([
@@ -40,6 +42,12 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => parent_setting_model_1.ParentSettings, (SU) => SU.age_of_children, { cascade: true }),
     __metadata("design:type", parent_setting_model_1.ParentSettings)
 ], SettingDesiredTime.prototype, "parent", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => nounu_setting_desired_time_model_1.NounuSettingDeriredTimes, (NSL) => NSL.time, {
+        onDelete: 'CASCADE',
+    }),
+    __metadata("design:type", Array)
+], SettingDesiredTime.prototype, "nounuSettingAreaWork", void 0);
 exports.SettingDesiredTime = SettingDesiredTime = __decorate([
     (0, typeorm_1.Entity)()
 ], SettingDesiredTime);

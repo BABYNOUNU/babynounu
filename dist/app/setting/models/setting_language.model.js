@@ -10,6 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SettingLanguages = void 0;
+const nounu_setting_languages_model_1 = require("../../nounu/models/nounu_setting_languages.model");
 const parent_setting_model_1 = require("../../parent/models/parent_setting.model");
 const typeorm_1 = require("typeorm");
 let SettingLanguages = class SettingLanguages {
@@ -18,6 +19,7 @@ let SettingLanguages = class SettingLanguages {
     name;
     description;
     parent;
+    nounuSettingLanguages;
 };
 exports.SettingLanguages = SettingLanguages;
 __decorate([
@@ -40,6 +42,12 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => parent_setting_model_1.ParentSettings, (SU) => SU.language, { cascade: true }),
     __metadata("design:type", parent_setting_model_1.ParentSettings)
 ], SettingLanguages.prototype, "parent", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => nounu_setting_languages_model_1.NounuSettingLanguages, (NSL) => NSL.language, {
+        onDelete: 'CASCADE',
+    }),
+    __metadata("design:type", Array)
+], SettingLanguages.prototype, "nounuSettingLanguages", void 0);
 exports.SettingLanguages = SettingLanguages = __decorate([
     (0, typeorm_1.Entity)()
 ], SettingLanguages);

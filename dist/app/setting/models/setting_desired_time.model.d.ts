@@ -1,3 +1,4 @@
+import { NounuSettingDeriredTimes } from 'src/app/nounu/models/nounu_setting_desired_time.model';
 import { ParentSettings } from 'src/app/parent/models/parent_setting.model';
 export declare class SettingDesiredTime {
     id: string;
@@ -5,4 +6,5 @@ export declare class SettingDesiredTime {
     name: string;
     description: string;
     parent: ParentSettings;
+    nounuSettingAreaWork: NounuSettingDeriredTimes[];
 }

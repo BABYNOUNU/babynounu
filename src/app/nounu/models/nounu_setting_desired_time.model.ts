@@ -18,6 +18,6 @@ export class NounuSettingDeriredTimes {
   @ManyToOne(() => Nounus, (nounu) => nounu.settingDesiredTimes, { cascade: true })
   nounu: Nounus;
 
-  @ManyToOne(() => SettingDesiredTime, (NS) => NS.id, { cascade: true })
+  @ManyToOne(() => SettingDesiredTime, { cascade: true })
   time: SettingDesiredTime;
 }

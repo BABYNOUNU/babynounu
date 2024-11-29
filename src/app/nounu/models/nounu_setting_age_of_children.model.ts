@@ -17,6 +17,6 @@ export class NounuSettingAgeOfChildrens {
   @ManyToOne(() => Nounus, (nounu) => nounu.settingAgeOfChildrens, { cascade: true })
   nounu: Nounus;
 
-  @ManyToOne(() => SettingAgeOfChildren, (NS) => NS.id, { cascade: true })
+  @ManyToOne(() => SettingAgeOfChildren, { cascade: true })
   AgeOfChildrens: SettingAgeOfChildren;
 }

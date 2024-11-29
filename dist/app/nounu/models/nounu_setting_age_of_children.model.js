@@ -28,7 +28,7 @@ __decorate([
     __metadata("design:type", nounu_model_1.Nounus)
 ], NounuSettingAgeOfChildrens.prototype, "nounu", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => setting_age_of_children_model_1.SettingAgeOfChildren, (NS) => NS.id, { cascade: true }),
+    (0, typeorm_1.ManyToOne)(() => setting_age_of_children_model_1.SettingAgeOfChildren, { cascade: true }),
     __metadata("design:type", setting_age_of_children_model_1.SettingAgeOfChildren)
 ], NounuSettingAgeOfChildrens.prototype, "AgeOfChildrens", void 0);
 exports.NounuSettingAgeOfChildrens = NounuSettingAgeOfChildrens = __decorate([

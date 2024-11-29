@@ -24,6 +24,6 @@ export class NounuSettingSpecificSkills {
   @ManyToOne(() => Nounus, (nounu) => nounu.settingSpecificSkills, { cascade: true })
   nounu: Nounus;
 
-  @ManyToOne(() => SettingSpecificSkills, (NS) => NS.id, { cascade: true })
+  @ManyToOne(() => SettingSpecificSkills, { cascade: true })
   skill: SettingSpecificSkills;
 }

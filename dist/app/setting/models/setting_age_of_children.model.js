@@ -10,6 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SettingAgeOfChildren = void 0;
+const nounu_setting_age_of_children_model_1 = require("../../nounu/models/nounu_setting_age_of_children.model");
 const parent_setting_model_1 = require("../../parent/models/parent_setting.model");
 const typeorm_1 = require("typeorm");
 let SettingAgeOfChildren = class SettingAgeOfChildren {
@@ -18,6 +19,7 @@ let SettingAgeOfChildren = class SettingAgeOfChildren {
     name;
     description;
     parent;
+    nounuSettingAreaWork;
 };
 exports.SettingAgeOfChildren = SettingAgeOfChildren;
 __decorate([
@@ -40,6 +42,12 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => parent_setting_model_1.ParentSettings, (SU) => SU.age_of_children, { cascade: true }),
     __metadata("design:type", parent_setting_model_1.ParentSettings)
 ], SettingAgeOfChildren.prototype, "parent", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => nounu_setting_age_of_children_model_1.NounuSettingAgeOfChildrens, (NSL) => NSL.AgeOfChildrens, {
+        onDelete: 'CASCADE',
+    }),
+    __metadata("design:type", Array)
+], SettingAgeOfChildren.prototype, "nounuSettingAreaWork", void 0);
 exports.SettingAgeOfChildren = SettingAgeOfChildren = __decorate([
     (0, typeorm_1.Entity)()
 ], SettingAgeOfChildren);

@@ -14,4 +14,6 @@ export class SettingChildrenAgeGroup {
 
   @Column('varchar', { length: 255, unique: false, nullable: false })
   name: string;
+
+  
 }

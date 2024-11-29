@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SettingSpecificSkills = void 0;
 const typeorm_1 = require("typeorm");
 const parent_setting_model_1 = require("../../parent/models/parent_setting.model");
+const nounu_settring_specific_skill_model_1 = require("../../nounu/models/nounu_settring_specific_skill.model");
 let SettingSpecificSkills = class SettingSpecificSkills {
     id;
     slug;
@@ -21,6 +22,7 @@ let SettingSpecificSkills = class SettingSpecificSkills {
     createdAt;
     updatedAt;
     deletedAt;
+    nounuSettingAreaWork;
 };
 exports.SettingSpecificSkills = SettingSpecificSkills;
 __decorate([
@@ -55,6 +57,12 @@ __decorate([
     (0, typeorm_1.DeleteDateColumn)({ type: 'timestamp', nullable: true }),
     __metadata("design:type", Date)
 ], SettingSpecificSkills.prototype, "deletedAt", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => nounu_settring_specific_skill_model_1.NounuSettingSpecificSkills, (NSL) => NSL.skill, {
+        onDelete: 'CASCADE',
+    }),
+    __metadata("design:type", Array)
+], SettingSpecificSkills.prototype, "nounuSettingAreaWork", void 0);
 exports.SettingSpecificSkills = SettingSpecificSkills = __decorate([
     (0, typeorm_1.Entity)()
 ], SettingSpecificSkills);

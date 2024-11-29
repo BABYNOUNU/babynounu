@@ -1,10 +1,10 @@
 import { Nounus } from 'src/app/nounu/models/nounu.model';
 import { NounuSettings } from 'src/app/nounu/models/nounu_setting.model';
+import { NounuSettingLanguages } from 'src/app/nounu/models/nounu_setting_languages.model';
 import { Parents } from 'src/app/parent/models/parent.model';
 import { ParentSettings } from 'src/app/parent/models/parent_setting.model';
 import { Parent } from 'src/app/parent/parent';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-
 
 @Entity()
 export class SettingLanguages {
@@ -20,7 +20,11 @@ export class SettingLanguages {
   @Column('text', { nullable: true })
   description: string;
 
-  @OneToMany(() => ParentSettings, (SU) => SU.language, { cascade: true})
-  parent: ParentSettings
+  @OneToMany(() => ParentSettings, (SU) => SU.language, { cascade: true })
+  parent: ParentSettings;
 
+  @OneToMany(() => NounuSettingLanguages, (NSL) => NSL.language, {
+    onDelete: 'CASCADE',
+  })
+  nounuSettingLanguages: NounuSettingLanguages[];
 }

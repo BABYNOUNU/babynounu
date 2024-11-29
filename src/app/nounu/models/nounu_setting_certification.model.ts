@@ -18,6 +18,6 @@ export class NounuSettingCertifications {
   @ManyToOne(() => Nounus, (nounu) => nounu.settingCertifications, { cascade: true })
   nounu: Nounus;
 
-  @ManyToOne(() => SettingCertifications, (NS) => NS.id, { cascade: true })
+  @ManyToOne(() => SettingCertifications, { cascade: true })
   certification: SettingCertifications;
 }

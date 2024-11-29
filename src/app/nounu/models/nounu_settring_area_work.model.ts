@@ -19,6 +19,6 @@ export class NounuSettingAreaWork {
   @JoinColumn({ name: 'nounu_id' }) // Ajoute une colonne 'nounu_id' pour la clé étrangère
   nounu: Nounus;
 
-  @ManyToOne(() => SettingLocalization, (NS) => NS.id, { cascade: true })
+  @ManyToOne(() => SettingLocalization, { cascade: true })
   area: SettingLocalization;
 }

@@ -17,6 +17,6 @@ export class NounuSettingLanguages {
   @ManyToOne(() => Nounus, (nounu) => nounu.settingLanguages, { cascade: true })
   nounu: Nounus;
 
-  @ManyToOne(() => SettingLanguages, (NS) => NS.id, { cascade: true })
-  language: SettingLanguages;
+  @ManyToOne(() => SettingLanguages, { cascade: true })
+language: SettingLanguages;
 }

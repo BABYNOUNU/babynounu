@@ -10,12 +10,14 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SettingCertifications = void 0;
+const nounu_setting_certification_model_1 = require("../../nounu/models/nounu_setting_certification.model");
 const typeorm_1 = require("typeorm");
 let SettingCertifications = class SettingCertifications {
     id;
     slug;
     name;
     description;
+    nounuSettingAreaWork;
 };
 exports.SettingCertifications = SettingCertifications;
 __decorate([
@@ -34,6 +36,12 @@ __decorate([
     (0, typeorm_1.Column)('text', { nullable: true }),
     __metadata("design:type", String)
 ], SettingCertifications.prototype, "description", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => nounu_setting_certification_model_1.NounuSettingCertifications, (NSL) => NSL.certification, {
+        onDelete: 'CASCADE',
+    }),
+    __metadata("design:type", Array)
+], SettingCertifications.prototype, "nounuSettingAreaWork", void 0);
 exports.SettingCertifications = SettingCertifications = __decorate([
     (0, typeorm_1.Entity)()
 ], SettingCertifications);

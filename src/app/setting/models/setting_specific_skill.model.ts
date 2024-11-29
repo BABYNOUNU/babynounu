@@ -6,6 +6,7 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn,
   DeleteDateColumn, } from 'typeorm';
 import { ParentSettings } from 'src/app/parent/models/parent_setting.model';
 import { NounuSettings } from 'src/app/nounu/models/nounu_setting.model';
+import { NounuSettingSpecificSkills } from 'src/app/nounu/models/nounu_settring_specific_skill.model';
 
 @Entity()
 export class SettingSpecificSkills {
@@ -32,4 +33,9 @@ export class SettingSpecificSkills {
 
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt: Date | null;
+
+  @OneToMany(() => NounuSettingSpecificSkills, (NSL) => NSL.skill, {
+    onDelete: 'CASCADE',
+  })
+  nounuSettingAreaWork: NounuSettingSpecificSkills[];
 }

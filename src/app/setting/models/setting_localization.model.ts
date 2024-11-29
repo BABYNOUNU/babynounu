@@ -1,4 +1,5 @@
 import { NounuSettings } from 'src/app/nounu/models/nounu_setting.model';
+import { NounuSettingAreaWork } from 'src/app/nounu/models/nounu_settring_area_work.model';
 import { ParentSettings } from 'src/app/parent/models/parent_setting.model';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
@@ -20,5 +21,10 @@ export class SettingLocalization {
   @OneToMany(() => ParentSettings, (SU) => SU.localization, { cascade: true })
   parent: ParentSettings;
 
+
+  @OneToMany(() => NounuSettingAreaWork, (NSL) => NSL.area, {
+    onDelete: 'CASCADE',
+  })
+  nounuSettingAreaWork: NounuSettingAreaWork[];
   
 }
