@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { ValidationError } from 'class-validator';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { isProd } from './database/database.providers';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -28,7 +29,7 @@ async function bootstrap() {
     .addBearerAuth()
     .setDescription('Your API description')
     .setVersion('1.0')
-    .addServer('http://localhost:3000/', 'Local environment')
+    .addServer(isProd ? 'https://api.babynounu.com/' : 'http://localhost:3000/', 'Local environment')
     .addServer('https://staging.yourapi.com/', 'Staging')
     .addServer('https://api.babynounu.com/', 'Production')
     .addTag('Baby Nounu')

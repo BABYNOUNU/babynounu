@@ -4,6 +4,7 @@ const core_1 = require("@nestjs/core");
 const app_module_1 = require("./app.module");
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
+const database_providers_1 = require("./database/database.providers");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     app.enableCors({
@@ -23,7 +24,7 @@ async function bootstrap() {
         .addBearerAuth()
         .setDescription('Your API description')
         .setVersion('1.0')
-        .addServer('http://localhost:3000/', 'Local environment')
+        .addServer(database_providers_1.isProd ? 'https://api.babynounu.com/' : 'http://localhost:3000/', 'Local environment')
         .addServer('https://staging.yourapi.com/', 'Staging')
         .addServer('https://api.babynounu.com/', 'Production')
         .addTag('Baby Nounu')

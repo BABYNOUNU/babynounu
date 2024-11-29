@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.databaseProviders = void 0;
+exports.databaseProviders = exports.isProd = void 0;
 const typeorm_1 = require("typeorm");
-const isProd = true;
+exports.isProd = true;
 const ProdDatabase = (dbProd, dbTest) => {
-    return isProd ? dbProd : dbTest;
+    return exports.isProd ? dbProd : dbTest;
 };
 exports.databaseProviders = [
     {
