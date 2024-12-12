@@ -15,10 +15,10 @@ export class NounuSettingAreaWork {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Nounus, (nounu) => nounu.settingAreaWorks, { cascade: true })
+  @ManyToOne(() => Nounus, (nounu) => nounu.settingAreaWorks, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'nounu_id' }) // Ajoute une colonne 'nounu_id' pour la clé étrangère
   nounu: Nounus;
 
-  @ManyToOne(() => SettingLocalization, { cascade: true })
+  @ManyToOne(() => SettingLocalization, { onDelete: 'CASCADE' })
   area: SettingLocalization;
 }

@@ -43,12 +43,16 @@ let NounuController = class NounuController {
 };
 exports.NounuController = NounuController;
 __decorate([
-    (0, common_1.UseInterceptors)((0, platform_express_1.AnyFilesInterceptor)({ storage: media_config_1.storage })),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileFieldsInterceptor)([
+        { name: 'profil_image', maxCount: 1 },
+        { name: 'document', maxCount: 5 },
+        { name: 'gallery', maxCount: 10 },
+    ], { storage: media_config_1.storage, limits: { fileSize: 10 * 1024 * 1024 }, })),
     (0, common_1.Post)('create'),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.UploadedFiles)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_nounu_dto_1.CreateNounuDto, Array]),
+    __metadata("design:paramtypes", [create_nounu_dto_1.CreateNounuDto, Object]),
     __metadata("design:returntype", Promise)
 ], NounuController.prototype, "create", null);
 __decorate([

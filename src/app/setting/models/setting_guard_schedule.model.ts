@@ -1,7 +1,5 @@
 import { NounuSettings } from 'src/app/nounu/models/nounu_setting.model';
 import { Parents } from 'src/app/parent/models/parent.model';
-import { ParentSettings } from 'src/app/parent/models/parent_setting.model';
-import { Parent } from 'src/app/parent/parent';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 
@@ -18,9 +16,5 @@ export class SettingGuardSchedules {
 
   @Column('text', { nullable: true })
   description: string;
-
-  @OneToMany(() => ParentSettings, (SU) => SU.guard_schedule, { cascade: true})
-  parent: ParentSettings
-
  
 }

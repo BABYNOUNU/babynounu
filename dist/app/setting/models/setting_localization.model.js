@@ -11,14 +11,12 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SettingLocalization = void 0;
 const nounu_settring_area_work_model_1 = require("../../nounu/models/nounu_settring_area_work.model");
-const parent_setting_model_1 = require("../../parent/models/parent_setting.model");
 const typeorm_1 = require("typeorm");
 let SettingLocalization = class SettingLocalization {
     id;
     slug;
     name;
     description;
-    parent;
     nounuSettingAreaWork;
 };
 exports.SettingLocalization = SettingLocalization;
@@ -39,12 +37,8 @@ __decorate([
     __metadata("design:type", String)
 ], SettingLocalization.prototype, "description", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => parent_setting_model_1.ParentSettings, (SU) => SU.localization, { cascade: true }),
-    __metadata("design:type", parent_setting_model_1.ParentSettings)
-], SettingLocalization.prototype, "parent", void 0);
-__decorate([
     (0, typeorm_1.OneToMany)(() => nounu_settring_area_work_model_1.NounuSettingAreaWork, (NSL) => NSL.area, {
-        onDelete: 'CASCADE',
+        cascade: true, onDelete: 'CASCADE',
     }),
     __metadata("design:type", Array)
 ], SettingLocalization.prototype, "nounuSettingAreaWork", void 0);

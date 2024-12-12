@@ -10,14 +10,12 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SettingGuardSchedules = void 0;
-const parent_setting_model_1 = require("../../parent/models/parent_setting.model");
 const typeorm_1 = require("typeorm");
 let SettingGuardSchedules = class SettingGuardSchedules {
     id;
     slug;
     name;
     description;
-    parent;
 };
 exports.SettingGuardSchedules = SettingGuardSchedules;
 __decorate([
@@ -36,10 +34,6 @@ __decorate([
     (0, typeorm_1.Column)('text', { nullable: true }),
     __metadata("design:type", String)
 ], SettingGuardSchedules.prototype, "description", void 0);
-__decorate([
-    (0, typeorm_1.OneToMany)(() => parent_setting_model_1.ParentSettings, (SU) => SU.guard_schedule, { cascade: true }),
-    __metadata("design:type", parent_setting_model_1.ParentSettings)
-], SettingGuardSchedules.prototype, "parent", void 0);
 exports.SettingGuardSchedules = SettingGuardSchedules = __decorate([
     (0, typeorm_1.Entity)()
 ], SettingGuardSchedules);

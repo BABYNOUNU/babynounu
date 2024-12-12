@@ -15,9 +15,9 @@ export class NounuSettingDeriredTimes {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Nounus, (nounu) => nounu.settingDesiredTimes, { cascade: true })
+  @ManyToOne(() => Nounus, (nounu) => nounu.settingDesiredTimes, { onDelete: 'CASCADE' })
   nounu: Nounus;
 
-  @ManyToOne(() => SettingDesiredTime, { cascade: true })
+  @ManyToOne(() => SettingDesiredTime, { onDelete: 'CASCADE' })
   time: SettingDesiredTime;
 }

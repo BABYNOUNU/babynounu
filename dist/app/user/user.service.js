@@ -53,8 +53,12 @@ let UserService = class UserService extends general_service_1.SettingGeneraleSer
         this.userRepository.delete({ id: where });
         return { message: 'User deleted' };
     }
-    loggedUser() {
-        return { message: 'User is connected', status: true };
+    async loggedUser(ID) {
+        const User = await this.userRepository.findOne({ where: { id: ID }, relations: ['role', 'type_profil', 'parent', 'nounu', 'abonnement'] });
+        if (!User) {
+            throw new common_1.BadRequestException({ message: 'user not exist in database' });
+        }
+        return User;
     }
 };
 exports.UserService = UserService;

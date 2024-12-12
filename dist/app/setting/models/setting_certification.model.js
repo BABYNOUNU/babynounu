@@ -38,7 +38,7 @@ __decorate([
 ], SettingCertifications.prototype, "description", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => nounu_setting_certification_model_1.NounuSettingCertifications, (NSL) => NSL.certification, {
-        onDelete: 'CASCADE',
+        cascade: true, onDelete: 'CASCADE',
     }),
     __metadata("design:type", Array)
 ], SettingCertifications.prototype, "nounuSettingAreaWork", void 0);

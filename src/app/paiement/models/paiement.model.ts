@@ -50,7 +50,7 @@ export class Paiements {
   @Column('varchar', { length: 255, nullable: true })
   customer_zip_code: string;
 
-  @OneToMany(() => Abonnements, (NS) => NS.paiement, { cascade: true })
+  @OneToMany(() => Abonnements, (NS) => NS.paiement, { cascade: true, })
   abonnement: Abonnements;
 
   @CreateDateColumn({ type: 'timestamp' })

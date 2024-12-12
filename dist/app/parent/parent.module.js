@@ -10,7 +10,6 @@ exports.ParentModule = void 0;
 const common_1 = require("@nestjs/common");
 const parent_controller_1 = require("./parent.controller");
 const parent_service_1 = require("./parent.service");
-const parent_1 = require("./parent");
 const parent_provider_1 = require("./parent.provider");
 const database_module_1 = require("../../database/database.module");
 let ParentModule = class ParentModule {
@@ -20,6 +19,6 @@ exports.ParentModule = ParentModule = __decorate([
     (0, common_1.Module)({
         imports: [database_module_1.DatabaseModule],
         controllers: [parent_controller_1.ParentController],
-        providers: [parent_service_1.ParentService, parent_1.Parent, ...parent_provider_1.ParentProviders]
+        providers: [parent_service_1.ParentService, ...parent_provider_1.ParentProviders]
     })
 ], ParentModule);

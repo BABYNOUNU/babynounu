@@ -37,7 +37,7 @@ __decorate([
     __metadata("design:type", String)
 ], settingSubscriptionTypes.prototype, "description", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => abonnement_model_1.Abonnements, (SU) => SU.type, { cascade: true }),
+    (0, typeorm_1.OneToMany)(() => abonnement_model_1.Abonnements, (SU) => SU.type, { cascade: true, onDelete: 'CASCADE' }),
     __metadata("design:type", abonnement_model_1.Abonnements)
 ], settingSubscriptionTypes.prototype, "abonnement", void 0);
 exports.settingSubscriptionTypes = settingSubscriptionTypes = __decorate([

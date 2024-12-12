@@ -37,7 +37,7 @@ __decorate([
     __metadata("design:type", String)
 ], Roles.prototype, "description", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => user_model_1.User, (user) => user.role, { onDelete: 'CASCADE' }),
+    (0, typeorm_1.OneToMany)(() => user_model_1.User, (user) => user.role, { cascade: true }),
     __metadata("design:type", user_model_1.User)
 ], Roles.prototype, "user", void 0);
 exports.Roles = Roles = __decorate([

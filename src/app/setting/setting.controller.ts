@@ -37,6 +37,8 @@ import { SettingCertifications } from './models/setting_certification.model';
 import { CertificationSeeders } from 'src/database/seeders/certification.seed';
 import { RoleSeeders } from 'src/database/seeders/role.seed';
 import { Roles } from '../role/models/role.model';
+import { SettingTypeProfil } from './models/setting_type_profil.model';
+import { TypeProfilSeeders } from 'src/database/seeders/typesProfil.seed';
 
 @ApiTags('Setting')
 @Controller('setting')
@@ -67,6 +69,8 @@ export class SettingController {
 
     @Inject('ROLE_REPOSITORY')
     private readonly roles: Repository<Roles>,
+    @Inject('TYPE_PROFIL_REPOSITORY')
+    private readonly settingTypeProfil: Repository<SettingTypeProfil>,
     
     
   ) {}
@@ -221,6 +225,14 @@ export class SettingController {
     return this.createSeeder(
       this.roles,
       RoleSeeders, 
+    );
+  }
+
+  @Post('seed/type_profil')
+  SeederTypeProfil() {
+    return this.createSeeder(
+      this.settingTypeProfil,
+      TypeProfilSeeders, 
     );
   }
 

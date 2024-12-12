@@ -25,6 +25,7 @@ export declare class Nounus {
     pricing_flexibility: boolean;
     confirmed_identity: string;
     photo: string;
+    user: User;
     settingLanguages: NounuSettingLanguages[];
     settingLocalizations: NounuSettingLocalizations[];
     settingAgeOfChildrens: NounuSettingAgeOfChildrens[];
@@ -32,7 +33,6 @@ export declare class Nounus {
     settingDesiredTimes: NounuSettingDeriredTimes[];
     settingAreaWorks: NounuSettingAreaWork[];
     settingSpecificSkills: NounuSettingSpecificSkills[];
-    user: User;
     createdAt: Date;
     updatedAt: Date;
     deletedAt: Date | null;

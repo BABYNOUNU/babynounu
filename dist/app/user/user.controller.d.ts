@@ -7,10 +7,7 @@ export declare class UserController {
     private readonly userService;
     constructor(userService: UserService);
     GetUsers(): Promise<import("./user.model").User[]>;
-    LoggedUser(): {
-        message: string;
-        status: boolean;
-    };
+    LoggedUser(ID: string): Promise<import("./user.model").User>;
     GetUser(slug: string): Promise<import("./user.model").User>;
     CreateUser(userBody: UserBody): Promise<import("./user.model").User>;
     UpdateUser(userBody: UserBody): Promise<import("./user.model").User>;

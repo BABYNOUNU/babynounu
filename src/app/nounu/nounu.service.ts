@@ -19,9 +19,11 @@ import { User } from '../user/user.model';
 import { SettingDesiredTime } from '../setting/models/setting_desired_time.model';
 import { SettingSpecificSkills } from '../setting/models/setting_specific_skill.model';
 import { NounuSettingSpecificSkills } from './models/nounu_settring_specific_skill.model';
+import { MediaService } from '../media/media.service';
+import { Medias } from '../media/models/media.model';
 
 @Injectable()
-export class NounuService {
+export class NounuService extends MediaService {
   constructor(
     @Inject('NOUNU_REPOSITORY')
     private readonly nounuRepository: Repository<Nounus>,
@@ -56,18 +58,23 @@ export class NounuService {
     private readonly nounuSettingSpecificSkillsRepository: Repository<NounuSettingSpecificSkills>,
     @Inject('USER_REPOSITORY')
     private readonly userRepository: Repository<User>,
-  ) {}
+    @Inject('MEDIA_REPOSITORY')
+    private readonly mediaRepository: Repository<Medias>,
+  ) {
+    super();
+  }
 
   async create(
     createNounuDto: CreateNounuDto,
-    files: Array<Express.Multer.File>,
+    files: {
+      profil_image?: Express.Multer.File[];
+      document?: Express.Multer.File[];
+      gallery?: Express.Multer.File[];
+    },
   ) {
-    if (!files || files.length === 0) {
+    if (!files) {
       throw new BadRequestException('At least one image is required');
     }
-
-    // Traiter et sauvegarder les chemins des fichiers
-    const imagePaths = files.map((file) => `/uploads/${file.filename}`);
 
     const nounu = this.nounuRepository.create({
       fullname: createNounuDto.fullname,
@@ -82,17 +89,31 @@ export class NounuService {
       biographie: createNounuDto.biographie,
       monthly_rate: createNounuDto.monthly_rate,
       emergencie: createNounuDto.emergencie,
-      confirmed_identity: `${imagePaths[0]}`,
+      confirmed_identity: `/uploads/${files.document[0].filename}`,
       pricing_flexibility: createNounuDto.pricing_flexibility,
-      photo: `${imagePaths[1]}`,
-      user: await this.userRepository.findOne({
-        where: { id: createNounuDto.user },
-      }),
+      photo: `/uploads/${files.profil_image[0].filename}`,
     });
     const saveNounu = await this.nounuRepository.save(nounu);
 
     if (!saveNounu) {
       throw new BadRequestException({ message: 'Nounu not created' });
+    }
+
+    await this.userRepository.update(
+      { id: createNounuDto.user },
+      { nounu: saveNounu },
+    );
+
+    // Ajout des images de galerie
+    for (const file of files.gallery) {
+      const imagePath = `/uploads/${file.filename}`;
+      this.createMedia(
+        {
+          url: imagePath,
+          media_nounu: saveNounu,
+        },
+        this.mediaRepository,
+      );
     }
 
     async function createRelation(
@@ -181,29 +202,48 @@ export class NounuService {
       await this.nounuSettingAreaWorksRepository.save(areaEntities);
 
     // Création des compétences spécifiques
-    // const skillObjects = await createRelation(
-    //   createNounuDto.settingSpecificSkills,
-    //   this.settingSpecificSkillsRepository,
-    //   'skill',
-    // );
-    // const skillEntities =
-    //   this.nounuSettingSpecificSkillsRepository.create(skillObjects);
-    // saveNounu.settingSpecificSkills =
-    //   await this.nounuSettingSpecificSkillsRepository.save(skillEntities);
+    const skillObjects = await createRelation(
+      createNounuDto.settingSpecificSkills,
+      this.settingSpecificSkillsRepository,
+      'skill',
+    );
+    const skillEntities =
+      this.nounuSettingSpecificSkillsRepository.create(skillObjects);
+    saveNounu.settingSpecificSkills =
+      await this.nounuSettingSpecificSkillsRepository.save(skillEntities);
 
-    return saveNounu;
+    const GetProfilNounu = await this.nounuRepository.findOne({
+      where: { id: saveNounu.id },
+      relations: ['user'],
+    });
+
+    return GetProfilNounu;
   }
 
   async findAll(): Promise<Nounus[]> {
     return this.nounuRepository.find({
-      relations: ['settingLanguages.language', 'settingDesiredTimes.time', 'user'],
+      relations: [
+        'settingLanguages.language',
+        'settingDesiredTimes.time',
+        'user',
+        'media',
+      ],
     });
   }
 
   async findOne(id: string): Promise<Nounus> {
     const nounu = await this.nounuRepository.findOne({
       where: { id },
-      relations: ['settingLanguages.language', 'settingDesiredTimes.time', 'settingAreaWorks.area', 'settingSpecificSkills.skill', 'settingAgeOfChildrens.AgeOfChildrens', 'settingCertifications.certification', 'user'],
+      relations: [
+        'settingLanguages.language',
+        'settingDesiredTimes.time',
+        'settingAreaWorks.area',
+        'settingSpecificSkills.skill',
+        'settingAgeOfChildrens.AgeOfChildrens',
+        'settingCertifications.certification',
+        'user',
+        'media',
+      ],
     });
     if (!nounu) {
       throw new NotFoundException(`Nounu with ID ${id} not found`);

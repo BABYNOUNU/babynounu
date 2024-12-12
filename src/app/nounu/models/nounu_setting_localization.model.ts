@@ -14,9 +14,9 @@ export class NounuSettingLocalizations{
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Nounus, (nounu) => nounu.settingLocalizations, { cascade: true })
+  @ManyToOne(() => Nounus, (nounu) => nounu.settingLocalizations, { onDelete: 'CASCADE' })
   nounu: Nounus;
 
-  @ManyToOne(() => SettingLocalization, { cascade: true })
+  @ManyToOne(() => SettingLocalization, { onDelete: 'CASCADE' })
   loacalization: SettingLocalization;
 }

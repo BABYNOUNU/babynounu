@@ -14,9 +14,9 @@ export class NounuSettingAgeOfChildrens {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Nounus, (nounu) => nounu.settingAgeOfChildrens, { cascade: true })
+  @ManyToOne(() => Nounus, (nounu) => nounu.settingAgeOfChildrens, { onDelete: 'CASCADE' })
   nounu: Nounus;
 
-  @ManyToOne(() => SettingAgeOfChildren, { cascade: true })
+  @ManyToOne(() => SettingAgeOfChildren, { onDelete: 'CASCADE' })
   AgeOfChildrens: SettingAgeOfChildren;
 }

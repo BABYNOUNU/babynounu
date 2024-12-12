@@ -22,8 +22,8 @@ __decorate([
         example: 'rehmat.sayani@gmail.com',
         required: true,
     }),
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsEmail)(),
+    (0, class_validator_1.IsString)({ message: 'Ce champs est requis' }),
+    (0, class_validator_1.IsEmail)({}, { message: 'Email invalide' }),
     __metadata("design:type", String)
 ], SginInAuthDto.prototype, "email", void 0);
 __decorate([
@@ -31,6 +31,7 @@ __decorate([
         example: 'password',
         required: true,
     }),
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsString)({ message: 'Ce champs est requis' }),
+    (0, class_validator_1.MinLength)(8, { message: 'Le mot de passe doit avoir au moins 8 caractères' }),
     __metadata("design:type", String)
 ], SginInAuthDto.prototype, "password", void 0);

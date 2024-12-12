@@ -34,9 +34,9 @@ export class UserController {
 
   // Logged User Connect
   @UseGuards(JwtAuthGuard)
-  @Get('/logged')
-  LoggedUser() {
-    return this.userService.loggedUser();
+  @Get('/logged/:id')
+  LoggedUser(@Param('id') ID: string) {
+    return this.userService.loggedUser(ID);
   }
 
   // Get Single User

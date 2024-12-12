@@ -14,9 +14,9 @@ export class NounuSettingLanguages {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Nounus, (nounu) => nounu.settingLanguages, { cascade: true })
+  @ManyToOne(() => Nounus, (nounu) => nounu.settingLanguages, { onDelete: 'CASCADE' })
   nounu: Nounus;
 
-  @ManyToOne(() => SettingLanguages, { cascade: true })
+  @ManyToOne(() => SettingLanguages, { onDelete: 'CASCADE' })
 language: SettingLanguages;
 }

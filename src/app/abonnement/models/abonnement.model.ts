@@ -18,17 +18,17 @@ export class Abonnements {
   id: string;
 
   @ManyToOne(() => Paiements, (SN) => SN.abonnement, {
-    onDelete: 'CASCADE',
+     onDelete: 'CASCADE',
   })
   paiement: Paiements;
 
   @ManyToOne(() => settingSubscriptionTypes, (SN) => SN.abonnement, {
-    onDelete: 'CASCADE',
+     onDelete: 'CASCADE',
   })
   type: settingSubscriptionTypes;
 
   @ManyToOne(() => User, (user) => user.abonnement, {
-    onDelete: 'CASCADE',
+     onDelete: 'CASCADE',
   })
   user: User;
 

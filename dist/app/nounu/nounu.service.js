@@ -16,7 +16,8 @@ exports.NounuService = void 0;
 const common_1 = require("@nestjs/common");
 const common_2 = require("@nestjs/common");
 const typeorm_1 = require("typeorm");
-let NounuService = class NounuService {
+const media_service_1 = require("../media/media.service");
+let NounuService = class NounuService extends media_service_1.MediaService {
     nounuRepository;
     nounuSettingsRepository;
     nounuSettingLanguagesRepository;
@@ -33,7 +34,9 @@ let NounuService = class NounuService {
     settingSpecificSkillsRepository;
     nounuSettingSpecificSkillsRepository;
     userRepository;
-    constructor(nounuRepository, nounuSettingsRepository, nounuSettingLanguagesRepository, settingLanguagesRepository, nounuSettingLocalizationsRepository, nounuSettingAgeOfChildrensRepository, nounuSettingCertificationsRepository, nounuSettingDesiredTimesRepository, nounuSettingAreaWorksRepository, settingAgeOfChildrensRepository, settingLocalizationsRepository, settingDesiredTimesRepository, settingCertificationsRepository, settingSpecificSkillsRepository, nounuSettingSpecificSkillsRepository, userRepository) {
+    mediaRepository;
+    constructor(nounuRepository, nounuSettingsRepository, nounuSettingLanguagesRepository, settingLanguagesRepository, nounuSettingLocalizationsRepository, nounuSettingAgeOfChildrensRepository, nounuSettingCertificationsRepository, nounuSettingDesiredTimesRepository, nounuSettingAreaWorksRepository, settingAgeOfChildrensRepository, settingLocalizationsRepository, settingDesiredTimesRepository, settingCertificationsRepository, settingSpecificSkillsRepository, nounuSettingSpecificSkillsRepository, userRepository, mediaRepository) {
+        super();
         this.nounuRepository = nounuRepository;
         this.nounuSettingsRepository = nounuSettingsRepository;
         this.nounuSettingLanguagesRepository = nounuSettingLanguagesRepository;
@@ -50,12 +53,12 @@ let NounuService = class NounuService {
         this.settingSpecificSkillsRepository = settingSpecificSkillsRepository;
         this.nounuSettingSpecificSkillsRepository = nounuSettingSpecificSkillsRepository;
         this.userRepository = userRepository;
+        this.mediaRepository = mediaRepository;
     }
     async create(createNounuDto, files) {
-        if (!files || files.length === 0) {
+        if (!files) {
             throw new common_1.BadRequestException('At least one image is required');
         }
-        const imagePaths = files.map((file) => `/uploads/${file.filename}`);
         const nounu = this.nounuRepository.create({
             fullname: createNounuDto.fullname,
             old: createNounuDto.old,
@@ -69,16 +72,21 @@ let NounuService = class NounuService {
             biographie: createNounuDto.biographie,
             monthly_rate: createNounuDto.monthly_rate,
             emergencie: createNounuDto.emergencie,
-            confirmed_identity: `${imagePaths[0]}`,
+            confirmed_identity: `/uploads/${files.document[0].filename}`,
             pricing_flexibility: createNounuDto.pricing_flexibility,
-            photo: `${imagePaths[1]}`,
-            user: await this.userRepository.findOne({
-                where: { id: createNounuDto.user },
-            }),
+            photo: `/uploads/${files.profil_image[0].filename}`,
         });
         const saveNounu = await this.nounuRepository.save(nounu);
         if (!saveNounu) {
             throw new common_1.BadRequestException({ message: 'Nounu not created' });
+        }
+        await this.userRepository.update({ id: createNounuDto.user }, { nounu: saveNounu });
+        for (const file of files.gallery) {
+            const imagePath = `/uploads/${file.filename}`;
+            this.createMedia({
+                url: imagePath,
+                media_nounu: saveNounu,
+            }, this.mediaRepository);
         }
         async function createRelation(items, repository, relationName) {
             if (!Array.isArray(items) || items.length === 0) {
@@ -118,17 +126,39 @@ let NounuService = class NounuService {
         const areaEntities = this.nounuSettingAreaWorksRepository.create(areaObjects);
         saveNounu.settingAreaWorks =
             await this.nounuSettingAreaWorksRepository.save(areaEntities);
-        return saveNounu;
+        const skillObjects = await createRelation(createNounuDto.settingSpecificSkills, this.settingSpecificSkillsRepository, 'skill');
+        const skillEntities = this.nounuSettingSpecificSkillsRepository.create(skillObjects);
+        saveNounu.settingSpecificSkills =
+            await this.nounuSettingSpecificSkillsRepository.save(skillEntities);
+        const GetProfilNounu = await this.nounuRepository.findOne({
+            where: { id: saveNounu.id },
+            relations: ['user'],
+        });
+        return GetProfilNounu;
     }
     async findAll() {
         return this.nounuRepository.find({
-            relations: ['settingLanguages.language', 'settingDesiredTimes.time', 'user'],
+            relations: [
+                'settingLanguages.language',
+                'settingDesiredTimes.time',
+                'user',
+                'media',
+            ],
         });
     }
     async findOne(id) {
         const nounu = await this.nounuRepository.findOne({
             where: { id },
-            relations: ['settingLanguages.language', 'settingDesiredTimes.time', 'settingAreaWorks.area', 'settingSpecificSkills.skill', 'settingAgeOfChildrens.AgeOfChildrens', 'settingCertifications.certification', 'user'],
+            relations: [
+                'settingLanguages.language',
+                'settingDesiredTimes.time',
+                'settingAreaWorks.area',
+                'settingSpecificSkills.skill',
+                'settingAgeOfChildrens.AgeOfChildrens',
+                'settingCertifications.certification',
+                'user',
+                'media',
+            ],
         });
         if (!nounu) {
             throw new common_2.NotFoundException(`Nounu with ID ${id} not found`);
@@ -164,7 +194,9 @@ exports.NounuService = NounuService = __decorate([
     __param(13, (0, common_1.Inject)('SETTING_SPECIFIC_SKILLS_REPOSITORY')),
     __param(14, (0, common_1.Inject)('NOUNU_SETTING_SPECIFIC_SKILLS_REPOSITORY')),
     __param(15, (0, common_1.Inject)('USER_REPOSITORY')),
+    __param(16, (0, common_1.Inject)('MEDIA_REPOSITORY')),
     __metadata("design:paramtypes", [typeorm_1.Repository,
+        typeorm_1.Repository,
         typeorm_1.Repository,
         typeorm_1.Repository,
         typeorm_1.Repository,

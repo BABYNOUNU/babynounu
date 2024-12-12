@@ -24,11 +24,11 @@ __decorate([
     __metadata("design:type", String)
 ], NounuSettingCertifications.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => nounu_model_1.Nounus, (nounu) => nounu.settingCertifications, { cascade: true }),
+    (0, typeorm_1.ManyToOne)(() => nounu_model_1.Nounus, (nounu) => nounu.settingCertifications, { onDelete: 'CASCADE' }),
     __metadata("design:type", nounu_model_1.Nounus)
 ], NounuSettingCertifications.prototype, "nounu", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => setting_certification_model_1.SettingCertifications, { cascade: true }),
+    (0, typeorm_1.ManyToOne)(() => setting_certification_model_1.SettingCertifications, { onDelete: 'CASCADE' }),
     __metadata("design:type", setting_certification_model_1.SettingCertifications)
 ], NounuSettingCertifications.prototype, "certification", void 0);
 exports.NounuSettingCertifications = NounuSettingCertifications = __decorate([

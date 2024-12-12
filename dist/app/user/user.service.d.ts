@@ -17,8 +17,5 @@ export declare class UserService extends SettingGeneraleService {
     deleteUser(where: any): Promise<{
         message: string;
     }>;
-    loggedUser(): {
-        message: string;
-        status: boolean;
-    };
+    loggedUser(ID: any): Promise<User | null>;
 }

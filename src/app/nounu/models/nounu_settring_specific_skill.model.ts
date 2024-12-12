@@ -21,9 +21,9 @@ export class NounuSettingSpecificSkills {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Nounus, (nounu) => nounu.settingSpecificSkills, { cascade: true })
+  @ManyToOne(() => Nounus, (nounu) => nounu.settingSpecificSkills, { onDelete: 'CASCADE' })
   nounu: Nounus;
 
-  @ManyToOne(() => SettingSpecificSkills, { cascade: true })
+  @ManyToOne(() => SettingSpecificSkills, { onDelete: 'CASCADE' })
   skill: SettingSpecificSkills;
 }

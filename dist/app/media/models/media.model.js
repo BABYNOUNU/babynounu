@@ -11,18 +11,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Medias = void 0;
 const nounu_model_1 = require("../../nounu/models/nounu.model");
-const parent_model_1 = require("../../parent/models/parent.model");
 const typeorm_1 = require("typeorm");
 let Medias = class Medias {
     id;
     url;
-    size;
-    type;
-    is_profile;
-    is_banner;
-    is_galery;
-    is_document;
-    media_parent;
     media_nounu;
 };
 exports.Medias = Medias;
@@ -35,35 +27,7 @@ __decorate([
     __metadata("design:type", String)
 ], Medias.prototype, "url", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'integer', unique: false, nullable: false }),
-    __metadata("design:type", Number)
-], Medias.prototype, "size", void 0);
-__decorate([
-    (0, typeorm_1.Column)('text', { unique: false, nullable: false }),
-    __metadata("design:type", String)
-], Medias.prototype, "type", void 0);
-__decorate([
-    (0, typeorm_1.Column)('boolean', { unique: false, nullable: false, default: false }),
-    __metadata("design:type", Boolean)
-], Medias.prototype, "is_profile", void 0);
-__decorate([
-    (0, typeorm_1.Column)('boolean', { unique: false, nullable: false, default: false }),
-    __metadata("design:type", Boolean)
-], Medias.prototype, "is_banner", void 0);
-__decorate([
-    (0, typeorm_1.Column)('boolean', { unique: false, nullable: false, default: true }),
-    __metadata("design:type", Boolean)
-], Medias.prototype, "is_galery", void 0);
-__decorate([
-    (0, typeorm_1.Column)('boolean', { unique: false, nullable: false, default: false }),
-    __metadata("design:type", Boolean)
-], Medias.prototype, "is_document", void 0);
-__decorate([
-    (0, typeorm_1.OneToMany)(() => parent_model_1.Parents, (parent) => parent.media, { onDelete: 'CASCADE' }),
-    __metadata("design:type", parent_model_1.Parents)
-], Medias.prototype, "media_parent", void 0);
-__decorate([
-    (0, typeorm_1.OneToMany)(() => nounu_model_1.Nounus, (nounu) => nounu.media, { onDelete: 'CASCADE' }),
+    (0, typeorm_1.ManyToOne)(() => nounu_model_1.Nounus, (nounu) => nounu.media, { onDelete: 'CASCADE' }),
     __metadata("design:type", nounu_model_1.Nounus)
 ], Medias.prototype, "media_nounu", void 0);
 exports.Medias = Medias = __decorate([

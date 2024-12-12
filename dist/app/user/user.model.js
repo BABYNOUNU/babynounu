@@ -15,14 +15,16 @@ const parent_model_1 = require("../parent/models/parent.model");
 const role_model_1 = require("../role/models/role.model");
 const nounu_model_1 = require("../nounu/models/nounu.model");
 const abonnement_model_1 = require("../abonnement/models/abonnement.model");
+const setting_type_profil_model_1 = require("../setting/models/setting_type_profil.model");
 let User = class User {
     id;
     slug;
     email;
     password;
     access_token;
-    parent;
+    type_profil;
     nounu;
+    parent;
     abonnement;
     role;
 };
@@ -48,19 +50,27 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "access_token", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => parent_model_1.Parents, (parent) => parent.user, { onDelete: 'CASCADE' }),
-    __metadata("design:type", parent_model_1.Parents)
-], User.prototype, "parent", void 0);
+    (0, typeorm_1.ManyToOne)(() => setting_type_profil_model_1.SettingTypeProfil, (SN) => SN.userType, { onDelete: 'CASCADE' }),
+    __metadata("design:type", setting_type_profil_model_1.SettingTypeProfil)
+], User.prototype, "type_profil", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => nounu_model_1.Nounus, (nounu) => nounu.user, { onDelete: 'CASCADE' }),
+    (0, typeorm_1.OneToOne)(() => nounu_model_1.Nounus, { eager: true, cascade: true, onDelete: 'CASCADE' }),
+    (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", nounu_model_1.Nounus)
 ], User.prototype, "nounu", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => abonnement_model_1.Abonnements, (abonnement) => abonnement.user, { onDelete: 'CASCADE' }),
+    (0, typeorm_1.OneToOne)(() => parent_model_1.Parents, { eager: true, cascade: true, onDelete: 'CASCADE' }),
+    (0, typeorm_1.JoinColumn)(),
+    __metadata("design:type", parent_model_1.Parents)
+], User.prototype, "parent", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => abonnement_model_1.Abonnements, (abonnement) => abonnement.user, {
+        cascade: true,
+    }),
     __metadata("design:type", nounu_model_1.Nounus)
 ], User.prototype, "abonnement", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => role_model_1.Roles, (role) => role.user, { cascade: true }),
+    (0, typeorm_1.ManyToOne)(() => role_model_1.Roles, (role) => role.user, { onDelete: 'CASCADE' }),
     __metadata("design:type", role_model_1.Roles)
 ], User.prototype, "role", void 0);
 exports.User = User = __decorate([

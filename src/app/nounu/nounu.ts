@@ -15,6 +15,8 @@ import { SettingCertifications } from '../setting/models/setting_certification.m
 import { User } from '../user/user.model';
 import { SettingDesiredTime } from '../setting/models/setting_desired_time.model';
 import { SettingSpecificSkills } from '../setting/models/setting_specific_skill.model';
+import { Medias } from '../media/models/media.model';
+import { NounuSettingSpecificSkills } from './models/nounu_settring_specific_skill.model';
 
 export const NounuProviders = [
     {
@@ -95,9 +97,13 @@ export const NounuProviders = [
 
 {
   provide: 'NOUNU_SETTING_SPECIFIC_SKILLS_REPOSITORY',
-  useFactory: (dataSource: DataSource) => dataSource.getRepository(User),
+  useFactory: (dataSource: DataSource) => dataSource.getRepository(NounuSettingSpecificSkills),
   inject: ['DATA_SOURCE'],
 },
-
+{
+  provide: 'MEDIA_REPOSITORY',
+  useFactory: (dataSource: DataSource) => dataSource.getRepository(Medias),
+  inject: ['DATA_SOURCE'],
+},
 
   ];

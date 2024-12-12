@@ -24,11 +24,11 @@ __decorate([
     __metadata("design:type", String)
 ], NounuSettingLocalizations.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => nounu_model_1.Nounus, (nounu) => nounu.settingLocalizations, { cascade: true }),
+    (0, typeorm_1.ManyToOne)(() => nounu_model_1.Nounus, (nounu) => nounu.settingLocalizations, { onDelete: 'CASCADE' }),
     __metadata("design:type", nounu_model_1.Nounus)
 ], NounuSettingLocalizations.prototype, "nounu", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => setting_localization_model_1.SettingLocalization, { cascade: true }),
+    (0, typeorm_1.ManyToOne)(() => setting_localization_model_1.SettingLocalization, { onDelete: 'CASCADE' }),
     __metadata("design:type", setting_localization_model_1.SettingLocalization)
 ], NounuSettingLocalizations.prototype, "loacalization", void 0);
 exports.NounuSettingLocalizations = NounuSettingLocalizations = __decorate([

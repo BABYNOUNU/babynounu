@@ -15,9 +15,9 @@ export class NounuSettingCertifications {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Nounus, (nounu) => nounu.settingCertifications, { cascade: true })
+  @ManyToOne(() => Nounus, (nounu) => nounu.settingCertifications, { onDelete: 'CASCADE' })
   nounu: Nounus;
 
-  @ManyToOne(() => SettingCertifications, { cascade: true })
+  @ManyToOne(() => SettingCertifications, { onDelete: 'CASCADE' })
   certification: SettingCertifications;
 }

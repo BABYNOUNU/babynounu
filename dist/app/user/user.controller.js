@@ -25,8 +25,8 @@ let UserController = class UserController {
     GetUsers() {
         return this.userService.users();
     }
-    LoggedUser() {
-        return this.userService.loggedUser();
+    LoggedUser(ID) {
+        return this.userService.loggedUser(ID);
     }
     GetUser(slug) {
         return this.userService.user(slug);
@@ -54,9 +54,10 @@ __decorate([
 ], UserController.prototype, "GetUsers", null);
 __decorate([
     (0, common_1.UseGuards)(auh_guard_1.JwtAuthGuard),
-    (0, common_1.Get)('/logged'),
+    (0, common_1.Get)('/logged/:id'),
+    __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "LoggedUser", null);
 __decorate([

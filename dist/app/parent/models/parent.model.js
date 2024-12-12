@@ -10,22 +10,40 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Parents = void 0;
-const media_model_1 = require("../../media/models/media.model");
-const user_model_1 = require("../../user/user.model");
 const typeorm_1 = require("typeorm");
-const parent_setting_model_1 = require("./parent_setting.model");
+const parent_setting_age_of_children_model_1 = require("./parent_setting_age_of_children.model");
+const parent_setting_desired_time_model_1 = require("./parent_setting_desired_time.model");
+const parent_setting_languages_model_1 = require("./parent_setting_languages.model");
+const parent_setting_localization_model_1 = require("./parent_setting_localization.model");
+const parent_settring_specific_skill_model_1 = require("./parent_settring_specific_skill.model");
+const parent_setting_guard_schedules_model_1 = require("./parent_setting_guard_schedules.model");
+const parent_setting_specific_need_model_1 = require("./parent_setting_specific_need.model");
+const parent_settring_area_work_model_1 = require("./parent_settring_area_work.model");
+const parent_setting_housekeeper_model_1 = require("./parent_setting_housekeeper.model");
+const parent_setting_service_frequency_model_1 = require("./parent_setting_service_frequency.model");
 let Parents = class Parents {
     id;
     fullname;
-    media;
-    old;
     phone;
     adresse;
-    setting;
     budget_min;
     budget_max;
-    mode_de_paiement;
-    user;
+    photo;
+    number_of_children;
+    localization;
+    payment_terms;
+    description;
+    availabilityServiceProvider;
+    settingAgeOfChildrens;
+    settingSpecificNeeds;
+    settingGuardSchedules;
+    settingDesiredTimes;
+    settingHousekeepers;
+    settingAreaWorks;
+    settingLanguages;
+    settingLocalizations;
+    settingSpecificSkills;
+    settingServiceFrequency;
     createdAt;
     updatedAt;
     deletedAt;
@@ -40,14 +58,6 @@ __decorate([
     __metadata("design:type", String)
 ], Parents.prototype, "fullname", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => media_model_1.Medias, (media) => media.media_parent, { cascade: true }),
-    __metadata("design:type", Array)
-], Parents.prototype, "media", void 0);
-__decorate([
-    (0, typeorm_1.Column)('varchar', { length: 255, unique: false, nullable: false }),
-    __metadata("design:type", String)
-], Parents.prototype, "old", void 0);
-__decorate([
     (0, typeorm_1.Column)('varchar', { length: 255, unique: false, nullable: false }),
     __metadata("design:type", String)
 ], Parents.prototype, "phone", void 0);
@@ -55,10 +65,6 @@ __decorate([
     (0, typeorm_1.Column)('varchar', { length: 255, unique: false, nullable: false }),
     __metadata("design:type", String)
 ], Parents.prototype, "adresse", void 0);
-__decorate([
-    (0, typeorm_1.ManyToOne)(() => parent_setting_model_1.ParentSettings, (parent) => parent.id, { cascade: true }),
-    __metadata("design:type", Array)
-], Parents.prototype, "setting", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: 'varchar', length: 255, unique: false, nullable: false }),
     __metadata("design:type", String)
@@ -68,13 +74,69 @@ __decorate([
     __metadata("design:type", String)
 ], Parents.prototype, "budget_max", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ type: 'text', nullable: false }),
+    __metadata("design:type", String)
+], Parents.prototype, "photo", void 0);
+__decorate([
+    (0, typeorm_1.Column)('varchar', { length: 255, nullable: false }),
+    __metadata("design:type", String)
+], Parents.prototype, "number_of_children", void 0);
+__decorate([
+    (0, typeorm_1.Column)('varchar', { length: 255, nullable: false }),
+    __metadata("design:type", String)
+], Parents.prototype, "localization", void 0);
+__decorate([
     (0, typeorm_1.Column)({ type: 'varchar', length: 255, unique: false, nullable: false }),
     __metadata("design:type", String)
-], Parents.prototype, "mode_de_paiement", void 0);
+], Parents.prototype, "payment_terms", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => user_model_1.User, (user) => user.parent, { cascade: true }),
-    __metadata("design:type", user_model_1.User)
-], Parents.prototype, "user", void 0);
+    (0, typeorm_1.Column)({ type: 'text', nullable: true }),
+    __metadata("design:type", String)
+], Parents.prototype, "description", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'varchar', length: 255, unique: false, nullable: false }),
+    __metadata("design:type", String)
+], Parents.prototype, "availabilityServiceProvider", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => parent_setting_age_of_children_model_1.ParentSettingAgeOfChildrens, (SN) => SN.parent, { cascade: true, onDelete: 'CASCADE' }),
+    __metadata("design:type", Array)
+], Parents.prototype, "settingAgeOfChildrens", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => parent_setting_specific_need_model_1.ParentSettingSpecificNeeds, (SN) => SN.parent, { cascade: true, onDelete: 'CASCADE' }),
+    __metadata("design:type", Array)
+], Parents.prototype, "settingSpecificNeeds", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => parent_setting_guard_schedules_model_1.ParentSettingGuardSchedules, (SN) => SN.parent, { cascade: true, onDelete: 'CASCADE' }),
+    __metadata("design:type", Array)
+], Parents.prototype, "settingGuardSchedules", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => parent_setting_desired_time_model_1.ParentSettingDeriredTimes, (SN) => SN.parent, { cascade: true, onDelete: 'CASCADE' }),
+    __metadata("design:type", Array)
+], Parents.prototype, "settingDesiredTimes", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => parent_setting_housekeeper_model_1.ParentSettingHousekeepers, (SN) => SN.parent, { cascade: true, onDelete: 'CASCADE' }),
+    __metadata("design:type", Array)
+], Parents.prototype, "settingHousekeepers", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => parent_settring_area_work_model_1.ParentSettingAreaWork, (SN) => SN.parent, { cascade: true, onDelete: 'CASCADE' }),
+    __metadata("design:type", Array)
+], Parents.prototype, "settingAreaWorks", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => parent_setting_languages_model_1.ParentSettingLanguages, (SN) => SN.parent, { cascade: true, onDelete: 'CASCADE' }),
+    __metadata("design:type", Array)
+], Parents.prototype, "settingLanguages", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => parent_setting_localization_model_1.ParentSettingLocalizations, (SN) => SN.parent, { cascade: true, onDelete: 'CASCADE' }),
+    __metadata("design:type", Array)
+], Parents.prototype, "settingLocalizations", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => parent_settring_specific_skill_model_1.ParentSettingSpecificSkills, (SN) => SN.parent, { cascade: true, onDelete: 'CASCADE' }),
+    __metadata("design:type", Array)
+], Parents.prototype, "settingSpecificSkills", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => parent_setting_service_frequency_model_1.ParentSettingServiceFrequency, (SN) => SN.parent, { cascade: true, onDelete: 'CASCADE' }),
+    __metadata("design:type", Array)
+], Parents.prototype, "settingServiceFrequency", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)({ type: 'timestamp' }),
     __metadata("design:type", Date)

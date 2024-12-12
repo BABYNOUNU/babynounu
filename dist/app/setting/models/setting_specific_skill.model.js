@@ -11,18 +11,16 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SettingSpecificSkills = void 0;
 const typeorm_1 = require("typeorm");
-const parent_setting_model_1 = require("../../parent/models/parent_setting.model");
 const nounu_settring_specific_skill_model_1 = require("../../nounu/models/nounu_settring_specific_skill.model");
 let SettingSpecificSkills = class SettingSpecificSkills {
     id;
     slug;
     name;
     description;
-    parent;
     createdAt;
     updatedAt;
     deletedAt;
-    nounuSettingAreaWork;
+    nounuSettingSpecificSkill;
 };
 exports.SettingSpecificSkills = SettingSpecificSkills;
 __decorate([
@@ -30,7 +28,7 @@ __decorate([
     __metadata("design:type", String)
 ], SettingSpecificSkills.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.Column)('varchar', { length: 255, unique: true, nullable: true }),
+    (0, typeorm_1.Column)('varchar', { nullable: true }),
     __metadata("design:type", String)
 ], SettingSpecificSkills.prototype, "slug", void 0);
 __decorate([
@@ -41,10 +39,6 @@ __decorate([
     (0, typeorm_1.Column)('text', { nullable: true }),
     __metadata("design:type", String)
 ], SettingSpecificSkills.prototype, "description", void 0);
-__decorate([
-    (0, typeorm_1.OneToMany)(() => parent_setting_model_1.ParentSettings, (PS) => PS.specific_skills, { cascade: true }),
-    __metadata("design:type", parent_setting_model_1.ParentSettings)
-], SettingSpecificSkills.prototype, "parent", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)({ type: 'timestamp' }),
     __metadata("design:type", Date)
@@ -59,10 +53,10 @@ __decorate([
 ], SettingSpecificSkills.prototype, "deletedAt", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => nounu_settring_specific_skill_model_1.NounuSettingSpecificSkills, (NSL) => NSL.skill, {
-        onDelete: 'CASCADE',
+        cascade: true, onDelete: 'CASCADE',
     }),
     __metadata("design:type", Array)
-], SettingSpecificSkills.prototype, "nounuSettingAreaWork", void 0);
+], SettingSpecificSkills.prototype, "nounuSettingSpecificSkill", void 0);
 exports.SettingSpecificSkills = SettingSpecificSkills = __decorate([
     (0, typeorm_1.Entity)()
 ], SettingSpecificSkills);

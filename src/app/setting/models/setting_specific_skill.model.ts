@@ -1,10 +1,8 @@
 import { Parents } from 'src/app/parent/models/parent.model';
-import { Parent } from 'src/app/parent/parent';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn, } from 'typeorm';
-import { ParentSettings } from 'src/app/parent/models/parent_setting.model';
 import { NounuSettings } from 'src/app/nounu/models/nounu_setting.model';
 import { NounuSettingSpecificSkills } from 'src/app/nounu/models/nounu_settring_specific_skill.model';
 
@@ -13,7 +11,7 @@ export class SettingSpecificSkills {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column('varchar', { length: 255, unique: true, nullable: true })
+  @Column('varchar', {  nullable: true })
   slug: string;
 
   @Column('varchar', { length: 255, unique: false, nullable: false })
@@ -21,9 +19,6 @@ export class SettingSpecificSkills {
 
   @Column('text', { nullable: true })
   description: string;
-
-  @OneToMany(() => ParentSettings, (PS) => PS.specific_skills, { cascade: true})
-  parent: ParentSettings
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
@@ -35,7 +30,7 @@ export class SettingSpecificSkills {
   deletedAt: Date | null;
 
   @OneToMany(() => NounuSettingSpecificSkills, (NSL) => NSL.skill, {
-    onDelete: 'CASCADE',
+    cascade: true, onDelete: 'CASCADE',
   })
-  nounuSettingAreaWork: NounuSettingSpecificSkills[];
+  nounuSettingSpecificSkill: NounuSettingSpecificSkills[];
 }

@@ -16,7 +16,7 @@ export class Roles {
   @Column('text', { nullable: true })
   description: string;
 
-  @OneToMany(() => User, (user) => user.role, { onDelete: 'CASCADE'})
+  @OneToMany(() => User, (user) => user.role, { cascade: true})
   user: User
 
 }

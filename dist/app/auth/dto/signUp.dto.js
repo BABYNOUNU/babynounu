@@ -17,6 +17,7 @@ class SginUpAuthDto {
     email;
     password;
     role;
+    type_profil;
 }
 exports.SginUpAuthDto = SginUpAuthDto;
 __decorate([
@@ -42,6 +43,7 @@ __decorate([
         required: true,
     }),
     (0, class_validator_1.IsString)({ message: 'Ce champs est requis' }),
+    (0, class_validator_1.MinLength)(8, { message: 'Le mot de passe doit avoir au moins 8 caractères' }),
     __metadata("design:type", String)
 ], SginUpAuthDto.prototype, "password", void 0);
 __decorate([
@@ -53,3 +55,12 @@ __decorate([
     (0, class_validator_1.IsNumber)({}, { message: 'Ce champ doit être un nombre' }),
     __metadata("design:type", Number)
 ], SginUpAuthDto.prototype, "role", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: '1',
+        required: true
+    }),
+    (0, class_validator_1.IsNotEmpty)({ message: 'Ce champ est requis' }),
+    (0, class_validator_1.IsNumber)({}, { message: 'Ce champ doit être un nombre' }),
+    __metadata("design:type", Number)
+], SginUpAuthDto.prototype, "type_profil", void 0);

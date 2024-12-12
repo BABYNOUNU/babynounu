@@ -32,6 +32,7 @@ export class SginUpAuthDto {
     required: true,
   })
   @IsString({ message: 'Ce champs est requis' })
+  @MinLength(8, { message: 'Le mot de passe doit avoir au moins 8 caractères' })
   password: string;
 
   @ApiProperty({
@@ -41,4 +42,12 @@ export class SginUpAuthDto {
   @IsNotEmpty({ message: 'Ce champ est requis' })
   @IsNumber({}, { message: 'Ce champ doit être un nombre' })
   role: number;
+
+  @ApiProperty({
+    example: '1',
+    required: true
+  })
+  @IsNotEmpty({ message: 'Ce champ est requis' })
+  @IsNumber({}, { message: 'Ce champ doit être un nombre' })
+  type_profil: number;
 }

@@ -17,7 +17,9 @@ import { User } from '../user/user.model';
 import { SettingDesiredTime } from '../setting/models/setting_desired_time.model';
 import { SettingSpecificSkills } from '../setting/models/setting_specific_skill.model';
 import { NounuSettingSpecificSkills } from './models/nounu_settring_specific_skill.model';
-export declare class NounuService {
+import { MediaService } from '../media/media.service';
+import { Medias } from '../media/models/media.model';
+export declare class NounuService extends MediaService {
     private readonly nounuRepository;
     private readonly nounuSettingsRepository;
     private readonly nounuSettingLanguagesRepository;
@@ -34,8 +36,13 @@ export declare class NounuService {
     private readonly settingSpecificSkillsRepository;
     private readonly nounuSettingSpecificSkillsRepository;
     private readonly userRepository;
-    constructor(nounuRepository: Repository<Nounus>, nounuSettingsRepository: Repository<NounuSettings>, nounuSettingLanguagesRepository: Repository<NounuSettingLanguages>, settingLanguagesRepository: Repository<SettingLanguages>, nounuSettingLocalizationsRepository: Repository<NounuSettingLocalizations>, nounuSettingAgeOfChildrensRepository: Repository<NounuSettingAgeOfChildrens>, nounuSettingCertificationsRepository: Repository<NounuSettingCertifications>, nounuSettingDesiredTimesRepository: Repository<NounuSettingDeriredTimes>, nounuSettingAreaWorksRepository: Repository<NounuSettingAreaWork>, settingAgeOfChildrensRepository: Repository<SettingAgeOfChildren>, settingLocalizationsRepository: Repository<SettingLocalization>, settingDesiredTimesRepository: Repository<SettingDesiredTime>, settingCertificationsRepository: Repository<SettingCertifications>, settingSpecificSkillsRepository: Repository<SettingSpecificSkills>, nounuSettingSpecificSkillsRepository: Repository<NounuSettingSpecificSkills>, userRepository: Repository<User>);
-    create(createNounuDto: CreateNounuDto, files: Array<Express.Multer.File>): Promise<Nounus>;
+    private readonly mediaRepository;
+    constructor(nounuRepository: Repository<Nounus>, nounuSettingsRepository: Repository<NounuSettings>, nounuSettingLanguagesRepository: Repository<NounuSettingLanguages>, settingLanguagesRepository: Repository<SettingLanguages>, nounuSettingLocalizationsRepository: Repository<NounuSettingLocalizations>, nounuSettingAgeOfChildrensRepository: Repository<NounuSettingAgeOfChildrens>, nounuSettingCertificationsRepository: Repository<NounuSettingCertifications>, nounuSettingDesiredTimesRepository: Repository<NounuSettingDeriredTimes>, nounuSettingAreaWorksRepository: Repository<NounuSettingAreaWork>, settingAgeOfChildrensRepository: Repository<SettingAgeOfChildren>, settingLocalizationsRepository: Repository<SettingLocalization>, settingDesiredTimesRepository: Repository<SettingDesiredTime>, settingCertificationsRepository: Repository<SettingCertifications>, settingSpecificSkillsRepository: Repository<SettingSpecificSkills>, nounuSettingSpecificSkillsRepository: Repository<NounuSettingSpecificSkills>, userRepository: Repository<User>, mediaRepository: Repository<Medias>);
+    create(createNounuDto: CreateNounuDto, files: {
+        profil_image?: Express.Multer.File[];
+        document?: Express.Multer.File[];
+        gallery?: Express.Multer.File[];
+    }): Promise<Nounus>;
     findAll(): Promise<Nounus[]>;
     findOne(id: string): Promise<Nounus>;
     update(id: string, updateNounuDto: UpdateNounuDto): Promise<Nounus>;

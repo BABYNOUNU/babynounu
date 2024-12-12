@@ -16,6 +16,8 @@ const setting_certification_model_1 = require("../setting/models/setting_certifi
 const user_model_1 = require("../user/user.model");
 const setting_desired_time_model_1 = require("../setting/models/setting_desired_time.model");
 const setting_specific_skill_model_1 = require("../setting/models/setting_specific_skill.model");
+const media_model_1 = require("../media/models/media.model");
+const nounu_settring_specific_skill_model_1 = require("./models/nounu_settring_specific_skill.model");
 exports.NounuProviders = [
     {
         provide: 'NOUNU_SETTING_REPOSITORY',
@@ -94,7 +96,12 @@ exports.NounuProviders = [
     },
     {
         provide: 'NOUNU_SETTING_SPECIFIC_SKILLS_REPOSITORY',
-        useFactory: (dataSource) => dataSource.getRepository(user_model_1.User),
+        useFactory: (dataSource) => dataSource.getRepository(nounu_settring_specific_skill_model_1.NounuSettingSpecificSkills),
+        inject: ['DATA_SOURCE'],
+    },
+    {
+        provide: 'MEDIA_REPOSITORY',
+        useFactory: (dataSource) => dataSource.getRepository(media_model_1.Medias),
         inject: ['DATA_SOURCE'],
     },
 ];

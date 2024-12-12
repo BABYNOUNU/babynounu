@@ -54,7 +54,11 @@ export class UserService extends SettingGeneraleService {
     return { message: 'User deleted' };
   }
 
-  loggedUser() {
-    return { message: 'User is connected', status: true };
+  async loggedUser(ID: any): Promise<User | null> {
+    const User = await this.userRepository.findOne({ where: { id: ID }, relations: ['role', 'type_profil', 'parent', 'nounu', 'abonnement'] });
+    if (!User) {
+      throw new BadRequestException({ message: 'user not exist in database' });
+    }
+    return User
   }
 }

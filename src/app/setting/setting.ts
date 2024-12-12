@@ -14,6 +14,7 @@ import { SettingServiceFrequency } from './models/setting_service_frequency.mode
 import { SettingDesiredTime } from './models/setting_desired_time.model';
 import { SettingPaymentTerms } from './models/setting_payment_terms.model';
 import { Roles } from '../role/models/role.model';
+import { SettingTypeProfil } from './models/setting_type_profil.model';
 
 
 export const SettingProviders = [
@@ -95,6 +96,11 @@ export const SettingProviders = [
     {
       provide: 'ROLE_REPOSITORY',
       useFactory: (dataSource: DataSource) => dataSource.getRepository(Roles),
+      inject: ['DATA_SOURCE'],
+    },
+    {
+      provide: 'TYPE_PROFIL_REPOSITORY',
+      useFactory: (dataSource: DataSource) => dataSource.getRepository(SettingTypeProfil),
       inject: ['DATA_SOURCE'],
     },
   ];

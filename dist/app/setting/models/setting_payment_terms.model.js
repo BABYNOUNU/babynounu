@@ -10,14 +10,12 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SettingPaymentTerms = void 0;
-const parent_setting_model_1 = require("../../parent/models/parent_setting.model");
 const typeorm_1 = require("typeorm");
 let SettingPaymentTerms = class SettingPaymentTerms {
     id;
     slug;
     name;
     description;
-    parent;
 };
 exports.SettingPaymentTerms = SettingPaymentTerms;
 __decorate([
@@ -36,10 +34,6 @@ __decorate([
     (0, typeorm_1.Column)('text', { nullable: true }),
     __metadata("design:type", String)
 ], SettingPaymentTerms.prototype, "description", void 0);
-__decorate([
-    (0, typeorm_1.OneToMany)(() => parent_setting_model_1.ParentSettings, (SU) => SU.age_of_children, { cascade: true }),
-    __metadata("design:type", parent_setting_model_1.ParentSettings)
-], SettingPaymentTerms.prototype, "parent", void 0);
 exports.SettingPaymentTerms = SettingPaymentTerms = __decorate([
     (0, typeorm_1.Entity)()
 ], SettingPaymentTerms);

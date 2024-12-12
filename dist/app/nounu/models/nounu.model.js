@@ -38,6 +38,7 @@ let Nounus = class Nounus {
     pricing_flexibility;
     confirmed_identity;
     photo;
+    user;
     settingLanguages;
     settingLocalizations;
     settingAgeOfChildrens;
@@ -45,7 +46,6 @@ let Nounus = class Nounus {
     settingDesiredTimes;
     settingAreaWorks;
     settingSpecificSkills;
-    user;
     createdAt;
     updatedAt;
     deletedAt;
@@ -60,7 +60,7 @@ __decorate([
     __metadata("design:type", String)
 ], Nounus.prototype, "fullname", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => media_model_1.Medias, (media) => media.media_nounu, { cascade: true }),
+    (0, typeorm_1.OneToMany)(() => media_model_1.Medias, (media) => media.media_nounu, { cascade: true }),
     __metadata("design:type", Array)
 ], Nounus.prototype, "media", void 0);
 __decorate([
@@ -120,37 +120,58 @@ __decorate([
     __metadata("design:type", String)
 ], Nounus.prototype, "photo", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => nounu_setting_languages_model_1.NounuSettingLanguages, (SN) => SN.nounu, { onDelete: 'CASCADE' }),
+    (0, typeorm_1.OneToOne)((type) => user_model_1.User, (user) => user.nounu, { onDelete: 'CASCADE' }),
+    __metadata("design:type", user_model_1.User)
+], Nounus.prototype, "user", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => nounu_setting_languages_model_1.NounuSettingLanguages, (SN) => SN.nounu, {
+        cascade: true,
+        onDelete: 'CASCADE',
+    }),
     __metadata("design:type", Array)
 ], Nounus.prototype, "settingLanguages", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => nounu_setting_localization_model_1.NounuSettingLocalizations, (SN) => SN.nounu, { onDelete: 'CASCADE' }),
+    (0, typeorm_1.OneToMany)(() => nounu_setting_localization_model_1.NounuSettingLocalizations, (SN) => SN.nounu, {
+        cascade: true,
+        onDelete: 'CASCADE',
+    }),
     __metadata("design:type", Array)
 ], Nounus.prototype, "settingLocalizations", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => nounu_setting_age_of_children_model_1.NounuSettingAgeOfChildrens, (SN) => SN.nounu, { onDelete: 'CASCADE' }),
+    (0, typeorm_1.OneToMany)(() => nounu_setting_age_of_children_model_1.NounuSettingAgeOfChildrens, (SN) => SN.nounu, {
+        cascade: true,
+        onDelete: 'CASCADE',
+    }),
     __metadata("design:type", Array)
 ], Nounus.prototype, "settingAgeOfChildrens", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => nounu_setting_certification_model_1.NounuSettingCertifications, (SN) => SN.nounu, { onDelete: 'CASCADE' }),
+    (0, typeorm_1.OneToMany)(() => nounu_setting_certification_model_1.NounuSettingCertifications, (SN) => SN.nounu, {
+        cascade: true,
+        onDelete: 'CASCADE',
+    }),
     __metadata("design:type", Array)
 ], Nounus.prototype, "settingCertifications", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => nounu_setting_desired_time_model_1.NounuSettingDeriredTimes, (SN) => SN.nounu, { onDelete: 'CASCADE' }),
+    (0, typeorm_1.OneToMany)(() => nounu_setting_desired_time_model_1.NounuSettingDeriredTimes, (SN) => SN.nounu, {
+        cascade: true,
+        onDelete: 'CASCADE',
+    }),
     __metadata("design:type", Array)
 ], Nounus.prototype, "settingDesiredTimes", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => nounu_settring_area_work_model_1.NounuSettingAreaWork, (SN) => SN.nounu, { onDelete: 'CASCADE' }),
+    (0, typeorm_1.OneToMany)(() => nounu_settring_area_work_model_1.NounuSettingAreaWork, (SN) => SN.nounu, {
+        cascade: true,
+        onDelete: 'CASCADE',
+    }),
     __metadata("design:type", Array)
 ], Nounus.prototype, "settingAreaWorks", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => nounu_settring_specific_skill_model_1.NounuSettingSpecificSkills, (SN) => SN.nounu, { onDelete: 'CASCADE' }),
+    (0, typeorm_1.OneToMany)(() => nounu_settring_specific_skill_model_1.NounuSettingSpecificSkills, (SN) => SN.nounu, {
+        cascade: true,
+        onDelete: 'CASCADE',
+    }),
     __metadata("design:type", Array)
 ], Nounus.prototype, "settingSpecificSkills", void 0);
-__decorate([
-    (0, typeorm_1.ManyToOne)(() => user_model_1.User, (user) => user.nounu, { cascade: true }),
-    __metadata("design:type", user_model_1.User)
-], Nounus.prototype, "user", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)({ type: 'timestamp' }),
     __metadata("design:type", Date)

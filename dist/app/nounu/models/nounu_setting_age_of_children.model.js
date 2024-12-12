@@ -24,11 +24,11 @@ __decorate([
     __metadata("design:type", String)
 ], NounuSettingAgeOfChildrens.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => nounu_model_1.Nounus, (nounu) => nounu.settingAgeOfChildrens, { cascade: true }),
+    (0, typeorm_1.ManyToOne)(() => nounu_model_1.Nounus, (nounu) => nounu.settingAgeOfChildrens, { onDelete: 'CASCADE' }),
     __metadata("design:type", nounu_model_1.Nounus)
 ], NounuSettingAgeOfChildrens.prototype, "nounu", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => setting_age_of_children_model_1.SettingAgeOfChildren, { cascade: true }),
+    (0, typeorm_1.ManyToOne)(() => setting_age_of_children_model_1.SettingAgeOfChildren, { onDelete: 'CASCADE' }),
     __metadata("design:type", setting_age_of_children_model_1.SettingAgeOfChildren)
 ], NounuSettingAgeOfChildrens.prototype, "AgeOfChildrens", void 0);
 exports.NounuSettingAgeOfChildrens = NounuSettingAgeOfChildrens = __decorate([

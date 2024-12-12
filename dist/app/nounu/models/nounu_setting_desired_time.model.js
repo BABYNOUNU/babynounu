@@ -24,11 +24,11 @@ __decorate([
     __metadata("design:type", String)
 ], NounuSettingDeriredTimes.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => nounu_model_1.Nounus, (nounu) => nounu.settingDesiredTimes, { cascade: true }),
+    (0, typeorm_1.ManyToOne)(() => nounu_model_1.Nounus, (nounu) => nounu.settingDesiredTimes, { onDelete: 'CASCADE' }),
     __metadata("design:type", nounu_model_1.Nounus)
 ], NounuSettingDeriredTimes.prototype, "nounu", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => setting_desired_time_model_1.SettingDesiredTime, { cascade: true }),
+    (0, typeorm_1.ManyToOne)(() => setting_desired_time_model_1.SettingDesiredTime, { onDelete: 'CASCADE' }),
     __metadata("design:type", setting_desired_time_model_1.SettingDesiredTime)
 ], NounuSettingDeriredTimes.prototype, "time", void 0);
 exports.NounuSettingDeriredTimes = NounuSettingDeriredTimes = __decorate([

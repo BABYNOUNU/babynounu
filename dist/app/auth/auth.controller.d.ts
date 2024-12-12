@@ -11,8 +11,9 @@ export declare class AuthController {
             slug: string;
             email: string;
             password: string;
-            parent: import("../parent/models/parent.model").Parents;
+            type_profil: import("../setting/models/setting_type_profil.model").SettingTypeProfil;
             nounu: import("../nounu/models/nounu.model").Nounus;
+            parent: import("../parent/models/parent.model").Parents;
             abonnement: import("../nounu/models/nounu.model").Nounus;
             role: import("../role/models/role.model").Roles;
         };
@@ -20,12 +21,14 @@ export declare class AuthController {
     SignIn(signInBody: SginInAuthDto): Promise<{
         user: {
             access_token: string;
+            profil: import("../nounu/models/nounu.model").Nounus | import("../parent/models/parent.model").Parents;
             id: string;
             slug: string;
             email: string;
             password: string;
-            parent: import("../parent/models/parent.model").Parents;
+            type_profil: import("../setting/models/setting_type_profil.model").SettingTypeProfil;
             nounu: import("../nounu/models/nounu.model").Nounus;
+            parent: import("../parent/models/parent.model").Parents;
             abonnement: import("../nounu/models/nounu.model").Nounus;
             role: import("../role/models/role.model").Roles;
         };

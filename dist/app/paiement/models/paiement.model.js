@@ -80,7 +80,7 @@ __decorate([
     __metadata("design:type", String)
 ], Paiements.prototype, "customer_zip_code", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => abonnement_model_1.Abonnements, (NS) => NS.paiement, { cascade: true }),
+    (0, typeorm_1.OneToMany)(() => abonnement_model_1.Abonnements, (NS) => NS.paiement, { cascade: true, }),
     __metadata("design:type", abonnement_model_1.Abonnements)
 ], Paiements.prototype, "abonnement", void 0);
 __decorate([

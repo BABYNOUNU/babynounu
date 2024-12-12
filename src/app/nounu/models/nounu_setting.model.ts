@@ -14,31 +14,31 @@ export class NounuSettings {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  // @OneToMany(() => Nounus, (nounu) => nounu.setting, { onDelete: 'CASCADE' })
+  // @OneToMany(() => Nounus, (nounu) => nounu.setting, { cascade: true, onDelete: 'CASCADE' })
   // nounu: Nounus;
 
   // @ManyToOne(() => SettingLanguages, (SN) => SN.nounu, {
-  //   onDelete: 'CASCADE',
+  //   cascade: true, onDelete: 'CASCADE',
   // })
   // language: SettingLanguages;
 
   // @ManyToOne(() => SettingAgeOfChildren, (AOC) => AOC.nounu, {
-  //   onDelete: 'CASCADE',
+  //   cascade: true, onDelete: 'CASCADE',
   // })
   // specific_skills: SettingSpecificSkills;
 
   // @ManyToOne(() => SettingGuardSchedules, (AOC) => AOC.nounu, {
-  //   onDelete: 'CASCADE',
+  //   cascade: true, onDelete: 'CASCADE',
   // })
   // guard_schedule: SettingGuardSchedules[];
 
   // @ManyToOne(() => SettingLocalization, (SN) => SN.nounu, {
-  //   onDelete: 'CASCADE',
+  //   cascade: true, onDelete: 'CASCADE',
   // })
   // localization: SettingLocalization[];
 
   // @ManyToOne(() => SettingCertifications, (SC) => SC.nounu, {
-  //   onDelete: 'CASCADE',
+  //   cascade: true, onDelete: 'CASCADE',
   // })
   // certification?: SettingCertifications[];
 }

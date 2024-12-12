@@ -24,11 +24,11 @@ __decorate([
     __metadata("design:type", String)
 ], NounuSettingLanguages.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => nounu_model_1.Nounus, (nounu) => nounu.settingLanguages, { cascade: true }),
+    (0, typeorm_1.ManyToOne)(() => nounu_model_1.Nounus, (nounu) => nounu.settingLanguages, { onDelete: 'CASCADE' }),
     __metadata("design:type", nounu_model_1.Nounus)
 ], NounuSettingLanguages.prototype, "nounu", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => setting_language_model_1.SettingLanguages, { cascade: true }),
+    (0, typeorm_1.ManyToOne)(() => setting_language_model_1.SettingLanguages, { onDelete: 'CASCADE' }),
     __metadata("design:type", setting_language_model_1.SettingLanguages)
 ], NounuSettingLanguages.prototype, "language", void 0);
 exports.NounuSettingLanguages = NounuSettingLanguages = __decorate([
