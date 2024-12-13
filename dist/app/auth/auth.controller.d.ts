@@ -21,7 +21,7 @@ export declare class AuthController {
     SignIn(signInBody: SginInAuthDto): Promise<{
         user: {
             access_token: string;
-            profil: import("../nounu/models/nounu.model").Nounus | import("../parent/models/parent.model").Parents;
+            profil: import("../parent/models/parent.model").Parents | import("../nounu/models/nounu.model").Nounus;
             id: string;
             slug: string;
             email: string;

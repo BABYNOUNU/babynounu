@@ -10,6 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Parents = void 0;
+const user_model_1 = require("../../user/user.model");
 const typeorm_1 = require("typeorm");
 const parent_setting_age_of_children_model_1 = require("./parent_setting_age_of_children.model");
 const parent_setting_desired_time_model_1 = require("./parent_setting_desired_time.model");
@@ -34,6 +35,7 @@ let Parents = class Parents {
     payment_terms;
     description;
     availabilityServiceProvider;
+    user;
     settingAgeOfChildrens;
     settingSpecificNeeds;
     settingGuardSchedules;
@@ -97,6 +99,10 @@ __decorate([
     (0, typeorm_1.Column)({ type: 'varchar', length: 255, unique: false, nullable: false }),
     __metadata("design:type", String)
 ], Parents.prototype, "availabilityServiceProvider", void 0);
+__decorate([
+    (0, typeorm_1.OneToOne)((type) => user_model_1.User, (user) => user.parent, { onDelete: 'CASCADE' }),
+    __metadata("design:type", user_model_1.User)
+], Parents.prototype, "user", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => parent_setting_age_of_children_model_1.ParentSettingAgeOfChildrens, (SN) => SN.parent, { cascade: true, onDelete: 'CASCADE' }),
     __metadata("design:type", Array)

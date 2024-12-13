@@ -1,3 +1,4 @@
+import { User } from 'src/app/user/user.model';
 import { ParentSettingAgeOfChildrens } from './parent_setting_age_of_children.model';
 import { ParentSettingDeriredTimes } from './parent_setting_desired_time.model';
 import { ParentSettingLanguages } from './parent_setting_languages.model';
@@ -21,6 +22,7 @@ export declare class Parents {
     payment_terms: string;
     description: string;
     availabilityServiceProvider: string;
+    user: User;
     settingAgeOfChildrens: ParentSettingAgeOfChildrens[];
     settingSpecificNeeds: ParentSettingSpecificNeeds[];
     settingGuardSchedules: ParentSettingGuardSchedules[];

@@ -12,6 +12,7 @@ import {
   Entity,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -63,6 +64,9 @@ export class Parents {
 
   @Column({ type: 'varchar', length: 255, unique: false, nullable: false })
   availabilityServiceProvider: string; 
+
+  @OneToOne((type) => User, (user) => user.parent, { onDelete: 'CASCADE' })
+  user: User;
 
   @OneToMany(() => ParentSettingAgeOfChildrens, (SN) => SN.parent, { cascade: true, onDelete: 'CASCADE' })
   settingAgeOfChildrens: ParentSettingAgeOfChildrens[];
