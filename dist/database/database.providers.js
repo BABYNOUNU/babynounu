@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.databaseProviders = exports.isProd = void 0;
 const typeorm_1 = require("typeorm");
-exports.isProd = false;
+exports.isProd = true;
 const ProdDatabase = (dbProd, dbTest) => {
     return exports.isProd ? dbProd : dbTest;
 };
