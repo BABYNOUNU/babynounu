@@ -16,6 +16,8 @@ const role_model_1 = require("../role/models/role.model");
 const nounu_model_1 = require("../nounu/models/nounu.model");
 const abonnement_model_1 = require("../abonnement/models/abonnement.model");
 const setting_type_profil_model_1 = require("../setting/models/setting_type_profil.model");
+const notification_model_1 = require("../notification/models/notification.model");
+const job_model_1 = require("../job/models/job.model");
 let User = class User {
     id;
     slug;
@@ -26,6 +28,8 @@ let User = class User {
     nounu;
     parent;
     abonnement;
+    notifications;
+    jobs;
     role;
 };
 exports.User = User;
@@ -69,6 +73,18 @@ __decorate([
     }),
     __metadata("design:type", nounu_model_1.Nounus)
 ], User.prototype, "abonnement", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => notification_model_1.Notification, (notification) => notification.user, {
+        cascade: true,
+    }),
+    __metadata("design:type", Array)
+], User.prototype, "notifications", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => job_model_1.Job, (job) => job.user, {
+        cascade: true,
+    }),
+    __metadata("design:type", Array)
+], User.prototype, "jobs", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => role_model_1.Roles, (role) => role.user, { onDelete: 'CASCADE' }),
     __metadata("design:type", role_model_1.Roles)

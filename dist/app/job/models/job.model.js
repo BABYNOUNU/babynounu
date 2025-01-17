@@ -9,52 +9,42 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Notification = void 0;
+exports.Job = void 0;
 const typeorm_1 = require("typeorm");
 const user_model_1 = require("../../user/user.model");
-let Notification = class Notification {
+let Job = class Job {
     id;
-    type;
-    message;
-    isRead;
+    title;
+    description;
+    location;
+    salary;
     user;
-    createdAt;
-    updatedAt;
-    deletedAt;
 };
-exports.Notification = Notification;
+exports.Job = Job;
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
-], Notification.prototype, "id", void 0);
+], Job.prototype, "id", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
-], Notification.prototype, "type", void 0);
+], Job.prototype, "title", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
-], Notification.prototype, "message", void 0);
+], Job.prototype, "description", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ default: false }),
-    __metadata("design:type", Boolean)
-], Notification.prototype, "isRead", void 0);
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Job.prototype, "location", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => user_model_1.User, (user) => user.notifications),
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", Number)
+], Job.prototype, "salary", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => user_model_1.User, (user) => user.jobs),
     __metadata("design:type", user_model_1.User)
-], Notification.prototype, "user", void 0);
-__decorate([
-    (0, typeorm_1.CreateDateColumn)(),
-    __metadata("design:type", Date)
-], Notification.prototype, "createdAt", void 0);
-__decorate([
-    (0, typeorm_1.UpdateDateColumn)(),
-    __metadata("design:type", Date)
-], Notification.prototype, "updatedAt", void 0);
-__decorate([
-    (0, typeorm_1.DeleteDateColumn)(),
-    __metadata("design:type", Date)
-], Notification.prototype, "deletedAt", void 0);
-exports.Notification = Notification = __decorate([
+], Job.prototype, "user", void 0);
+exports.Job = Job = __decorate([
     (0, typeorm_1.Entity)()
-], Notification);
+], Job);

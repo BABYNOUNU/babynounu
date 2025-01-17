@@ -27,6 +27,8 @@ export declare class AuthService {
             nounu: Nounus;
             parent: import("../parent/models/parent.model").Parents;
             abonnement: Nounus;
+            notifications: import("../notification/models/notification.model").Notification[];
+            jobs: import("../job/models/job.model").Job[];
             role: Roles;
         };
     }>;
@@ -35,7 +37,7 @@ export declare class AuthService {
     }): Promise<{
         user: {
             access_token: string;
-            profil: import("../parent/models/parent.model").Parents | Nounus;
+            profil: Nounus | import("../parent/models/parent.model").Parents;
             id: string;
             slug: string;
             email: string;
@@ -44,6 +46,8 @@ export declare class AuthService {
             nounu: Nounus;
             parent: import("../parent/models/parent.model").Parents;
             abonnement: Nounus;
+            notifications: import("../notification/models/notification.model").Notification[];
+            jobs: import("../job/models/job.model").Job[];
             role: Roles;
         };
     }>;

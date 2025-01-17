@@ -15,13 +15,15 @@ export declare class AuthController {
             nounu: import("../nounu/models/nounu.model").Nounus;
             parent: import("../parent/models/parent.model").Parents;
             abonnement: import("../nounu/models/nounu.model").Nounus;
+            notifications: import("../notification/models/notification.model").Notification[];
+            jobs: import("../job/models/job.model").Job[];
             role: import("../role/models/role.model").Roles;
         };
     }>;
     SignIn(signInBody: SginInAuthDto): Promise<{
         user: {
             access_token: string;
-            profil: import("../parent/models/parent.model").Parents | import("../nounu/models/nounu.model").Nounus;
+            profil: import("../nounu/models/nounu.model").Nounus | import("../parent/models/parent.model").Parents;
             id: string;
             slug: string;
             email: string;
@@ -30,6 +32,8 @@ export declare class AuthController {
             nounu: import("../nounu/models/nounu.model").Nounus;
             parent: import("../parent/models/parent.model").Parents;
             abonnement: import("../nounu/models/nounu.model").Nounus;
+            notifications: import("../notification/models/notification.model").Notification[];
+            jobs: import("../job/models/job.model").Job[];
             role: import("../role/models/role.model").Roles;
         };
     }>;

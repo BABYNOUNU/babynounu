@@ -1,6 +1,6 @@
 {
   "name": "babyNounu",
-  "version": "0.2.53",
+  "version": "0.2.59",
   "description": "",
   "author": "",
   "private": true,
@@ -29,6 +29,7 @@
     "@nestjs/platform-socket.io": "^10.4.6",
     "@nestjs/serve-static": "^4.0.2",
     "@nestjs/swagger": "^7.4.2",
+    "@nestjs/typeorm": "^10.0.2",
     "@nestjs/websockets": "^10.4.6",
     "@types/bcryptjs": "^2.4.6",
     "@types/passport-jwt": "^4.0.1",

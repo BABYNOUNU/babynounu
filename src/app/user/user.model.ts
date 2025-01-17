@@ -13,6 +13,8 @@ import { Roles } from '../role/models/role.model';
 import { Nounus } from '../nounu/models/nounu.model';
 import { Abonnements } from '../abonnement/models/abonnement.model';
 import { SettingTypeProfil } from '../setting/models/setting_type_profil.model';
+import { Notification } from '../notification/models/notification.model';
+import { Job } from '../job/models/job.model';
 
 @Entity()
 export class User {
@@ -33,6 +35,7 @@ export class User {
 
   @ManyToOne(() => SettingTypeProfil, (SN) => SN.userType, { onDelete: 'CASCADE' })
   type_profil: SettingTypeProfil;
+  
 
   @OneToOne(() => Nounus, { eager: true, cascade: true, onDelete: 'CASCADE' })
   @JoinColumn()
@@ -46,6 +49,16 @@ export class User {
     cascade: true,
   })
   abonnement: Nounus;
+
+  @OneToMany(() => Notification, (notification) => notification.user, {
+    cascade: true,
+  })
+  notifications: Notification[];
+
+  @OneToMany(() => Job, (job) => job.user, {
+    cascade: true,
+  })
+  jobs: Job[];
 
   @ManyToOne(() => Roles, (role) => role.user, {  onDelete: 'CASCADE' })
   role: Roles;

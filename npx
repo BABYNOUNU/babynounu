@@ -1,11 +1,13 @@
-mkdir ./src/app/upload &&
-npx nest generate module app/upload --no-spec &&
-npx nest generate controller app/upload --no-spec &&
-npx nest generate service app/upload --no-spec &&
-npx nest generate provider app/upload --no-spec &&
-mkdir ./src/app/upload/models &&
-mkdir ./src/app/upload/dto &&
-touch ./src/app/upload/models/upload.model.ts
+mkdir ./src/app/jobs &&
+npx nest generate module app/job --no-spec &&
+npx nest generate controller app/job --no-spec &&
+npx nest generate service app/job --no-spec &&
+npx nest generate provider app/job --no-spec &&
+mkdir ./src/app/job/models &&
+mkdir ./src/app/job/dtos &&
+touch ./src/app/job/dtos/create-job.dto.ts &&
+touch ./src/app/job/dtos/update-job.dto.ts &&
+touch ./src/app/job/models/job.model.ts
 
 git init
 git add ./

@@ -12,32 +12,41 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.NotificationService = void 0;
+exports.JobsService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("typeorm");
-let NotificationService = class NotificationService {
-    notificationRepository;
-    constructor(notificationRepository) {
-        this.notificationRepository = notificationRepository;
+let JobsService = class JobsService {
+    jobRepository;
+    constructor(jobRepository) {
+        this.jobRepository = jobRepository;
     }
-    async createNotification(createNotificationDto) {
-        const notification = this.notificationRepository.create(createNotificationDto);
-        return this.notificationRepository.save(notification);
+    async createJob(createJobDto) {
+        const job = this.jobRepository.create(createJobDto);
+        return this.jobRepository.save(job);
     }
-    async getNotifications(userId) {
-        console.log(userId);
-        return await this.notificationRepository.find({
-            where: { user: { id: userId.toString() } },
-            order: { createdAt: 'DESC' },
-        });
+    async findAllJobs() {
+        return this.jobRepository.find();
     }
-    async markAsRead(notificationId) {
-        await this.notificationRepository.update(notificationId, { isRead: true });
+    async findJobById(id) {
+        const job = await this.jobRepository.findOne({ where: { id } });
+        if (!job) {
+            throw new common_1.NotFoundException(`Job with ID ${id} not found`);
+        }
+        return job;
+    }
+    async updateJob(id, updateJobDto) {
+        const job = await this.findJobById(id);
+        Object.assign(job, updateJobDto);
+        return this.jobRepository.save(job);
+    }
+    async deleteJob(id) {
+        const job = await this.findJobById(id);
+        return this.jobRepository.remove(job);
     }
 };
-exports.NotificationService = NotificationService;
-exports.NotificationService = NotificationService = __decorate([
+exports.JobsService = JobsService;
+exports.JobsService = JobsService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, common_1.Inject)('NOTIFICATION_REPOSITORY')),
+    __param(0, (0, common_1.Inject)('JOB_REPOSITORY')),
     __metadata("design:paramtypes", [typeorm_1.Repository])
-], NotificationService);
+], JobsService);
