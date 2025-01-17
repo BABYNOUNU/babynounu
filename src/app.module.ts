@@ -36,6 +36,7 @@ import { JobModule } from './app/job/job.module';
     SettingModule,
     ChatModule,
     NotificationModule,
+    JobModule,
     MediaModule,
     RoleModule,
     AbonnementModule,

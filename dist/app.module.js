@@ -44,6 +44,7 @@ exports.AppModule = AppModule = __decorate([
             setting_module_1.SettingModule,
             chat_module_1.ChatModule,
             notification_module_1.NotificationModule,
+            job_module_1.JobModule,
             media_module_1.MediaModule,
             role_module_1.RoleModule,
             abonnement_module_1.AbonnementModule,
