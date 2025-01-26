@@ -17,6 +17,7 @@ export declare class AuthController {
             abonnement: import("../nounu/models/nounu.model").Nounus;
             notifications: import("../notification/models/notification.model").Notification[];
             jobs: import("../job/models/job.model").Job[];
+            paiements: import("../paiement/models/paiement.model").Paiements[];
             role: import("../role/models/role.model").Roles;
         };
     }>;
@@ -34,6 +35,7 @@ export declare class AuthController {
             abonnement: import("../nounu/models/nounu.model").Nounus;
             notifications: import("../notification/models/notification.model").Notification[];
             jobs: import("../job/models/job.model").Job[];
+            paiements: import("../paiement/models/paiement.model").Paiements[];
             role: import("../role/models/role.model").Roles;
         };
     }>;

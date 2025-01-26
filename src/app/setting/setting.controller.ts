@@ -39,6 +39,8 @@ import { RoleSeeders } from 'src/database/seeders/role.seed';
 import { Roles } from '../role/models/role.model';
 import { SettingTypeProfil } from './models/setting_type_profil.model';
 import { TypeProfilSeeders } from 'src/database/seeders/typesProfil.seed';
+import { settingSubscriptionTypes } from './models/setting_subscription_type.model';
+import { TypePaiementSeeders } from 'src/database/seeders/type.seed';
 
 @ApiTags('Setting')
 @Controller('setting')
@@ -71,6 +73,8 @@ export class SettingController {
     private readonly roles: Repository<Roles>,
     @Inject('TYPE_PROFIL_REPOSITORY')
     private readonly settingTypeProfil: Repository<SettingTypeProfil>,
+    @Inject('TYPE_PAIEMENT_REPOSITORY')
+    private readonly settingTypePaiement: Repository<settingSubscriptionTypes>,
     
     
   ) {}
@@ -233,6 +237,14 @@ export class SettingController {
     return this.createSeeder(
       this.settingTypeProfil,
       TypeProfilSeeders, 
+    );
+  }
+
+  @Post('seed/setting-type')
+  SeederSettingTypePaiement() {
+    return this.createSeeder(
+      this.settingTypePaiement,
+      TypePaiementSeeders, 
     );
   }
 

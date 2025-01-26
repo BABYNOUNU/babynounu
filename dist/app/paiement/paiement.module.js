@@ -11,12 +11,14 @@ const common_1 = require("@nestjs/common");
 const paiement_controller_1 = require("./paiement.controller");
 const paiement_service_1 = require("./paiement.service");
 const paiement_1 = require("./paiement");
+const database_module_1 = require("../../database/database.module");
 let PaiementModule = class PaiementModule {
 };
 exports.PaiementModule = PaiementModule;
 exports.PaiementModule = PaiementModule = __decorate([
     (0, common_1.Module)({
-        controllers: [paiement_controller_1.PaiementController],
-        providers: [paiement_service_1.PaiementService, paiement_1.Paiement]
+        imports: [database_module_1.DatabaseModule],
+        controllers: [paiement_controller_1.PaymentController],
+        providers: [paiement_service_1.PaymentService, ...paiement_1.PaiementProviders]
     })
 ], PaiementModule);

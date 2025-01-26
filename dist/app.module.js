@@ -48,7 +48,7 @@ exports.AppModule = AppModule = __decorate([
             media_module_1.MediaModule,
             role_module_1.RoleModule,
             abonnement_module_1.AbonnementModule,
-            job_module_1.JobModule,
+            job_module_1.JobModule
         ],
         controllers: [],
         providers: [],

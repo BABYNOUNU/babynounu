@@ -21,7 +21,7 @@ let settingSubscriptionTypes = class settingSubscriptionTypes {
 };
 exports.settingSubscriptionTypes = settingSubscriptionTypes;
 __decorate([
-    (0, typeorm_1.PrimaryGeneratedColumn)('uuid'),
+    (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", String)
 ], settingSubscriptionTypes.prototype, "id", void 0);
 __decorate([

@@ -15,6 +15,7 @@ import { Abonnements } from '../abonnement/models/abonnement.model';
 import { SettingTypeProfil } from '../setting/models/setting_type_profil.model';
 import { Notification } from '../notification/models/notification.model';
 import { Job } from '../job/models/job.model';
+import { Paiements } from '../paiement/models/paiement.model';
 
 @Entity()
 export class User {
@@ -59,6 +60,12 @@ export class User {
     cascade: true,
   })
   jobs: Job[];
+
+  @OneToMany(() => Paiements, (paiement) => paiement.user, {
+    cascade: true,
+  })
+  paiements: Paiements[];
+  
 
   @ManyToOne(() => Roles, (role) => role.user, {  onDelete: 'CASCADE' })
   role: Roles;

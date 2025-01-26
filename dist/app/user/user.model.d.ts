@@ -4,6 +4,7 @@ import { Nounus } from '../nounu/models/nounu.model';
 import { SettingTypeProfil } from '../setting/models/setting_type_profil.model';
 import { Notification } from '../notification/models/notification.model';
 import { Job } from '../job/models/job.model';
+import { Paiements } from '../paiement/models/paiement.model';
 export declare class User {
     id: string;
     slug: string;
@@ -16,5 +17,6 @@ export declare class User {
     abonnement: Nounus;
     notifications: Notification[];
     jobs: Job[];
+    paiements: Paiements[];
     role: Roles;
 }

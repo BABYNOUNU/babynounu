@@ -88,7 +88,7 @@ export class AuthService {
   async signIn({ signInBody }: { signInBody: SginInAuthDto }) {
     // CHECK IF USER ALREADY EXISTS
     const user = await this.userRepository.findOne({
-      where: { email: signInBody.email }, relations: ['type_profil']
+      where: { email: signInBody.email }, relations: ['type_profil',]
     });
     if (!user) {
       throw new BadRequestException("L'addresse email ou mot de passe est incorrect"); 
@@ -110,6 +110,7 @@ export class AuthService {
       
 
     // RETURN DATA USER CREATE
+    console.log(isUserExist.nounu, isUserExist.parent);
     return {
       user: {
         ...user,

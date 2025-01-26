@@ -18,6 +18,7 @@ const abonnement_model_1 = require("../abonnement/models/abonnement.model");
 const setting_type_profil_model_1 = require("../setting/models/setting_type_profil.model");
 const notification_model_1 = require("../notification/models/notification.model");
 const job_model_1 = require("../job/models/job.model");
+const paiement_model_1 = require("../paiement/models/paiement.model");
 let User = class User {
     id;
     slug;
@@ -30,6 +31,7 @@ let User = class User {
     abonnement;
     notifications;
     jobs;
+    paiements;
     role;
 };
 exports.User = User;
@@ -85,6 +87,12 @@ __decorate([
     }),
     __metadata("design:type", Array)
 ], User.prototype, "jobs", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => paiement_model_1.Paiements, (paiement) => paiement.user, {
+        cascade: true,
+    }),
+    __metadata("design:type", Array)
+], User.prototype, "paiements", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => role_model_1.Roles, (role) => role.user, { onDelete: 'CASCADE' }),
     __metadata("design:type", role_model_1.Roles)

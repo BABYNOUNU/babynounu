@@ -29,6 +29,7 @@ export declare class AuthService {
             abonnement: Nounus;
             notifications: import("../notification/models/notification.model").Notification[];
             jobs: import("../job/models/job.model").Job[];
+            paiements: import("../paiement/models/paiement.model").Paiements[];
             role: Roles;
         };
     }>;
@@ -48,6 +49,7 @@ export declare class AuthService {
             abonnement: Nounus;
             notifications: import("../notification/models/notification.model").Notification[];
             jobs: import("../job/models/job.model").Job[];
+            paiements: import("../paiement/models/paiement.model").Paiements[];
             role: Roles;
         };
     }>;

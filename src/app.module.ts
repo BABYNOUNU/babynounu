@@ -40,7 +40,7 @@ import { JobModule } from './app/job/job.module';
     MediaModule,
     RoleModule,
     AbonnementModule,
-    JobModule,
+    JobModule
   ],
   controllers: [],
   providers: [],

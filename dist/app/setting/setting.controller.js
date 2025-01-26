@@ -30,6 +30,7 @@ const paymentTerms_seed_1 = require("../../database/seeders/paymentTerms.seed");
 const certification_seed_1 = require("../../database/seeders/certification.seed");
 const role_seed_1 = require("../../database/seeders/role.seed");
 const typesProfil_seed_1 = require("../../database/seeders/typesProfil.seed");
+const type_seed_1 = require("../../database/seeders/type.seed");
 let SettingController = class SettingController {
     settingAgeOfChildrenRepository;
     settingSpecificNeed;
@@ -44,7 +45,8 @@ let SettingController = class SettingController {
     settingCertification;
     roles;
     settingTypeProfil;
-    constructor(settingAgeOfChildrenRepository, settingSpecificNeed, settingGuardSchelude, settingHousekeeper, settingServiceFrequency, settingDesiredTime, settingSpecificSkills, settingLanguages, settingLocalization, settingPaymentTerms, settingCertification, roles, settingTypeProfil) {
+    settingTypePaiement;
+    constructor(settingAgeOfChildrenRepository, settingSpecificNeed, settingGuardSchelude, settingHousekeeper, settingServiceFrequency, settingDesiredTime, settingSpecificSkills, settingLanguages, settingLocalization, settingPaymentTerms, settingCertification, roles, settingTypeProfil, settingTypePaiement) {
         this.settingAgeOfChildrenRepository = settingAgeOfChildrenRepository;
         this.settingSpecificNeed = settingSpecificNeed;
         this.settingGuardSchelude = settingGuardSchelude;
@@ -58,6 +60,7 @@ let SettingController = class SettingController {
         this.settingCertification = settingCertification;
         this.roles = roles;
         this.settingTypeProfil = settingTypeProfil;
+        this.settingTypePaiement = settingTypePaiement;
     }
     removeDuplicatesByName(array1, array2) {
         const namesInArray2 = new Set(array2.map((item) => item.name));
@@ -127,6 +130,9 @@ let SettingController = class SettingController {
     }
     SeederTypeProfil() {
         return this.createSeeder(this.settingTypeProfil, typesProfil_seed_1.TypeProfilSeeders);
+    }
+    SeederSettingTypePaiement() {
+        return this.createSeeder(this.settingTypePaiement, type_seed_1.TypePaiementSeeders);
     }
 };
 exports.SettingController = SettingController;
@@ -208,6 +214,12 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], SettingController.prototype, "SeederTypeProfil", null);
+__decorate([
+    (0, common_1.Post)('seed/setting-type'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], SettingController.prototype, "SeederSettingTypePaiement", null);
 exports.SettingController = SettingController = __decorate([
     (0, swagger_1.ApiTags)('Setting'),
     (0, common_1.Controller)('setting'),
@@ -224,7 +236,9 @@ exports.SettingController = SettingController = __decorate([
     __param(10, (0, common_1.Inject)('SETTING_CERTIFICATION_REPOSITORY')),
     __param(11, (0, common_1.Inject)('ROLE_REPOSITORY')),
     __param(12, (0, common_1.Inject)('TYPE_PROFIL_REPOSITORY')),
+    __param(13, (0, common_1.Inject)('TYPE_PAIEMENT_REPOSITORY')),
     __metadata("design:paramtypes", [typeorm_1.Repository,
+        typeorm_1.Repository,
         typeorm_1.Repository,
         typeorm_1.Repository,
         typeorm_1.Repository,

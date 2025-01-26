@@ -1,6 +1,7 @@
 import { Abonnement } from 'src/app/abonnement/abonnement';
 import { Abonnements } from 'src/app/abonnement/models/abonnement.model';
 import { Parents } from 'src/app/parent/models/parent.model';
+import { User } from 'src/app/user/user.model';
 import {
   Entity,
   ManyToOne,
@@ -18,10 +19,22 @@ export class Paiements {
   id: string;
 
   @Column('varchar', { length: 255, nullable: true })
-  transaction: string;
+  transaction_id: string;
 
-  @Column('int', { nullable: true })
-  amount: number;
+  @Column()
+  amount: number; // Montant du paiement
+
+  @Column('varchar', { length: 255, nullable: true }) 
+  currency: string; // Devise (ex: USD, EUR)
+
+  @Column('varchar', { length: 255, nullable: true })
+  status: string; // Statut du paiement (ex: "pending", "completed", "failed")
+
+  @Column('varchar', { length: 255, nullable: true })
+  payment_token: string;
+
+  @Column('varchar', { length: 255, nullable: true })
+  paymentMethod: string; // Méthode de paiement (ex: "credit_card", "paypal")
 
   @Column('varchar', { length: 255, nullable: true })
   customer_name: string;
@@ -52,6 +65,9 @@ export class Paiements {
 
   @OneToMany(() => Abonnements, (NS) => NS.paiement, { cascade: true, })
   abonnement: Abonnements;
+
+  @ManyToOne(() => User, (user) => user.paiements, { onDelete: 'CASCADE' })
+  user: User;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

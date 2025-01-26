@@ -8,6 +8,7 @@ import { SettingLocalization } from './models/setting_localization.model';
 import { SettingDesiredTime } from './models/setting_desired_time.model';
 import { Roles } from '../role/models/role.model';
 import { SettingTypeProfil } from './models/setting_type_profil.model';
+import { settingSubscriptionTypes } from './models/setting_subscription_type.model';
 export declare const SettingProviders: ({
     provide: string;
     useFactory: (dataSource: DataSource) => import("typeorm").Repository<SettingGuardSchedules>;
@@ -43,5 +44,9 @@ export declare const SettingProviders: ({
 } | {
     provide: string;
     useFactory: (dataSource: DataSource) => import("typeorm").Repository<SettingTypeProfil>;
+    inject: string[];
+} | {
+    provide: string;
+    useFactory: (dataSource: DataSource) => import("typeorm").Repository<settingSubscriptionTypes>;
     inject: string[];
 })[];

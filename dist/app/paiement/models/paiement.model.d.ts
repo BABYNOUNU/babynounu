@@ -1,8 +1,13 @@
 import { Abonnements } from 'src/app/abonnement/models/abonnement.model';
+import { User } from 'src/app/user/user.model';
 export declare class Paiements {
     id: string;
-    transaction: string;
+    transaction_id: string;
     amount: number;
+    currency: string;
+    status: string;
+    payment_token: string;
+    paymentMethod: string;
     customer_name: string;
     customer_surname: string;
     customer_email: string;
@@ -13,6 +18,7 @@ export declare class Paiements {
     customer_state: string;
     customer_zip_code: string;
     abonnement: Abonnements;
+    user: User;
     createdAt: Date;
     updatedAt: Date;
     deletedAt: Date | null;

@@ -15,6 +15,7 @@ import { SettingDesiredTime } from './models/setting_desired_time.model';
 import { SettingPaymentTerms } from './models/setting_payment_terms.model';
 import { Roles } from '../role/models/role.model';
 import { SettingTypeProfil } from './models/setting_type_profil.model';
+import { settingSubscriptionTypes } from './models/setting_subscription_type.model';
 
 
 export const SettingProviders = [
@@ -103,5 +104,10 @@ export const SettingProviders = [
       useFactory: (dataSource: DataSource) => dataSource.getRepository(SettingTypeProfil),
       inject: ['DATA_SOURCE'],
     },
+    {
+      provide: 'TYPE_PAIEMENT_REPOSITORY',
+      useFactory: (dataSource: DataSource) => dataSource.getRepository(settingSubscriptionTypes),
+      inject: ['DATA_SOURCE'],
+    } 
   ];
   
