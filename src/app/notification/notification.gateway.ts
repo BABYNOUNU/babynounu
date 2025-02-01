@@ -8,8 +8,15 @@ import {
     ConnectedSocket,
   } from '@nestjs/websockets';
   import { Server, Socket } from 'socket.io';
+import { HOST } from 'src/database/database.providers';
   
-  @WebSocketGateway({ cors: true }) // Activez CORS pour permettre les connexions depuis le frontend
+  @WebSocketGateway({
+    cors: {
+      origin: HOST, // Autoriser uniquement votre domaine en production
+      methods: ['GET', 'POST'],
+      credentials: true,
+    },
+  })
   export class NotificationGateway {
     @WebSocketServer()
     server: Server;

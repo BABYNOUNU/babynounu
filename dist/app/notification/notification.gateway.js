@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.NotificationGateway = void 0;
 const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
+const database_providers_1 = require("../../database/database.providers");
 let NotificationGateway = class NotificationGateway {
     server;
     handleConnection(client) {
@@ -42,5 +43,11 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], NotificationGateway.prototype, "handleMessage", null);
 exports.NotificationGateway = NotificationGateway = __decorate([
-    (0, websockets_1.WebSocketGateway)({ cors: true })
+    (0, websockets_1.WebSocketGateway)({
+        cors: {
+            origin: database_providers_1.HOST,
+            methods: ['GET', 'POST'],
+            credentials: true,
+        },
+    })
 ], NotificationGateway);

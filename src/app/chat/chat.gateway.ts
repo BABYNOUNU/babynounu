@@ -9,8 +9,15 @@ import {
   } from '@nestjs/websockets';
   import { Socket, Server } from 'socket.io';
   import { ChatService } from './chat.service';
+import { HOST } from 'src/database/database.providers';
   
-  @WebSocketGateway({ cors: true })
+   @WebSocketGateway({
+      cors: {
+        origin: HOST, // Autoriser uniquement votre domaine en production
+        methods: ['GET', 'POST'],
+        credentials: true,
+      },
+    })
   export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer()
     server: Server;

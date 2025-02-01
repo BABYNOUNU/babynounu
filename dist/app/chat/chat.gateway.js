@@ -16,6 +16,7 @@ exports.ChatGateway = void 0;
 const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
 const chat_service_1 = require("./chat.service");
+const database_providers_1 = require("../../database/database.providers");
 let ChatGateway = class ChatGateway {
     chatService;
     server;
@@ -61,6 +62,12 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ChatGateway.prototype, "handleMessage", null);
 exports.ChatGateway = ChatGateway = __decorate([
-    (0, websockets_1.WebSocketGateway)({ cors: true }),
+    (0, websockets_1.WebSocketGateway)({
+        cors: {
+            origin: database_providers_1.HOST,
+            methods: ['GET', 'POST'],
+            credentials: true,
+        },
+    }),
     __metadata("design:paramtypes", [chat_service_1.ChatService])
 ], ChatGateway);
