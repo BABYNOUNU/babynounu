@@ -43,7 +43,7 @@ export declare class NounuService extends MediaService {
         document?: Express.Multer.File[];
         gallery?: Express.Multer.File[];
     }): Promise<Nounus>;
-    findAll(): Promise<Nounus[]>;
+    findAll(userId: any): Promise<Nounus[]>;
     findOne(id: string): Promise<Nounus>;
     update(id: string, updateNounuDto: UpdateNounuDto): Promise<Nounus>;
     remove(id: string): Promise<void>;

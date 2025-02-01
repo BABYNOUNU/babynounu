@@ -16,6 +16,7 @@ import { AbonnementModule } from './app/abonnement/abonnement.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { JobModule } from './app/job/job.module';
+import { JobApplicationModule } from './app/job-application/job-application.module';
 
 
 
@@ -40,7 +41,8 @@ import { JobModule } from './app/job/job.module';
     MediaModule,
     RoleModule,
     AbonnementModule,
-    JobModule
+    JobModule,
+    JobApplicationModule
   ],
   controllers: [],
   providers: [],

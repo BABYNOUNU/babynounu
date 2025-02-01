@@ -28,8 +28,8 @@ let NounuController = class NounuController {
     async create(createNounuDto, files) {
         return this.nounuService.create(createNounuDto, files);
     }
-    async findAll() {
-        return this.nounuService.findAll();
+    async findAll(userId) {
+        return this.nounuService.findAll(userId);
     }
     async findOne(id) {
         return this.nounuService.findOne(id);
@@ -57,8 +57,9 @@ __decorate([
 ], NounuController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
+    __param(0, (0, common_1.Query)('userId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], NounuController.prototype, "findAll", null);
 __decorate([

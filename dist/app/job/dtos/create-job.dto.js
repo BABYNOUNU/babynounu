@@ -10,32 +10,49 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateJobDto = void 0;
-const swagger_1 = require("@nestjs/swagger");
+const class_validator_1 = require("class-validator");
 class CreateJobDto {
     title;
     description;
-    location;
-    salary;
-    userId;
+    budget_min;
+    budget_max;
+    service_frequency;
+    schedules_available;
+    user;
 }
 exports.CreateJobDto = CreateJobDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'Software Engineer', description: 'Title of the job' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], CreateJobDto.prototype, "title", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'Develop and maintain software applications', description: 'Description of the job' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], CreateJobDto.prototype, "description", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'New York, USA', description: 'Location of the job' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
-], CreateJobDto.prototype, "location", void 0);
+], CreateJobDto.prototype, "budget_min", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 80000, description: 'Salary offered for the job' }),
-    __metadata("design:type", Number)
-], CreateJobDto.prototype, "salary", void 0);
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateJobDto.prototype, "budget_max", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 1, description: 'ID of the user posting the job' }),
-    __metadata("design:type", Number)
-], CreateJobDto.prototype, "userId", void 0);
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateJobDto.prototype, "service_frequency", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateJobDto.prototype, "schedules_available", void 0);
+__decorate([
+    (0, class_validator_1.IsUUID)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateJobDto.prototype, "user", void 0);

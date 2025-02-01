@@ -33,7 +33,9 @@ let ParentService = class ParentService {
     settingSpecificNeedsRepository;
     parentSettingGuardSchedulesRepository;
     settingGuardSchedulesRepository;
-    constructor(parentSettingLanguagesRepository, settingLanguagesRepository, parentSettingLocalizationsRepository, parentSettingAgeOfChildrensRepository, parentSettingDesiredTimesRepository, parentSettingAreaWorksRepository, settingAgeOfChildrensRepository, settingLocalizationsRepository, settingDesiredTimesRepository, settingSpecificSkillsRepository, parentSettingSpecificSkillsRepository, userRepository, parentsRepository, parentSettingSpecificNeedsRepository, settingSpecificNeedsRepository, parentSettingGuardSchedulesRepository, settingGuardSchedulesRepository) {
+    settingServiceFrequencyRepository;
+    parentServiceFrequencyRepository;
+    constructor(parentSettingLanguagesRepository, settingLanguagesRepository, parentSettingLocalizationsRepository, parentSettingAgeOfChildrensRepository, parentSettingDesiredTimesRepository, parentSettingAreaWorksRepository, settingAgeOfChildrensRepository, settingLocalizationsRepository, settingDesiredTimesRepository, settingSpecificSkillsRepository, parentSettingSpecificSkillsRepository, userRepository, parentsRepository, parentSettingSpecificNeedsRepository, settingSpecificNeedsRepository, parentSettingGuardSchedulesRepository, settingGuardSchedulesRepository, settingServiceFrequencyRepository, parentServiceFrequencyRepository) {
         this.parentSettingLanguagesRepository = parentSettingLanguagesRepository;
         this.settingLanguagesRepository = settingLanguagesRepository;
         this.parentSettingLocalizationsRepository = parentSettingLocalizationsRepository;
@@ -51,6 +53,8 @@ let ParentService = class ParentService {
         this.settingSpecificNeedsRepository = settingSpecificNeedsRepository;
         this.parentSettingGuardSchedulesRepository = parentSettingGuardSchedulesRepository;
         this.settingGuardSchedulesRepository = settingGuardSchedulesRepository;
+        this.settingServiceFrequencyRepository = settingServiceFrequencyRepository;
+        this.parentServiceFrequencyRepository = parentServiceFrequencyRepository;
     }
     async Parents() {
         return this.parentsRepository.find();
@@ -161,6 +165,13 @@ let ParentService = class ParentService {
                 targetRepository: this.parentSettingGuardSchedulesRepository,
                 targetField: 'settingGuardSchedules',
             },
+            {
+                items: createParentDto.settingServiceFrequency,
+                repository: this.settingServiceFrequencyRepository,
+                relationName: 'service',
+                targetRepository: this.parentServiceFrequencyRepository,
+                targetField: 'settingServiceFrequency',
+            },
         ];
         for (const relation of relations) {
             const objects = await createRelation(relation.items, relation.repository, relation.relationName);
@@ -203,7 +214,11 @@ exports.ParentService = ParentService = __decorate([
     __param(14, (0, common_1.Inject)('SETTING_SPECIFIC_NEEDS_REPOSITORY')),
     __param(15, (0, common_1.Inject)('PARENT_SETTING_GUARD_SCHEDULES_REPOSITORY')),
     __param(16, (0, common_1.Inject)('SETTING_GUARD_SCHEDULE_REPOSITORY')),
+    __param(17, (0, common_1.Inject)('SETTING_SERVICE_FREQUENCY_REPOSITORY')),
+    __param(18, (0, common_1.Inject)('PARENT_SETTING_SERVICE_FREQUENCY_REPOSITORY')),
     __metadata("design:paramtypes", [typeorm_1.Repository,
+        typeorm_1.Repository,
+        typeorm_1.Repository,
         typeorm_1.Repository,
         typeorm_1.Repository,
         typeorm_1.Repository,

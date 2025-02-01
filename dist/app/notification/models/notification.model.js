@@ -12,12 +12,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Notification = void 0;
 const typeorm_1 = require("typeorm");
 const user_model_1 = require("../../user/user.model");
+const job_model_1 = require("../../job/models/job.model");
 let Notification = class Notification {
     id;
     type;
+    job;
     message;
     isRead;
     user;
+    sender;
     createdAt;
     updatedAt;
     deletedAt;
@@ -32,6 +35,10 @@ __decorate([
     __metadata("design:type", String)
 ], Notification.prototype, "type", void 0);
 __decorate([
+    (0, typeorm_1.ManyToOne)(() => job_model_1.Job, (job) => job.notifications),
+    __metadata("design:type", job_model_1.Job)
+], Notification.prototype, "job", void 0);
+__decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
 ], Notification.prototype, "message", void 0);
@@ -40,9 +47,13 @@ __decorate([
     __metadata("design:type", Boolean)
 ], Notification.prototype, "isRead", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => user_model_1.User, (user) => user.notifications),
+    (0, typeorm_1.ManyToOne)(() => user_model_1.User, (user) => user.notifications, { onDelete: 'CASCADE' }),
     __metadata("design:type", user_model_1.User)
 ], Notification.prototype, "user", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => user_model_1.User, (user) => user.sentNotifications, { onDelete: 'CASCADE' }),
+    __metadata("design:type", user_model_1.User)
+], Notification.prototype, "sender", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)(),
     __metadata("design:type", Date)

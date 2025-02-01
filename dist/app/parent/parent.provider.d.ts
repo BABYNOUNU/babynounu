@@ -15,6 +15,7 @@ import { SettingLanguages } from '../setting/models/setting_language.model';
 import { ParentSettingGuardSchedules } from './models/parent_setting_guard_schedules.model';
 import { SettingGuardSchedules } from '../setting/models/setting_guard_schedule.model';
 import { Parents } from './models/parent.model';
+import { ParentSettingServiceFrequency } from './models/parent_setting_service_frequency.model';
 export declare const ParentProviders: ({
     provide: string;
     useFactory: (dataSource: DataSource) => import("typeorm").Repository<SettingLanguages>;
@@ -78,5 +79,9 @@ export declare const ParentProviders: ({
 } | {
     provide: string;
     useFactory: (dataSource: DataSource) => import("typeorm").Repository<Parents>;
+    inject: string[];
+} | {
+    provide: string;
+    useFactory: (dataSource: DataSource) => import("typeorm").Repository<ParentSettingServiceFrequency>;
     inject: string[];
 })[];

@@ -1,6 +1,6 @@
 import { BadRequestException, Inject } from '@nestjs/common';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { Nounus } from './models/nounu.model';
 import { NounuSettings } from './models/nounu_setting.model';
 import { CreateNounuDto } from './dto/create-nounu.dto';
@@ -220,8 +220,13 @@ export class NounuService extends MediaService {
     return GetProfilNounu;
   }
 
-  async findAll(): Promise<Nounus[]> {
+  async findAll(userId: any): Promise<Nounus[]> {
     return this.nounuRepository.find({
+      where: {
+        user: {
+          email: Not(userId),
+        },
+      },
       relations: [
         'settingLanguages.language',
         'settingDesiredTimes.time',

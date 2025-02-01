@@ -34,7 +34,7 @@ let NotificationController = class NotificationController {
 };
 exports.NotificationController = NotificationController;
 __decorate([
-    (0, common_1.Post)(),
+    (0, common_1.Post)('create'),
     (0, swagger_1.ApiOperation)({ summary: 'Create a notification' }),
     (0, swagger_1.ApiBody)({ type: create_notification_dto_1.CreateNotificationDto }),
     (0, swagger_1.ApiResponse)({

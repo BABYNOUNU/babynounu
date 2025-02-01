@@ -136,8 +136,13 @@ let NounuService = class NounuService extends media_service_1.MediaService {
         });
         return GetProfilNounu;
     }
-    async findAll() {
+    async findAll(userId) {
         return this.nounuRepository.find({
+            where: {
+                user: {
+                    email: (0, typeorm_1.Not)(userId),
+                },
+            },
             relations: [
                 'settingLanguages.language',
                 'settingDesiredTimes.time',

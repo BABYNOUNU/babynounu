@@ -32,6 +32,10 @@ let JobsController = class JobsController {
     async findJobById(id) {
         return this.jobsService.findJobById(id);
     }
+    async findAllJobByUser(userId) {
+        console.log(userId);
+        return this.jobsService.findAllJobByUser(userId);
+    }
     async updateJob(id, updateJobDto) {
         return this.jobsService.updateJob(id, updateJobDto);
     }
@@ -41,7 +45,7 @@ let JobsController = class JobsController {
 };
 exports.JobsController = JobsController;
 __decorate([
-    (0, common_1.Post)(),
+    (0, common_1.Post)('create'),
     (0, swagger_1.ApiOperation)({ summary: 'Create a new job posting' }),
     (0, swagger_1.ApiBody)({ type: create_job_dto_1.CreateJobDto }),
     (0, swagger_1.ApiResponse)({ status: 201, description: 'Job created successfully' }),
@@ -71,6 +75,17 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], JobsController.prototype, "findJobById", null);
+__decorate([
+    (0, common_1.Get)('user/:userId'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get a job posting by ID' }),
+    (0, swagger_1.ApiParam)({ name: 'id', type: Number }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Job retrieved successfully' }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Job not found' }),
+    __param(0, (0, common_1.Param)('userId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], JobsController.prototype, "findAllJobByUser", null);
 __decorate([
     (0, common_1.Patch)(':id'),
     (0, swagger_1.ApiOperation)({ summary: 'Update a job posting' }),

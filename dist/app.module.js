@@ -23,6 +23,7 @@ const abonnement_module_1 = require("./app/abonnement/abonnement.module");
 const serve_static_1 = require("@nestjs/serve-static");
 const path_1 = require("path");
 const job_module_1 = require("./app/job/job.module");
+const job_application_module_1 = require("./app/job-application/job-application.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -48,7 +49,8 @@ exports.AppModule = AppModule = __decorate([
             media_module_1.MediaModule,
             role_module_1.RoleModule,
             abonnement_module_1.AbonnementModule,
-            job_module_1.JobModule
+            job_module_1.JobModule,
+            job_application_module_1.JobApplicationModule
         ],
         controllers: [],
         providers: [],

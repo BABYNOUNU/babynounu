@@ -1,23 +1,44 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+} from 'typeorm';
 import { User } from 'src/app/user/user.model';
+import { Notification } from 'src/app/notification/models/notification.model';
+import { JobApplication } from 'src/app/job-application/models/job-application.model';
 
-@Entity()
+@Entity('job')
 export class Job {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
-  title: string; // Titre de l'offre d'emploi
+  title: string;
+
+  @Column({ type: 'text' })
+  description: string;
 
   @Column()
-  description: string; // Description de l'offre
+  budget_min: string;
 
   @Column()
-  location: string; // Localisation du poste
+  budget_max: string;
 
   @Column()
-  salary: number; // Salaire proposé
+  service_frequency: string;
+
+  @OneToMany(() => Notification, (notification) => notification.job)
+  notifications: Notification[];
+
+  @OneToMany(() => JobApplication, (jobApplication) => jobApplication.jobs, { cascade: true })
+  job_application: JobApplication; // Pas un tableau
+
+  @Column()
+  schedules_available: string;
 
   @ManyToOne(() => User, (user) => user.jobs)
-  user: User; // Utilisateur qui a posté l'offre
+  user: User;
 }

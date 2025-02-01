@@ -19,6 +19,8 @@ import { ParentSettingSpecificNeeds } from './models/parent_setting_specific_nee
 import { SettingSpecificNeed } from '../setting/models/setting_specific_need.model';
 import { ParentSettingGuardSchedules } from './models/parent_setting_guard_schedules.model';
 import { SettingGuardSchedules } from '../setting/models/setting_guard_schedule.model';
+import { SettingServiceFrequency } from '../setting/models/setting_service_frequency.model';
+import { ParentSettingServiceFrequency } from './models/parent_setting_service_frequency.model';
 
 @Injectable()
 export class ParentService {
@@ -56,6 +58,10 @@ export class ParentService {
     private readonly parentSettingGuardSchedulesRepository: Repository<ParentSettingGuardSchedules>,
     @Inject('SETTING_GUARD_SCHEDULE_REPOSITORY')
     private readonly settingGuardSchedulesRepository: Repository<SettingGuardSchedules>,
+    @Inject('SETTING_SERVICE_FREQUENCY_REPOSITORY')
+    private readonly settingServiceFrequencyRepository: Repository<SettingServiceFrequency>,
+    @Inject('PARENT_SETTING_SERVICE_FREQUENCY_REPOSITORY')
+    private readonly parentServiceFrequencyRepository: Repository<ParentSettingServiceFrequency>,
   ) {}
 
   async Parents(): Promise<Parents[]> {
@@ -193,6 +199,13 @@ export class ParentService {
         relationName: 'GuardSchedules',
         targetRepository: this.parentSettingGuardSchedulesRepository,
         targetField: 'settingGuardSchedules',
+      },
+      {
+        items: createParentDto.settingServiceFrequency,
+        repository: this.settingServiceFrequencyRepository,
+        relationName: 'service',
+        targetRepository: this.parentServiceFrequencyRepository,
+        targetField: 'settingServiceFrequency',
       },
     ];
 

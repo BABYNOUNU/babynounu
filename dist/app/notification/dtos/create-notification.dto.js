@@ -5,5 +5,7 @@ class CreateNotificationDto {
     type;
     message;
     userId;
+    is_read;
+    senderUserId;
 }
 exports.CreateNotificationDto = CreateNotificationDto;

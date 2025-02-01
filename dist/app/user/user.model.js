@@ -19,6 +19,10 @@ const setting_type_profil_model_1 = require("../setting/models/setting_type_prof
 const notification_model_1 = require("../notification/models/notification.model");
 const job_model_1 = require("../job/models/job.model");
 const paiement_model_1 = require("../paiement/models/paiement.model");
+const conversation_model_1 = require("../chat/models/conversation.model");
+const job_application_model_1 = require("../job-application/models/job-application.model");
+const preference_model_1 = require("../Preference/models/preference.model");
+const parameter_model_1 = require("../parameter/models/parameter.model");
 let User = class User {
     id;
     slug;
@@ -30,8 +34,13 @@ let User = class User {
     parent;
     abonnement;
     notifications;
+    sentNotifications;
+    conversations;
+    job_to_apply;
     jobs;
     paiements;
+    preference;
+    parametre;
     role;
 };
 exports.User = User;
@@ -82,6 +91,24 @@ __decorate([
     __metadata("design:type", Array)
 ], User.prototype, "notifications", void 0);
 __decorate([
+    (0, typeorm_1.OneToMany)(() => notification_model_1.Notification, (notification) => notification.sender, {
+        cascade: true,
+    }),
+    __metadata("design:type", Array)
+], User.prototype, "sentNotifications", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => conversation_model_1.Conversation, (conversation) => conversation.user, {
+        cascade: true,
+    }),
+    __metadata("design:type", Array)
+], User.prototype, "conversations", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => job_application_model_1.JobApplication, (job_to_apply) => job_to_apply.user, {
+        cascade: true,
+    }),
+    __metadata("design:type", Array)
+], User.prototype, "job_to_apply", void 0);
+__decorate([
     (0, typeorm_1.OneToMany)(() => job_model_1.Job, (job) => job.user, {
         cascade: true,
     }),
@@ -93,6 +120,14 @@ __decorate([
     }),
     __metadata("design:type", Array)
 ], User.prototype, "paiements", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => preference_model_1.Preference, (preference) => preference.user, { cascade: true }),
+    __metadata("design:type", preference_model_1.Preference)
+], User.prototype, "preference", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => parameter_model_1.Parameter, (parametre) => parametre.user, { cascade: true }),
+    __metadata("design:type", Array)
+], User.prototype, "parametre", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => role_model_1.Roles, (role) => role.user, { onDelete: 'CASCADE' }),
     __metadata("design:type", role_model_1.Roles)

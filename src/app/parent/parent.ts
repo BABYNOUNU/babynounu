@@ -18,6 +18,8 @@ import { SettingLanguages } from '../setting/models/setting_language.model';
 import { ParentSettingGuardSchedules } from './models/parent_setting_guard_schedules.model';
 import { SettingGuardSchedules } from '../setting/models/setting_guard_schedule.model';
 import { SettingSpecificNeed } from '../setting/models/setting_specific_need.model';
+import { SettingServiceFrequency } from '../setting/models/setting_service_frequency.model';
+import { ParentSettingServiceFrequency } from './models/parent_setting_service_frequency.model';
 
 export const ParentProviders = [
   {
@@ -112,18 +114,33 @@ export const ParentProviders = [
 
   {
     provide: 'PARENT_SETTING_GUARD_SCHEDULES_REPOSITORY',
-    useFactory: (dataSource: DataSource) => dataSource.getRepository(ParentSettingGuardSchedules),
+    useFactory: (dataSource: DataSource) =>
+      dataSource.getRepository(ParentSettingGuardSchedules),
     inject: ['DATA_SOURCE'],
   },
 
   {
     provide: 'SETTING_GUARD_SCHEDULE_REPOSITORY',
-    useFactory: (dataSource: DataSource) => dataSource.getRepository(SettingGuardSchedules),
+    useFactory: (dataSource: DataSource) =>
+      dataSource.getRepository(SettingGuardSchedules),
     inject: ['DATA_SOURCE'],
   },
   {
     provide: 'SETTING_SPECIFIC_NEEDS_REPOSITORY',
-    useFactory: (dataSource: DataSource) => dataSource.getRepository(SettingSpecificNeed),
+    useFactory: (dataSource: DataSource) =>
+      dataSource.getRepository(SettingSpecificNeed),
+    inject: ['DATA_SOURCE'],
+  },
+  {
+    provide: 'SETTING_SERVICE_FREQUENCY_REPOSITORY',
+    useFactory: (dataSource: DataSource) =>
+      dataSource.getRepository(SettingServiceFrequency),
+    inject: ['DATA_SOURCE'],
+  },
+  {
+    provide: 'PARENT_SETTING_SERVICE_FREQUENCY_REPOSITORY',
+    useFactory: (dataSource: DataSource) =>
+      dataSource.getRepository(ParentSettingServiceFrequency),
     inject: ['DATA_SOURCE'],
   },
 ];

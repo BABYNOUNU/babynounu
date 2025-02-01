@@ -17,6 +17,8 @@ import { ParentSettingSpecificNeeds } from './models/parent_setting_specific_nee
 import { SettingSpecificNeed } from '../setting/models/setting_specific_need.model';
 import { ParentSettingGuardSchedules } from './models/parent_setting_guard_schedules.model';
 import { SettingGuardSchedules } from '../setting/models/setting_guard_schedule.model';
+import { SettingServiceFrequency } from '../setting/models/setting_service_frequency.model';
+import { ParentSettingServiceFrequency } from './models/parent_setting_service_frequency.model';
 export declare class ParentService {
     private readonly parentSettingLanguagesRepository;
     private readonly settingLanguagesRepository;
@@ -35,7 +37,9 @@ export declare class ParentService {
     private readonly settingSpecificNeedsRepository;
     private readonly parentSettingGuardSchedulesRepository;
     private readonly settingGuardSchedulesRepository;
-    constructor(parentSettingLanguagesRepository: Repository<ParentSettingLanguages>, settingLanguagesRepository: Repository<SettingLanguages>, parentSettingLocalizationsRepository: Repository<ParentSettingLocalizations>, parentSettingAgeOfChildrensRepository: Repository<ParentSettingAgeOfChildrens>, parentSettingDesiredTimesRepository: Repository<ParentSettingDeriredTimes>, parentSettingAreaWorksRepository: Repository<ParentSettingAreaWork>, settingAgeOfChildrensRepository: Repository<SettingAgeOfChildren>, settingLocalizationsRepository: Repository<SettingLocalization>, settingDesiredTimesRepository: Repository<SettingDesiredTime>, settingSpecificSkillsRepository: Repository<SettingSpecificSkills>, parentSettingSpecificSkillsRepository: Repository<ParentSettingSpecificSkills>, userRepository: Repository<User>, parentsRepository: Repository<Parents>, parentSettingSpecificNeedsRepository: Repository<ParentSettingSpecificNeeds>, settingSpecificNeedsRepository: Repository<SettingSpecificNeed>, parentSettingGuardSchedulesRepository: Repository<ParentSettingGuardSchedules>, settingGuardSchedulesRepository: Repository<SettingGuardSchedules>);
+    private readonly settingServiceFrequencyRepository;
+    private readonly parentServiceFrequencyRepository;
+    constructor(parentSettingLanguagesRepository: Repository<ParentSettingLanguages>, settingLanguagesRepository: Repository<SettingLanguages>, parentSettingLocalizationsRepository: Repository<ParentSettingLocalizations>, parentSettingAgeOfChildrensRepository: Repository<ParentSettingAgeOfChildrens>, parentSettingDesiredTimesRepository: Repository<ParentSettingDeriredTimes>, parentSettingAreaWorksRepository: Repository<ParentSettingAreaWork>, settingAgeOfChildrensRepository: Repository<SettingAgeOfChildren>, settingLocalizationsRepository: Repository<SettingLocalization>, settingDesiredTimesRepository: Repository<SettingDesiredTime>, settingSpecificSkillsRepository: Repository<SettingSpecificSkills>, parentSettingSpecificSkillsRepository: Repository<ParentSettingSpecificSkills>, userRepository: Repository<User>, parentsRepository: Repository<Parents>, parentSettingSpecificNeedsRepository: Repository<ParentSettingSpecificNeeds>, settingSpecificNeedsRepository: Repository<SettingSpecificNeed>, parentSettingGuardSchedulesRepository: Repository<ParentSettingGuardSchedules>, settingGuardSchedulesRepository: Repository<SettingGuardSchedules>, settingServiceFrequencyRepository: Repository<SettingServiceFrequency>, parentServiceFrequencyRepository: Repository<ParentSettingServiceFrequency>);
     Parents(): Promise<Parents[]>;
     Parent(ParentsWhereUniqueInput: any): Promise<Parents | null>;
     create(createParentDto: CreateParentDto, files: {

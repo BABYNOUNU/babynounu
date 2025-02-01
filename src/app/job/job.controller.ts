@@ -9,18 +9,21 @@ import {
     UsePipes,
     ValidationPipe,
     NotFoundException,
+    UseGuards,
+    Req,
   } from '@nestjs/common';
   import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam } from '@nestjs/swagger';
   import { JobsService } from './job.service';
   import { CreateJobDto } from './dtos/create-job.dto';
   import { UpdateJobDto } from './dtos/update-job.dto';
+import { JwtAuthGuard } from '../auth/auh.guard';
   
   @ApiTags('jobs') // Tag pour Swagger
   @Controller('jobs')
   export class JobsController {
     constructor(private readonly jobsService: JobsService) {}
   
-    @Post()
+    @Post('create')
     @ApiOperation({ summary: 'Create a new job posting' })
     @ApiBody({ type: CreateJobDto }) // Schéma du corps de la requête
     @ApiResponse({ status: 201, description: 'Job created successfully' })
@@ -44,6 +47,17 @@ import {
     @ApiResponse({ status: 404, description: 'Job not found' })
     async findJobById(@Param('id') id: number) {
       return this.jobsService.findJobById(id);
+    }
+
+    
+    @Get('user/:userId')
+    @ApiOperation({ summary: 'Get a job posting by ID' })
+    @ApiParam({ name: 'id', type: Number }) // Paramètre de route
+    @ApiResponse({ status: 200, description: 'Job retrieved successfully' })
+    @ApiResponse({ status: 404, description: 'Job not found' })
+    async findAllJobByUser(@Param('userId') userId: any) {
+      console.log(userId)
+      return this.jobsService.findAllJobByUser(userId);
     }
   
     @Patch(':id')

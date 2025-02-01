@@ -76,7 +76,7 @@ export class Nounus {
   @Column('text', { nullable: true })
   photo: string;
 
-  @OneToOne((type) => User, (user) => user.nounu, { onDelete: 'CASCADE' })
+  @OneToOne(() => User, (user) => user.nounu, { onDelete: 'CASCADE' })
   user: User;
 
   @OneToMany(() => NounuSettingLanguages, (SN) => SN.nounu, {

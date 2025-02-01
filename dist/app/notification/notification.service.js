@@ -13,16 +13,31 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NotificationService = void 0;
+const notification_gateway_1 = require("./notification.gateway");
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("typeorm");
 let NotificationService = class NotificationService {
     notificationRepository;
-    constructor(notificationRepository) {
+    notificationGateway;
+    constructor(notificationRepository, notificationGateway) {
         this.notificationRepository = notificationRepository;
+        this.notificationGateway = notificationGateway;
     }
     async createNotification(createNotificationDto) {
-        const notification = this.notificationRepository.create(createNotificationDto);
-        return this.notificationRepository.save(notification);
+        const notification = this.notificationRepository.create({
+            type: createNotificationDto.type,
+            message: createNotificationDto.message,
+            user: { id: createNotificationDto.userId },
+            isRead: createNotificationDto.is_read,
+            sender: { id: createNotificationDto.senderUserId },
+        });
+        const saveNotification = await this.notificationRepository.save(notification);
+        if (!saveNotification) {
+            throw new common_1.NotFoundException('Notification not saved');
+        }
+        this.notificationGateway.server
+            .emit('notification', saveNotification);
+        return saveNotification;
     }
     async getNotifications(userId) {
         console.log(userId);
@@ -39,5 +54,6 @@ exports.NotificationService = NotificationService;
 exports.NotificationService = NotificationService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)('NOTIFICATION_REPOSITORY')),
-    __metadata("design:paramtypes", [typeorm_1.Repository])
+    __metadata("design:paramtypes", [typeorm_1.Repository,
+        notification_gateway_1.NotificationGateway])
 ], NotificationService);

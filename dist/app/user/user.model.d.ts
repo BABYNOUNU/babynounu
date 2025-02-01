@@ -5,6 +5,10 @@ import { SettingTypeProfil } from '../setting/models/setting_type_profil.model';
 import { Notification } from '../notification/models/notification.model';
 import { Job } from '../job/models/job.model';
 import { Paiements } from '../paiement/models/paiement.model';
+import { Conversation } from '../chat/models/conversation.model';
+import { JobApplication } from '../job-application/models/job-application.model';
+import { Preference } from '../Preference/models/preference.model';
+import { Parameter } from '../parameter/models/parameter.model';
 export declare class User {
     id: string;
     slug: string;
@@ -16,7 +20,12 @@ export declare class User {
     parent: Parents;
     abonnement: Nounus;
     notifications: Notification[];
+    sentNotifications: Notification[];
+    conversations: Conversation[];
+    job_to_apply: JobApplication[];
     jobs: Job[];
     paiements: Paiements[];
+    preference: Preference;
+    parametre: Parameter[];
     role: Roles;
 }

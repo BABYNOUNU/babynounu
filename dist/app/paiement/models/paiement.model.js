@@ -42,7 +42,7 @@ __decorate([
     __metadata("design:type", String)
 ], Paiements.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.Column)('varchar', { length: 255, nullable: true }),
+    (0, typeorm_1.Column)('varchar', { length: 255, nullable: true, unique: true }),
     __metadata("design:type", String)
 ], Paiements.prototype, "transaction_id", void 0);
 __decorate([

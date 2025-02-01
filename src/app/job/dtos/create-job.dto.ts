@@ -1,18 +1,34 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { IsString, IsOptional, IsArray, IsUUID, IsNotEmpty } from 'class-validator';
 
 export class CreateJobDto {
-  @ApiProperty({ example: 'Software Engineer', description: 'Title of the job' })
+  @IsString()
+  @IsNotEmpty()
   title: string;
 
-  @ApiProperty({ example: 'Develop and maintain software applications', description: 'Description of the job' })
+  @IsString()
+  @IsNotEmpty()
   description: string;
 
-  @ApiProperty({ example: 'New York, USA', description: 'Location of the job' })
-  location: string;
+  @IsString()
+  @IsNotEmpty()
+  budget_min: string;
 
-  @ApiProperty({ example: 80000, description: 'Salary offered for the job' })
-  salary: number;
+  @IsString()
+  @IsNotEmpty()
+  budget_max: string;
 
-  @ApiProperty({ example: 1, description: 'ID of the user posting the job' })
-  userId: number;
+  @IsString()
+  @IsNotEmpty()
+  service_frequency: string;
+
+  @IsString()
+  @IsNotEmpty()
+  schedules_available: string;
+
+
+
+
+  @IsUUID()
+  @IsOptional()
+  user?: string; // ID de l'utilisateur lié
 }

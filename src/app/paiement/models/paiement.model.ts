@@ -1,4 +1,3 @@
-import { Abonnement } from 'src/app/abonnement/abonnement';
 import { Abonnements } from 'src/app/abonnement/models/abonnement.model';
 import { Parents } from 'src/app/parent/models/parent.model';
 import { User } from 'src/app/user/user.model';
@@ -18,7 +17,7 @@ export class Paiements {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column('varchar', { length: 255, nullable: true })
+  @Column('varchar', { length: 255, nullable: true, unique: true })
   transaction_id: string;
 
   @Column()

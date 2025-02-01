@@ -23,7 +23,7 @@ import {
 export class NotificationController {
   constructor(private readonly notificationsService: NotificationService) {}
 
-  @Post()
+  @Post('create')
   @ApiOperation({ summary: 'Create a notification' }) // Description de l'opération
   @ApiBody({ type: CreateNotificationDto }) // Documenter le corps de la requête
   @ApiResponse({

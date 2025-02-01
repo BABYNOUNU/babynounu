@@ -18,6 +18,8 @@ const parent_setting_guard_schedules_model_1 = require("./models/parent_setting_
 const setting_guard_schedule_model_1 = require("../setting/models/setting_guard_schedule.model");
 const setting_specific_need_model_1 = require("../setting/models/setting_specific_need.model");
 const parent_model_1 = require("./models/parent.model");
+const parent_setting_service_frequency_model_1 = require("./models/parent_setting_service_frequency.model");
+const setting_service_frequency_model_1 = require("../setting/models/setting_service_frequency.model");
 exports.ParentProviders = [
     {
         provide: 'SEETING_LANGUAGE_REPOSITORY',
@@ -107,6 +109,16 @@ exports.ParentProviders = [
     {
         provide: 'PARENT_REPOSITORY',
         useFactory: (dataSource) => dataSource.getRepository(parent_model_1.Parents),
+        inject: ['DATA_SOURCE'],
+    },
+    {
+        provide: 'SETTING_SERVICE_FREQUENCY_REPOSITORY',
+        useFactory: (dataSource) => dataSource.getRepository(setting_service_frequency_model_1.SettingServiceFrequency),
+        inject: ['DATA_SOURCE'],
+    },
+    {
+        provide: 'PARENT_SETTING_SERVICE_FREQUENCY_REPOSITORY',
+        useFactory: (dataSource) => dataSource.getRepository(parent_setting_service_frequency_model_1.ParentSettingServiceFrequency),
         inject: ['DATA_SOURCE'],
     },
 ];

@@ -16,8 +16,13 @@ export declare class AuthController {
             parent: import("../parent/models/parent.model").Parents;
             abonnement: import("../nounu/models/nounu.model").Nounus;
             notifications: import("../notification/models/notification.model").Notification[];
+            sentNotifications: import("../notification/models/notification.model").Notification[];
+            conversations: import("../chat/models/conversation.model").Conversation[];
+            job_to_apply: import("../job-application/models/job-application.model").JobApplication[];
             jobs: import("../job/models/job.model").Job[];
             paiements: import("../paiement/models/paiement.model").Paiements[];
+            preference: import("../Preference/models/preference.model").Preference;
+            parametre: import("../parameter/models/parameter.model").Parameter[];
             role: import("../role/models/role.model").Roles;
         };
     }>;
@@ -34,8 +39,13 @@ export declare class AuthController {
             parent: import("../parent/models/parent.model").Parents;
             abonnement: import("../nounu/models/nounu.model").Nounus;
             notifications: import("../notification/models/notification.model").Notification[];
+            sentNotifications: import("../notification/models/notification.model").Notification[];
+            conversations: import("../chat/models/conversation.model").Conversation[];
+            job_to_apply: import("../job-application/models/job-application.model").JobApplication[];
             jobs: import("../job/models/job.model").Job[];
             paiements: import("../paiement/models/paiement.model").Paiements[];
+            preference: import("../Preference/models/preference.model").Preference;
+            parametre: import("../parameter/models/parameter.model").Parameter[];
             role: import("../role/models/role.model").Roles;
         };
     }>;

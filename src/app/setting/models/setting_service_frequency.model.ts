@@ -16,9 +16,6 @@ export class SettingServiceFrequency {
   name: string;
 
   @Column('text', { nullable: true })
-  description: string;
-
-
-  
+  description: string; 
 
 }

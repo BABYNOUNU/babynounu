@@ -120,7 +120,7 @@ __decorate([
     __metadata("design:type", String)
 ], Nounus.prototype, "photo", void 0);
 __decorate([
-    (0, typeorm_1.OneToOne)((type) => user_model_1.User, (user) => user.nounu, { onDelete: 'CASCADE' }),
+    (0, typeorm_1.OneToOne)(() => user_model_1.User, (user) => user.nounu, { onDelete: 'CASCADE' }),
     __metadata("design:type", user_model_1.User)
 ], Nounus.prototype, "user", void 0);
 __decorate([

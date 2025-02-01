@@ -9,6 +9,9 @@ import {
   Delete,
   UploadedFiles,
   UseInterceptors,
+  UseGuards,
+  Req,
+  Query,
 } from '@nestjs/common';
 import { NounuService } from './nounu.service';
 import { CreateNounuDto } from './dto/create-nounu.dto';
@@ -16,6 +19,9 @@ import { UpdateNounuDto } from './dto/update-nounu.dto';
 
 import { ApiTags } from '@nestjs/swagger';
 import { AnyFilesInterceptor, FileFieldsInterceptor } from '@nestjs/platform-express';
+import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from '../auth/auh.guard';
+import { query } from 'express';
 
 @ApiTags('Nounu')
 @Controller('nounu')
@@ -36,9 +42,10 @@ export class NounuController {
     return this.nounuService.create(createNounuDto, files);
   }
 
+  
   @Get()
-  async findAll() {
-    return this.nounuService.findAll();
+  async findAll(@Query('userId') userId: string) {
+    return this.nounuService.findAll(userId);
   }
 
   @Get(':id')

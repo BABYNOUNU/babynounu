@@ -16,6 +16,10 @@ import { SettingTypeProfil } from '../setting/models/setting_type_profil.model';
 import { Notification } from '../notification/models/notification.model';
 import { Job } from '../job/models/job.model';
 import { Paiements } from '../paiement/models/paiement.model';
+import { Conversation } from '../chat/models/conversation.model';
+import { JobApplication } from '../job-application/models/job-application.model';
+import { Preference } from '../Preference/models/preference.model';
+import { Parameter } from '../parameter/models/parameter.model';
 
 @Entity()
 export class User {
@@ -56,6 +60,21 @@ export class User {
   })
   notifications: Notification[];
 
+  @OneToMany(() => Notification, (notification) => notification.sender, {
+    cascade: true,
+  })
+  sentNotifications: Notification[];
+
+  @OneToMany(() => Conversation, (conversation) => conversation.user, {
+    cascade: true,
+  })
+  conversations: Conversation[];
+
+  @OneToMany(() => JobApplication, (job_to_apply) => job_to_apply.user, {
+    cascade: true,
+  })
+  job_to_apply: JobApplication[];
+
   @OneToMany(() => Job, (job) => job.user, {
     cascade: true,
   })
@@ -65,6 +84,12 @@ export class User {
     cascade: true,
   })
   paiements: Paiements[];
+
+  @OneToMany(() => Preference, (preference) => preference.user, {cascade: true})
+  preference: Preference;
+
+  @OneToMany(() => Parameter, (parametre) => parametre.user, {cascade: true})
+  parametre: Parameter[]
   
 
   @ManyToOne(() => Roles, (role) => role.user, {  onDelete: 'CASCADE' })

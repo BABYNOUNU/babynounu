@@ -9,7 +9,7 @@ export declare class NounuController {
         document?: Express.Multer.File[];
         gallery?: Express.Multer.File[];
     }): Promise<import("./models/nounu.model").Nounus>;
-    findAll(): Promise<import("./models/nounu.model").Nounus[]>;
+    findAll(userId: string): Promise<import("./models/nounu.model").Nounus[]>;
     findOne(id: string): Promise<import("./models/nounu.model").Nounus>;
     update(id: string, updateNounuDto: UpdateNounuDto): Promise<import("./models/nounu.model").Nounus>;
     remove(id: string): Promise<void>;
