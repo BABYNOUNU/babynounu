@@ -76,7 +76,7 @@ __decorate([
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Payment not found' }),
     __param(0, (0, common_1.Param)('paymentId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], PaymentController.prototype, "getPaymentById", null);
 __decorate([
@@ -92,7 +92,7 @@ __decorate([
     __param(0, (0, common_1.Param)('paymentId')),
     __param(1, (0, common_1.Body)('status')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, String]),
+    __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], PaymentController.prototype, "updatePaymentStatus", null);
 exports.PaymentController = PaymentController = __decorate([

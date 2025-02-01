@@ -38,7 +38,7 @@ let AbonnementController = class AbonnementController {
 };
 exports.AbonnementController = AbonnementController;
 __decorate([
-    (0, common_1.Post)(),
+    (0, common_1.Post)('confirm'),
     (0, swagger_1.ApiOperation)({ summary: 'Create a new subscription' }),
     (0, swagger_1.ApiBody)({ type: create_abonnement_dto_1.CreateAbonnementDto }),
     (0, swagger_1.ApiResponse)({

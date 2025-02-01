@@ -56,7 +56,7 @@ export class PaymentController {
     description: 'Payment retrieved successfully',
   })
   @ApiResponse({ status: 404, description: 'Payment not found' })
-  async getPaymentById(@Param('paymentId') paymentId: number) {
+  async getPaymentById(@Param('paymentId') paymentId: string) {
     return this.paymentService.getPaymentById(paymentId);
   }
 
@@ -70,7 +70,7 @@ export class PaymentController {
   })
   @ApiResponse({ status: 404, description: 'Payment not found' })
   async updatePaymentStatus(
-    @Param('paymentId') paymentId: number,
+    @Param('paymentId') paymentId: string,
     @Body('status') status: string,
   ) {
     return this.paymentService.updatePaymentStatus(paymentId, status);

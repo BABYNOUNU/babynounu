@@ -1,14 +1,18 @@
+import { NotificationService } from './../notification/notification.service';
 import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Abonnements } from './models/abonnement.model';
 import { CreateAbonnementDto } from './dtos/create-abonnement.dto';
 import { NotificationGateway } from '../notification/notification.gateway';
+import { PaymentService } from '../paiement/paiement.service';
 
 @Injectable()
 export class AbonnementService {
   constructor(
     @Inject('ABONNEMENT_REPOSITORY')
     private readonly abonnementRepository: Repository<Abonnements>,
+    private readonly paymentService: PaymentService,
+    private readonly NotificationService: NotificationService,
     private readonly notificationGateway: NotificationGateway
   ) {}
 
@@ -37,6 +41,15 @@ export class AbonnementService {
     if(!abonnementSave) {
         throw new NotFoundException(`Abonnement with transaction ID ${createAbonnementDto.transactionId} not found`);
     }
+
+    this.paymentService.updatePaymentStatus(createAbonnementDto.paiementId, 'completed');
+    this.NotificationService.createNotification({ 
+      type: 'ABONNEMENT',
+      userId: createAbonnementDto.userId.toString(),
+      message: `Votre abonnement a bien été validé`,
+      is_read: false,
+      senderUserId: createAbonnementDto.userId.toString()
+     });
 
      // Émettre un événement Socket.IO
      const GetAbonnement = await this.getAbonnementById(abonnementSave.id);

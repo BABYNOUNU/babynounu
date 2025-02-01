@@ -24,7 +24,7 @@ import { JwtAuthGuard } from '../auth/auh.guard';
   export class AbonnementController {
     constructor(private readonly abonnementService: AbonnementService) {}
   
-    @Post()
+    @Post('confirm')
     @ApiOperation({ summary: 'Create a new subscription' }) // Description de l'opération
     @ApiBody({ type: CreateAbonnementDto }) // Documenter le corps de la requête
     @ApiResponse({

@@ -18,13 +18,10 @@ export class PaymentService {
    */
   async createPayment(createPaymentDto: CreatePaymentDto) {
     const hasUserPaid = await this.paymentRepository.findOne({
-      where: { user: { id: createPaymentDto.userId } },
-      relations: ['user'],
+      where: { user: { id: createPaymentDto.userId }, status: 'PENDING' },
     });
     if (hasUserPaid) {
-      throw new BadRequestException({
-        message: "L'utilisateur a deja paye",
-      });
+      await this.paymentRepository.softDelete(hasUserPaid.id);
     }
 
     const payment = this.paymentRepository.create({
@@ -78,7 +75,7 @@ export class PaymentService {
    * @param paymentId - ID du paiement.
    * @returns Le paiement correspondant.
    */
-  async getPaymentById(paymentId: number) {
+  async getPaymentById(paymentId: string) {
     return this.paymentRepository.findOne({
       where: { id: paymentId.toString() },
     });
@@ -90,7 +87,7 @@ export class PaymentService {
    * @param status - Nouveau statut (ex: "completed", "failed").
    * @returns Le paiement mis à jour.
    */
-  async updatePaymentStatus(paymentId: number, status: string) {
+  async updatePaymentStatus(paymentId: string, status: string) {
     await this.paymentRepository.update(paymentId, { status });
     return this.getPaymentById(paymentId);
   }

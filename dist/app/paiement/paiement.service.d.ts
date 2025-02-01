@@ -6,6 +6,6 @@ export declare class PaymentService {
     constructor(paymentRepository: Repository<Paiements>);
     createPayment(createPaymentDto: CreatePaymentDto): Promise<any>;
     getPaymentsByUser(userId: number): Promise<Paiements[]>;
-    getPaymentById(paymentId: number): Promise<Paiements>;
-    updatePaymentStatus(paymentId: number, status: string): Promise<Paiements>;
+    getPaymentById(paymentId: string): Promise<Paiements>;
+    updatePaymentStatus(paymentId: string, status: string): Promise<Paiements>;
 }

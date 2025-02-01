@@ -5,6 +5,6 @@ export declare class PaymentController {
     constructor(paymentService: PaymentService);
     createPayment(createPaymentDto: CreatePaymentDto): Promise<any>;
     getPaymentsByUser(userId: number): Promise<import("./models/paiement.model").Paiements[]>;
-    getPaymentById(paymentId: number): Promise<import("./models/paiement.model").Paiements>;
-    updatePaymentStatus(paymentId: number, status: string): Promise<import("./models/paiement.model").Paiements>;
+    getPaymentById(paymentId: string): Promise<import("./models/paiement.model").Paiements>;
+    updatePaymentStatus(paymentId: string, status: string): Promise<import("./models/paiement.model").Paiements>;
 }

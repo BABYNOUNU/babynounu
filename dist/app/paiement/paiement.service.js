@@ -23,13 +23,10 @@ let PaymentService = class PaymentService {
     }
     async createPayment(createPaymentDto) {
         const hasUserPaid = await this.paymentRepository.findOne({
-            where: { user: { id: createPaymentDto.userId } },
-            relations: ['user'],
+            where: { user: { id: createPaymentDto.userId }, status: 'PENDING' },
         });
         if (hasUserPaid) {
-            throw new common_1.BadRequestException({
-                message: "L'utilisateur a deja paye",
-            });
+            await this.paymentRepository.softDelete(hasUserPaid.id);
         }
         const payment = this.paymentRepository.create({
             ...createPaymentDto,
