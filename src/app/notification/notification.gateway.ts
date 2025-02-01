@@ -11,11 +11,7 @@ import {
 import { HOST } from 'src/database/database.providers';
   
   @WebSocketGateway({
-    cors: {
-      origin: HOST, // Autoriser uniquement votre domaine en production
-      methods: ['GET', 'POST'],
-      credentials: true,
-    },
+    cors: true,
   })
   export class NotificationGateway {
     @WebSocketServer()
