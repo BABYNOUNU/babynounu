@@ -6,10 +6,11 @@ import { DatabaseModule } from 'src/database/database.module';
 import { AbonnementProviders } from './abonnement';
 import { NotificationGateway } from '../notification/notification.gateway';
 import { PaymentService } from '../paiement/paiement.service';
+import { NotificationService } from '../notification/notification.service';
 
 @Module({
   imports: [DatabaseModule],
   controllers: [AbonnementController],
-  providers: [AbonnementService, NotificationGateway, PaymentService, ...AbonnementProviders],
+  providers: [AbonnementService, NotificationGateway, PaymentService, NotificationService, ...AbonnementProviders],
 })
 export class AbonnementModule {}

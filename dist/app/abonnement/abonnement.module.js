@@ -14,6 +14,7 @@ const database_module_1 = require("../../database/database.module");
 const abonnement_1 = require("./abonnement");
 const notification_gateway_1 = require("../notification/notification.gateway");
 const paiement_service_1 = require("../paiement/paiement.service");
+const notification_service_1 = require("../notification/notification.service");
 let AbonnementModule = class AbonnementModule {
 };
 exports.AbonnementModule = AbonnementModule;
@@ -21,6 +22,6 @@ exports.AbonnementModule = AbonnementModule = __decorate([
     (0, common_1.Module)({
         imports: [database_module_1.DatabaseModule],
         controllers: [abonnement_controller_1.AbonnementController],
-        providers: [abonnement_service_1.AbonnementService, notification_gateway_1.NotificationGateway, paiement_service_1.PaymentService, ...abonnement_1.AbonnementProviders],
+        providers: [abonnement_service_1.AbonnementService, notification_gateway_1.NotificationGateway, paiement_service_1.PaymentService, notification_service_1.NotificationService, ...abonnement_1.AbonnementProviders],
     })
 ], AbonnementModule);
