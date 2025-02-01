@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JobApplicationProviders = void 0;
-const Job_model_1 = require("../Job/models/Job.model");
+const job_model_1 = require("../job/models/job.model");
 const job_application_model_1 = require("./models/job-application.model");
 const user_model_1 = require("../user/user.model");
 const notification_model_1 = require("../notification/models/notification.model");
@@ -13,7 +13,7 @@ exports.JobApplicationProviders = [
     },
     {
         provide: 'JOB_REPOSITORY',
-        useFactory: (dataSource) => dataSource.getRepository(Job_model_1.Job),
+        useFactory: (dataSource) => dataSource.getRepository(job_model_1.Job),
         inject: ['DATA_SOURCE'],
     },
     {

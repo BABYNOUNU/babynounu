@@ -1,8 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.databaseProviders = exports.isProd = void 0;
+exports.databaseProviders = exports.HOST = exports.isProd = void 0;
 const typeorm_1 = require("typeorm");
-exports.isProd = true;
+exports.isProd = false;
+exports.HOST = exports.isProd ? 'https://api.babynounu.com' : 'https://api.babynounu.com';
 const ProdDatabase = (dbProd, dbTest) => {
     return exports.isProd ? dbProd : dbTest;
 };

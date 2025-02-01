@@ -7,7 +7,7 @@ import { JobApplication } from './models/job-application.model';
 import { CreateJobApplicationDto } from './dto/create-job-application.dto';
 import { UpdateJobApplicationDto } from './dto/update-job-application.dto';
 import { User } from '../user/user.model';
-import { Job } from '../Job/models/Job.model';
+import { Job } from '../job/models/job.model';
 import { NotificationService } from '../notification/notification.service';
 
 @Injectable()

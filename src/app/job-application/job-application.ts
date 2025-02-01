@@ -1,6 +1,6 @@
 
 import { Injectable , Inject } from '@nestjs/common';
-import { Job } from '../Job/models/Job.model';
+import { Job } from '../job/models/job.model';
 import { JobApplication } from './models/job-application.model';
 import { DataSource } from 'typeorm';
 import { User } from '../user/user.model';
