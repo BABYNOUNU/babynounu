@@ -32,7 +32,7 @@ let PaymentService = class PaymentService {
             ...createPaymentDto,
             user: { id: createPaymentDto.userId },
         });
-        await this.paymentRepository.save(payment);
+        const paymentSave = await this.paymentRepository.save(payment);
         var config = {
             method: 'post',
             url: 'https://api-checkout.cinetpay.com/v2/payment',
@@ -46,14 +46,14 @@ let PaymentService = class PaymentService {
                 ...createPaymentDto,
             },
         };
-        const { data: paymentDataSave } = await (0, axios_1.default)(config);
-        if (!paymentDataSave) {
+        const { data: paymentData } = await (0, axios_1.default)(config);
+        if (!paymentData) {
             throw new common_1.BadRequestException({
                 message: "Erreur lors de l'initiation du paiement",
             });
         }
-        await this.paymentRepository.update({ id: paymentDataSave.id }, { payment_token: paymentDataSave.payment_token });
-        return paymentDataSave;
+        await this.paymentRepository.update({ id: paymentSave.id }, { payment_token: paymentData.data.payment_token });
+        return paymentData;
     }
     async getPaymentsByUser(userId) {
         return this.paymentRepository.find({
@@ -67,6 +67,10 @@ let PaymentService = class PaymentService {
     }
     async updatePaymentStatus(paymentId, status) {
         await this.paymentRepository.update(paymentId, { status });
+        return this.getPaymentById(paymentId);
+    }
+    async updatePayment(paymentId, updateData) {
+        await this.paymentRepository.update(paymentId, updateData);
         return this.getPaymentById(paymentId);
     }
 };

@@ -31,6 +31,7 @@ const certification_seed_1 = require("../../database/seeders/certification.seed"
 const role_seed_1 = require("../../database/seeders/role.seed");
 const typesProfil_seed_1 = require("../../database/seeders/typesProfil.seed");
 const type_seed_1 = require("../../database/seeders/type.seed");
+const type_parameter_seed_1 = require("../../database/seeders/parameters/type.parameter.seed");
 let SettingController = class SettingController {
     settingAgeOfChildrenRepository;
     settingSpecificNeed;
@@ -46,7 +47,9 @@ let SettingController = class SettingController {
     roles;
     settingTypeProfil;
     settingTypePaiement;
-    constructor(settingAgeOfChildrenRepository, settingSpecificNeed, settingGuardSchelude, settingHousekeeper, settingServiceFrequency, settingDesiredTime, settingSpecificSkills, settingLanguages, settingLocalization, settingPaymentTerms, settingCertification, roles, settingTypeProfil, settingTypePaiement) {
+    typeParameterRepository;
+    parameterRepository;
+    constructor(settingAgeOfChildrenRepository, settingSpecificNeed, settingGuardSchelude, settingHousekeeper, settingServiceFrequency, settingDesiredTime, settingSpecificSkills, settingLanguages, settingLocalization, settingPaymentTerms, settingCertification, roles, settingTypeProfil, settingTypePaiement, typeParameterRepository, parameterRepository) {
         this.settingAgeOfChildrenRepository = settingAgeOfChildrenRepository;
         this.settingSpecificNeed = settingSpecificNeed;
         this.settingGuardSchelude = settingGuardSchelude;
@@ -61,6 +64,8 @@ let SettingController = class SettingController {
         this.roles = roles;
         this.settingTypeProfil = settingTypeProfil;
         this.settingTypePaiement = settingTypePaiement;
+        this.typeParameterRepository = typeParameterRepository;
+        this.parameterRepository = parameterRepository;
     }
     removeDuplicatesByName(array1, array2) {
         const namesInArray2 = new Set(array2.map((item) => item.name));
@@ -73,6 +78,7 @@ let SettingController = class SettingController {
         let settingSave;
         let isNext = 0;
         const IsNameExist = await Repository.find();
+        console.log(IsNameExist);
         for (let index = 0; index < this.removeDuplicatesByName(createSeederBody, IsNameExist).length; index++) {
             const Seeder = this.removeDuplicatesByName(createSeederBody, IsNameExist)[index];
             Seeder.slug = await new slug_utils_1.SlugUtils().all(Seeder.name, Repository);
@@ -80,6 +86,7 @@ let SettingController = class SettingController {
                 slug: Seeder.slug,
                 name: Seeder.name,
                 description: Seeder.description,
+                type_parameter: Seeder.type_parameter,
             });
             settingSave = await Repository.save(newSetting);
         }
@@ -92,38 +99,41 @@ let SettingController = class SettingController {
             },
         };
     }
+    SeederParametreTypes() {
+        return this.createSeeder(this.typeParameterRepository, type_parameter_seed_1.typeParametresSeeders);
+    }
     SeederAgeOfChildren() {
-        return this.createSeeder(this.settingAgeOfChildrenRepository, agesOfChildren_seed_1.default);
+        return this.createSeeder(this.parameterRepository, agesOfChildren_seed_1.default);
     }
     SeederSpecificNeed() {
-        return this.createSeeder(this.settingSpecificNeed, specificNeed_seed_1.default);
+        return this.createSeeder(this.parameterRepository, specificNeed_seed_1.default);
     }
     SeederGuardSchedule() {
-        return this.createSeeder(this.settingGuardSchelude, guardSchedule_seed_1.default);
+        return this.createSeeder(this.parameterRepository, guardSchedule_seed_1.default);
     }
     SeederHousekeeper() {
-        return this.createSeeder(this.settingHousekeeper, houseKeepers_seed_1.default);
+        return this.createSeeder(this.parameterRepository, houseKeepers_seed_1.default);
     }
     SeederServiceFrequency() {
-        return this.createSeeder(this.settingServiceFrequency, serviceFrequencies_seed_1.ServiceFrequencieSeeders);
+        return this.createSeeder(this.parameterRepository, serviceFrequencies_seed_1.ServiceFrequencieSeeders);
     }
     SeederDesiredTimes() {
-        return this.createSeeder(this.settingDesiredTime, schedule_seed_1.DesiredTimesSeeders);
+        return this.createSeeder(this.parameterRepository, schedule_seed_1.DesiredTimesSeeders);
     }
     SeederSpecificSkills() {
-        return this.createSeeder(this.settingSpecificSkills, specificSkills_seed_1.SpecificSkillSeeders);
+        return this.createSeeder(this.parameterRepository, specificSkills_seed_1.SpecificSkillSeeders);
     }
     SeederLanguages() {
-        return this.createSeeder(this.settingLanguages, spokenLanguage_seed_1.SpokenLanguageSeeders);
+        return this.createSeeder(this.parameterRepository, spokenLanguage_seed_1.SpokenLanguageSeeders);
     }
     SeederLocalization() {
-        return this.createSeeder(this.settingLocalization, localization_seed_1.LocalizationSeeders);
+        return this.createSeeder(this.parameterRepository, localization_seed_1.LocalizationSeeders);
     }
     SeederPaymentTerms() {
-        return this.createSeeder(this.settingPaymentTerms, paymentTerms_seed_1.PaymentTermSeeders);
+        return this.createSeeder(this.parameterRepository, paymentTerms_seed_1.PaymentTermSeeders);
     }
     SeederCertifications() {
-        return this.createSeeder(this.settingCertification, certification_seed_1.CertificationSeeders);
+        return this.createSeeder(this.parameterRepository, certification_seed_1.CertificationSeeders);
     }
     SeederRoles() {
         return this.createSeeder(this.roles, role_seed_1.RoleSeeders);
@@ -136,6 +146,12 @@ let SettingController = class SettingController {
     }
 };
 exports.SettingController = SettingController;
+__decorate([
+    (0, common_1.Post)('seed/parametres/types'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], SettingController.prototype, "SeederParametreTypes", null);
 __decorate([
     (0, common_1.Post)('seed/age-of-children'),
     __metadata("design:type", Function),
@@ -237,7 +253,11 @@ exports.SettingController = SettingController = __decorate([
     __param(11, (0, common_1.Inject)('ROLE_REPOSITORY')),
     __param(12, (0, common_1.Inject)('TYPE_PROFIL_REPOSITORY')),
     __param(13, (0, common_1.Inject)('TYPE_PAIEMENT_REPOSITORY')),
+    __param(14, (0, common_1.Inject)('TYPE_PARAMETER_REPOSITORY')),
+    __param(15, (0, common_1.Inject)('PARAMETER_REPOSITORY')),
     __metadata("design:paramtypes", [typeorm_1.Repository,
+        typeorm_1.Repository,
+        typeorm_1.Repository,
         typeorm_1.Repository,
         typeorm_1.Repository,
         typeorm_1.Repository,

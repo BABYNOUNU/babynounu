@@ -16,20 +16,13 @@ const typeorm_1 = require("typeorm");
 let Paiements = class Paiements {
     id;
     transaction_id;
+    operator_id;
+    payment_date;
     amount;
     currency;
     status;
     payment_token;
     paymentMethod;
-    customer_name;
-    customer_surname;
-    customer_email;
-    customer_phone_number;
-    customer_address;
-    customer_city;
-    customer_country;
-    customer_state;
-    customer_zip_code;
     abonnement;
     user;
     createdAt;
@@ -45,6 +38,14 @@ __decorate([
     (0, typeorm_1.Column)('varchar', { length: 255, nullable: true, unique: true }),
     __metadata("design:type", String)
 ], Paiements.prototype, "transaction_id", void 0);
+__decorate([
+    (0, typeorm_1.Column)('varchar', { length: 255, nullable: true, unique: true }),
+    __metadata("design:type", String)
+], Paiements.prototype, "operator_id", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'timestamp', nullable: true }),
+    __metadata("design:type", Date)
+], Paiements.prototype, "payment_date", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", Number)
@@ -65,42 +66,6 @@ __decorate([
     (0, typeorm_1.Column)('varchar', { length: 255, nullable: true }),
     __metadata("design:type", String)
 ], Paiements.prototype, "paymentMethod", void 0);
-__decorate([
-    (0, typeorm_1.Column)('varchar', { length: 255, nullable: true }),
-    __metadata("design:type", String)
-], Paiements.prototype, "customer_name", void 0);
-__decorate([
-    (0, typeorm_1.Column)('varchar', { length: 255, nullable: true }),
-    __metadata("design:type", String)
-], Paiements.prototype, "customer_surname", void 0);
-__decorate([
-    (0, typeorm_1.Column)('varchar', { length: 255, nullable: true }),
-    __metadata("design:type", String)
-], Paiements.prototype, "customer_email", void 0);
-__decorate([
-    (0, typeorm_1.Column)('varchar', { length: 255, nullable: true }),
-    __metadata("design:type", String)
-], Paiements.prototype, "customer_phone_number", void 0);
-__decorate([
-    (0, typeorm_1.Column)('varchar', { length: 255, nullable: true }),
-    __metadata("design:type", String)
-], Paiements.prototype, "customer_address", void 0);
-__decorate([
-    (0, typeorm_1.Column)('varchar', { length: 255, nullable: true }),
-    __metadata("design:type", String)
-], Paiements.prototype, "customer_city", void 0);
-__decorate([
-    (0, typeorm_1.Column)('varchar', { length: 255, nullable: true }),
-    __metadata("design:type", String)
-], Paiements.prototype, "customer_country", void 0);
-__decorate([
-    (0, typeorm_1.Column)('varchar', { length: 255, nullable: true }),
-    __metadata("design:type", String)
-], Paiements.prototype, "customer_state", void 0);
-__decorate([
-    (0, typeorm_1.Column)('varchar', { length: 255, nullable: true }),
-    __metadata("design:type", String)
-], Paiements.prototype, "customer_zip_code", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => abonnement_model_1.Abonnements, (NS) => NS.paiement, { cascade: true, }),
     __metadata("design:type", abonnement_model_1.Abonnements)

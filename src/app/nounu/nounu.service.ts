@@ -92,17 +92,13 @@ export class NounuService extends MediaService {
       confirmed_identity: `/uploads/${files.document[0].filename}`,
       pricing_flexibility: createNounuDto.pricing_flexibility,
       photo: `/uploads/${files.profil_image[0].filename}`,
+      user: { id: createNounuDto.user },
     });
     const saveNounu = await this.nounuRepository.save(nounu);
 
     if (!saveNounu) {
       throw new BadRequestException({ message: 'Nounu not created' });
     }
-
-    await this.userRepository.update(
-      { id: createNounuDto.user },
-      { nounu: saveNounu },
-    );
 
     // Ajout des images de galerie
     for (const file of files.gallery) {
@@ -123,12 +119,13 @@ export class NounuService extends MediaService {
     ) {
       if (!Array.isArray(items) || items.length === 0) {
         throw new Error(`Invalid items: ${items}`);
-      }
+      } 
 
       const relationObjects = await Promise.all(
-        items.map(async (item: string) => {
+        items.map(async (item: any) => {
+          item = JSON.parse(item);
           const entity = await repository.findOne({
-            where: { name: item }, // Associe selon le nom ou un autre critère
+            where: { name: item.name }, // Associe selon le nom ou un autre critère
           });
 
           if (!entity) {

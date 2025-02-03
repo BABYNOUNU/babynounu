@@ -41,6 +41,9 @@ import { SettingTypeProfil } from './models/setting_type_profil.model';
 import { TypeProfilSeeders } from 'src/database/seeders/typesProfil.seed';
 import { settingSubscriptionTypes } from './models/setting_subscription_type.model';
 import { TypePaiementSeeders } from 'src/database/seeders/type.seed';
+import { TypeParameter } from '../parameter/models/parameter_type.model';
+import { typeParametresSeeders } from 'src/database/seeders/parameters/type.parameter.seed';
+import { Parameter } from '../parameter/models/parameter.model';
 
 @ApiTags('Setting')
 @Controller('setting')
@@ -75,6 +78,11 @@ export class SettingController {
     private readonly settingTypeProfil: Repository<SettingTypeProfil>,
     @Inject('TYPE_PAIEMENT_REPOSITORY')
     private readonly settingTypePaiement: Repository<settingSubscriptionTypes>,
+
+    @Inject('TYPE_PARAMETER_REPOSITORY')
+    private readonly typeParameterRepository: Repository<TypeParameter>,
+    @Inject('PARAMETER_REPOSITORY')
+    private readonly parameterRepository: Repository<Parameter>,
     
     
   ) {}
@@ -104,7 +112,7 @@ export class SettingController {
     let isNext = 0;
 
     const IsNameExist = await Repository.find();
-
+    console.log(IsNameExist);
     for (let index = 0; index < this.removeDuplicatesByName(createSeederBody, IsNameExist).length; index++) {
       const Seeder = this.removeDuplicatesByName(createSeederBody, IsNameExist)[index];
 
@@ -115,7 +123,8 @@ export class SettingController {
       const newSetting = Repository.create({
         slug: Seeder.slug,
         name: Seeder.name,
-        description: Seeder.description,
+        description: Seeder.description,  
+        type_parameter: Seeder.type_parameter,
       });
       settingSave = await Repository.save(newSetting);
     }
@@ -132,11 +141,22 @@ export class SettingController {
     };
   }
 
+
+ 
+
+  @Post('seed/parametres/types')
+  SeederParametreTypes() {
+    return this.createSeeder(
+      this.typeParameterRepository,
+      typeParametresSeeders,
+    );
+  }
+
   // Get All Parents
   @Post('seed/age-of-children')
   SeederAgeOfChildren() {
     return this.createSeeder(
-      this.settingAgeOfChildrenRepository,
+      this.parameterRepository,
       agesOfChildrenSeeders,
     );
   }
@@ -144,7 +164,7 @@ export class SettingController {
   @Post('seed/specific-need')
   SeederSpecificNeed() {
     return this.createSeeder(
-      this.settingSpecificNeed,
+      this.parameterRepository,
       specificNeedSeeders,
     );
   }
@@ -152,7 +172,7 @@ export class SettingController {
   @Post('seed/guard-schedule')
   SeederGuardSchedule() {
     return this.createSeeder(
-      this.settingGuardSchelude,
+      this.parameterRepository,
       GuardScheduleSeeders,
     );
   }
@@ -160,7 +180,7 @@ export class SettingController {
   @Post('seed/housekeeper')
   SeederHousekeeper() {
     return this.createSeeder(
-      this.settingHousekeeper,
+      this.parameterRepository,
       HouseKeeperSeeders,
     );
   }
@@ -169,7 +189,7 @@ export class SettingController {
   @Post('seed/service-frequency')
   SeederServiceFrequency() {
     return this.createSeeder(
-      this.settingServiceFrequency,
+      this.parameterRepository,
       ServiceFrequencieSeeders,
     );
   }
@@ -178,7 +198,7 @@ export class SettingController {
   @Post('seed/desired-times')
   SeederDesiredTimes() {
     return this.createSeeder(
-      this.settingDesiredTime,
+      this.parameterRepository,
       DesiredTimesSeeders,
     );
   }
@@ -186,7 +206,7 @@ export class SettingController {
   @Post('seed/specific-skills')
   SeederSpecificSkills() {
     return this.createSeeder(
-      this.settingSpecificSkills,
+      this.parameterRepository,
       SpecificSkillSeeders,
     );
   }
@@ -194,7 +214,7 @@ export class SettingController {
   @Post('seed/languages')
   SeederLanguages() {
     return this.createSeeder(
-      this.settingLanguages,
+      this.parameterRepository,
       SpokenLanguageSeeders,
     );
   }
@@ -202,7 +222,7 @@ export class SettingController {
   @Post('seed/localization')
   SeederLocalization() {
     return this.createSeeder(
-      this.settingLocalization,
+      this.parameterRepository,
       LocalizationSeeders,
     );
   }
@@ -210,7 +230,7 @@ export class SettingController {
   @Post('seed/payment-terms')
   SeederPaymentTerms() {
     return this.createSeeder(
-      this.settingPaymentTerms,
+      this.parameterRepository,
       PaymentTermSeeders,
     );
   }
@@ -219,7 +239,7 @@ export class SettingController {
   @Post('seed/certifications')
   SeederCertifications() {
     return this.createSeeder(
-      this.settingCertification,
+      this.parameterRepository,
       CertificationSeeders, 
     );
   }

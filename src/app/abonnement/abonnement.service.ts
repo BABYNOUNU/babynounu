@@ -5,6 +5,7 @@ import { Abonnements } from './models/abonnement.model';
 import { CreateAbonnementDto } from './dtos/create-abonnement.dto';
 import { NotificationGateway } from '../notification/notification.gateway';
 import { PaymentService } from '../paiement/paiement.service';
+import axios from 'axios';
 
 @Injectable()
 export class AbonnementService {
@@ -27,7 +28,24 @@ export class AbonnementService {
         where: { paiement: { user: { id: createAbonnementDto.userId }, transaction_id: createAbonnementDto.transactionId } }
     });
 
-    if (!paiement) {
+    
+
+    var config = {
+      method: 'post',
+      url: 'https://api-checkout.cinetpay.com/v2/payment/check',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: {
+        apikey: process.env.CINETPAY_API_KEY, // Remplacez par votre clé API
+        site_id: process.env.CINETPAY_SITE_ID, // Remplacez par votre site ID
+        transaction_id : createAbonnementDto.transactionId, // Remplacez par votre transaction ID
+      },
+    };
+
+    const { data: abonnementChecked } = await axios(config);
+
+    if (!abonnementChecked) {
         throw new NotFoundException(`Paiement with transaction ID ${createAbonnementDto.transactionId} not found`);
     }
 
@@ -42,7 +60,14 @@ export class AbonnementService {
         throw new NotFoundException(`Abonnement with transaction ID ${createAbonnementDto.transactionId} not found`);
     }
 
-    this.paymentService.updatePaymentStatus(createAbonnementDto.paiementId, 'completed');
+    // Mettre à jour le paiement
+
+    this.paymentService.updatePayment(createAbonnementDto.paiementId, {
+      status: abonnementChecked.data.status,
+      paymentMethod: abonnementChecked.data.payment_method,
+      currency: abonnementChecked.data.currency,
+      operator_id: abonnementChecked.data.operator_id,
+    });
     this.NotificationService.createNotification({ 
       type: 'ABONNEMENT',
       userId: createAbonnementDto.userId.toString(),

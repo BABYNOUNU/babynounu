@@ -9,7 +9,7 @@ export class CreateNounuDto {
     fullname: string;
     old: string;
     phone: string;
-    adresse: string;
+    adresse: any;
     year_experience: string;
     hourly_rate?: string;
     monthly_rate?: string;

@@ -20,6 +20,12 @@ export class Paiements {
   @Column('varchar', { length: 255, nullable: true, unique: true })
   transaction_id: string;
 
+  @Column('varchar', { length: 255, nullable: true, unique: true })
+  operator_id: string;
+
+  @Column({ type: 'timestamp', nullable: true })
+  payment_date: Date; // Date du paiement
+
   @Column()
   amount: number; // Montant du paiement
 
@@ -34,33 +40,6 @@ export class Paiements {
 
   @Column('varchar', { length: 255, nullable: true })
   paymentMethod: string; // Méthode de paiement (ex: "credit_card", "paypal")
-
-  @Column('varchar', { length: 255, nullable: true })
-  customer_name: string;
-
-  @Column('varchar', { length: 255, nullable: true })
-  customer_surname: string;
-
-  @Column('varchar', { length: 255, nullable: true })
-  customer_email: string;
-
-  @Column('varchar', { length: 255, nullable: true })
-  customer_phone_number: string;
-
-  @Column('varchar', { length: 255, nullable: true })
-  customer_address: string;
-
-  @Column('varchar', { length: 255, nullable: true })
-  customer_city: string;
-
-  @Column('varchar', { length: 255, nullable: true })
-  customer_country: string;
-
-  @Column('varchar', { length: 255, nullable: true })
-  customer_state: string;
-
-  @Column('varchar', { length: 255, nullable: true })
-  customer_zip_code: string;
 
   @OneToMany(() => Abonnements, (NS) => NS.paiement, { cascade: true, })
   abonnement: Abonnements;

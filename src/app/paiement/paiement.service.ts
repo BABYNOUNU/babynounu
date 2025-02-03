@@ -3,6 +3,7 @@ import { Repository } from 'typeorm';
 import { Paiements } from './models/paiement.model';
 import { CreatePaymentDto } from './dtos/create-payment.dto';
 import axios from 'axios';
+import { UpdatePaymentDto } from './dtos/update-payment.dto';
 
 @Injectable()
 export class PaymentService {
@@ -28,7 +29,7 @@ export class PaymentService {
       ...createPaymentDto,
       user: { id: createPaymentDto.userId },
     });
-    await this.paymentRepository.save(payment);
+    const paymentSave =await this.paymentRepository.save(payment);
 
     var config = {
       method: 'post',
@@ -44,19 +45,19 @@ export class PaymentService {
       },
     };
 
-    const { data: paymentDataSave } = await axios(config);
-    if (!paymentDataSave) {
+    const { data: paymentData } = await axios(config);
+    if (!paymentData) {
       throw new BadRequestException({
         message: "Erreur lors de l'initiation du paiement",
       });
     }
 
     await this.paymentRepository.update(
-      { id: paymentDataSave.id },
-      { payment_token: paymentDataSave.payment_token },
+      { id: paymentSave.id },
+      { payment_token: paymentData.data.payment_token },
     );
 
-    return paymentDataSave;
+    return paymentData; 
   }
 
   /**
@@ -91,4 +92,16 @@ export class PaymentService {
     await this.paymentRepository.update(paymentId, { status });
     return this.getPaymentById(paymentId);
   }
+
+/**
+ * Met à jour un paiement.
+ * @param paymentId - ID du paiement.
+ * @param updateData - Données pour mettre à jour le paiement.
+ * @returns Le paiement mis à jour.
+ */
+async updatePayment(paymentId: string, updateData: Partial<UpdatePaymentDto>) {
+  await this.paymentRepository.update(paymentId, updateData);
+  return this.getPaymentById(paymentId);
+}
+
 }

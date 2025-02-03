@@ -6,7 +6,7 @@ export declare class ParameterService {
     constructor(parameterRepository: Repository<Parameter>);
     findAll(): Promise<Parameter[]>;
     findByType(typeParametre: any): Promise<Parameter[]>;
-    create(createParameterDto: CreateParameterDto): Promise<Parameter>;
+    create(createParameterDto: CreateParameterDto): Promise<void>;
     update(id: number, updateParameterDto: CreateParameterDto): Promise<Parameter>;
     remove(id: number): Promise<Parameter>;
 }

@@ -22,7 +22,7 @@ const paiement_model_1 = require("../paiement/models/paiement.model");
 const conversation_model_1 = require("../chat/models/conversation.model");
 const job_application_model_1 = require("../job-application/models/job-application.model");
 const preference_model_1 = require("../Preference/models/preference.model");
-const parameter_model_1 = require("../parameter/models/parameter.model");
+const profile_model_1 = require("../profiles/models/profile.model");
 let User = class User {
     id;
     slug;
@@ -37,10 +37,10 @@ let User = class User {
     sentNotifications;
     conversations;
     job_to_apply;
+    profile;
     jobs;
     paiements;
     preference;
-    parametre;
     role;
 };
 exports.User = User;
@@ -109,6 +109,10 @@ __decorate([
     __metadata("design:type", Array)
 ], User.prototype, "job_to_apply", void 0);
 __decorate([
+    (0, typeorm_1.OneToOne)(() => profile_model_1.Profile, profile => profile.user),
+    __metadata("design:type", profile_model_1.Profile)
+], User.prototype, "profile", void 0);
+__decorate([
     (0, typeorm_1.OneToMany)(() => job_model_1.Job, (job) => job.user, {
         cascade: true,
     }),
@@ -124,10 +128,6 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => preference_model_1.Preference, (preference) => preference.user, { cascade: true }),
     __metadata("design:type", preference_model_1.Preference)
 ], User.prototype, "preference", void 0);
-__decorate([
-    (0, typeorm_1.OneToMany)(() => parameter_model_1.Parameter, (parametre) => parametre.user, { cascade: true }),
-    __metadata("design:type", Array)
-], User.prototype, "parametre", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => role_model_1.Roles, (role) => role.user, { onDelete: 'CASCADE' }),
     __metadata("design:type", role_model_1.Roles)

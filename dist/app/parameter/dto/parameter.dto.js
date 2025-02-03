@@ -15,6 +15,8 @@ const class_validator_1 = require("class-validator");
 class CreateParameterDto {
     title;
     type;
+    type_parameter;
+    preference;
 }
 exports.CreateParameterDto = CreateParameterDto;
 __decorate([
@@ -29,3 +31,15 @@ __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], CreateParameterDto.prototype, "type", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Type de paramètre' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateParameterDto.prototype, "type_parameter", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Type de paramètre' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateParameterDto.prototype, "preference", void 0);

@@ -13,11 +13,9 @@ exports.Preference = void 0;
 const typeorm_1 = require("typeorm");
 const parameter_model_1 = require("../../parameter/models/parameter.model");
 const user_model_1 = require("../../user/user.model");
-const parameter_type_model_1 = require("../../parameter/models/parameter_type.model");
 let Preference = class Preference {
     id;
-    parameter;
-    parent;
+    localization;
     user;
     created_at;
     updated_at;
@@ -31,11 +29,7 @@ __decorate([
 __decorate([
     (0, typeorm_1.ManyToOne)(() => parameter_model_1.Parameter, (type) => type.preference, { onDelete: 'CASCADE', }),
     __metadata("design:type", Array)
-], Preference.prototype, "parameter", void 0);
-__decorate([
-    (0, typeorm_1.ManyToOne)(() => parameter_type_model_1.TypeParameter, (type) => type.parameter, { onDelete: 'CASCADE', }),
-    __metadata("design:type", parameter_type_model_1.TypeParameter)
-], Preference.prototype, "parent", void 0);
+], Preference.prototype, "localization", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => user_model_1.User, (type) => type.preference, { onDelete: 'CASCADE', }),
     __metadata("design:type", user_model_1.User)

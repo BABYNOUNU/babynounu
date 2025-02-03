@@ -9,6 +9,8 @@ import { SettingDesiredTime } from './models/setting_desired_time.model';
 import { Roles } from '../role/models/role.model';
 import { SettingTypeProfil } from './models/setting_type_profil.model';
 import { settingSubscriptionTypes } from './models/setting_subscription_type.model';
+import { TypeParameter } from '../parameter/models/parameter_type.model';
+import { Parameter } from '../parameter/models/parameter.model';
 export declare const SettingProviders: ({
     provide: string;
     useFactory: (dataSource: DataSource) => import("typeorm").Repository<SettingGuardSchedules>;
@@ -48,5 +50,13 @@ export declare const SettingProviders: ({
 } | {
     provide: string;
     useFactory: (dataSource: DataSource) => import("typeorm").Repository<settingSubscriptionTypes>;
+    inject: string[];
+} | {
+    provide: string;
+    useFactory: (dataSource: DataSource) => import("typeorm").Repository<TypeParameter>;
+    inject: string[];
+} | {
+    provide: string;
+    useFactory: (dataSource: DataSource) => import("typeorm").Repository<Parameter>;
     inject: string[];
 })[];

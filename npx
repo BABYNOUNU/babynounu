@@ -1,13 +1,13 @@
-mkdir ./src/app/jobs &&
-npx nest generate module app/job --no-spec &&
-npx nest generate controller app/job --no-spec &&
-npx nest generate service app/job --no-spec &&
-npx nest generate provider app/job --no-spec &&
-mkdir ./src/app/job/models &&
-mkdir ./src/app/job/dtos &&
-touch ./src/app/job/dtos/create-job.dto.ts &&
-touch ./src/app/job/dtos/update-job.dto.ts &&
-touch ./src/app/job/models/job.model.ts
+mkdir ./src/app/profiles &&
+npx nest generate module app/profiles --no-spec &&
+npx nest generate controller app/profiles --no-spec &&
+npx nest generate service app/profiles --no-spec &&
+npx nest generate provider app/profiles --no-spec &&
+mkdir ./src/app/profiles/models &&
+mkdir ./src/app/profiles/dtos &&
+touch ./src/app/profiles/dtos/create-profile.dto.ts &&
+touch ./src/app/profiles/dtos/update-profile.dto.ts &&
+touch ./src/app/profiles/models/profile.model.ts
 
 git init
 git add ./

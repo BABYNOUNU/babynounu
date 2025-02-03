@@ -21,6 +21,7 @@ export class Abonnements {
      onDelete: 'CASCADE',
   })
   paiement: Paiements;
+  
 
   @ManyToOne(() => settingSubscriptionTypes, (SN) => SN.abonnement, {
      onDelete: 'CASCADE',

@@ -79,6 +79,7 @@ let ParentService = class ParentService {
         return parent;
     }
     async create(createParentDto, files) {
+        console.log(createParentDto);
         if (!files || !files.profil_image?.length) {
             throw new common_1.BadRequestException('At least one image is required');
         }
@@ -94,18 +95,19 @@ let ParentService = class ParentService {
             availabilityServiceProvider: createParentDto.availabilityServiceProvider,
             description: createParentDto.description,
             photo: `/uploads/${files.profil_image[0].filename}`,
+            user: { id: createParentDto.user },
         });
         const saveParent = await this.parentsRepository.save(parent);
         if (!saveParent) {
             throw new common_1.BadRequestException({ message: 'Parent not created' });
         }
-        await this.userRepository.update({ id: createParentDto.user }, { parent: saveParent });
         async function createRelation(items, repository, relationName) {
             if (!Array.isArray(items) || items.length === 0) {
                 return [];
             }
             return Promise.all(items.map(async (item) => {
-                const entity = await repository.findOne({ where: { name: item } });
+                item = JSON.parse(item);
+                const entity = await repository.findOne({ where: { id: item.id } });
                 if (!entity) {
                     throw new Error(`Entity not found for item: ${item}`);
                 }

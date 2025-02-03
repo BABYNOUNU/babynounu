@@ -32,8 +32,6 @@ let ParameterService = class ParameterService {
         });
     }
     async create(createParameterDto) {
-        const newParameter = this.parameterRepository.create(createParameterDto);
-        return this.parameterRepository.save(newParameter);
     }
     async update(id, updateParameterDto) {
         const parameter = await this.parameterRepository.findOne({ where: { id } });

@@ -75,12 +75,12 @@ let NounuService = class NounuService extends media_service_1.MediaService {
             confirmed_identity: `/uploads/${files.document[0].filename}`,
             pricing_flexibility: createNounuDto.pricing_flexibility,
             photo: `/uploads/${files.profil_image[0].filename}`,
+            user: { id: createNounuDto.user },
         });
         const saveNounu = await this.nounuRepository.save(nounu);
         if (!saveNounu) {
             throw new common_1.BadRequestException({ message: 'Nounu not created' });
         }
-        await this.userRepository.update({ id: createNounuDto.user }, { nounu: saveNounu });
         for (const file of files.gallery) {
             const imagePath = `/uploads/${file.filename}`;
             this.createMedia({
@@ -93,8 +93,9 @@ let NounuService = class NounuService extends media_service_1.MediaService {
                 throw new Error(`Invalid items: ${items}`);
             }
             const relationObjects = await Promise.all(items.map(async (item) => {
+                item = JSON.parse(item);
                 const entity = await repository.findOne({
-                    where: { name: item },
+                    where: { name: item.name },
                 });
                 if (!entity) {
                     throw new Error(`Entity not found for item: ${item}`);

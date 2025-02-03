@@ -28,8 +28,12 @@ export class ParameterService {
 
   // Créer un nouveau paramètre
   async create(createParameterDto: CreateParameterDto) {
-    const newParameter = this.parameterRepository.create(createParameterDto);
-    return this.parameterRepository.save(newParameter);
+    // const newParameter = this.parameterRepository.create({
+    //   type_parameter: createParameterDto.type_parameter,
+    //   user: createParameterDto.user,
+    //   preference: createParameterDto.preference
+    // });
+    // return this.parameterRepository.save(newParameter);
   }
 
   // Mettre à jour un paramètre

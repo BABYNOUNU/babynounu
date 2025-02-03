@@ -12,4 +12,15 @@ export class CreateParameterDto {
   @IsString()
   @IsNotEmpty()
   type: string;
+
+
+  @ApiProperty({ description: 'Type de paramètre' })
+  @IsString()
+  @IsNotEmpty()
+  type_parameter: string;
+
+  @ApiProperty({ description: 'Type de paramètre' })
+  @IsString()
+  @IsNotEmpty()
+  preference: string;
 }

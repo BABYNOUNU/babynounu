@@ -13,6 +13,8 @@ import { SettingCertifications } from './models/setting_certification.model';
 import { Roles } from '../role/models/role.model';
 import { SettingTypeProfil } from './models/setting_type_profil.model';
 import { settingSubscriptionTypes } from './models/setting_subscription_type.model';
+import { TypeParameter } from '../parameter/models/parameter_type.model';
+import { Parameter } from '../parameter/models/parameter.model';
 export declare class SettingController {
     private readonly settingAgeOfChildrenRepository;
     private readonly settingSpecificNeed;
@@ -28,9 +30,14 @@ export declare class SettingController {
     private readonly roles;
     private readonly settingTypeProfil;
     private readonly settingTypePaiement;
-    constructor(settingAgeOfChildrenRepository: Repository<SettingAgeOfChildren>, settingSpecificNeed: Repository<SettingSpecificNeed>, settingGuardSchelude: Repository<SettingGuardSchedules>, settingHousekeeper: Repository<SettingHousekeeper>, settingServiceFrequency: Repository<SettingServiceFrequency>, settingDesiredTime: Repository<SettingDesiredTime>, settingSpecificSkills: Repository<SettingSpecificSkills>, settingLanguages: Repository<SettingLanguages>, settingLocalization: Repository<SettingLocalization>, settingPaymentTerms: Repository<SettingPaymentTerms>, settingCertification: Repository<SettingCertifications>, roles: Repository<Roles>, settingTypeProfil: Repository<SettingTypeProfil>, settingTypePaiement: Repository<settingSubscriptionTypes>);
+    private readonly typeParameterRepository;
+    private readonly parameterRepository;
+    constructor(settingAgeOfChildrenRepository: Repository<SettingAgeOfChildren>, settingSpecificNeed: Repository<SettingSpecificNeed>, settingGuardSchelude: Repository<SettingGuardSchedules>, settingHousekeeper: Repository<SettingHousekeeper>, settingServiceFrequency: Repository<SettingServiceFrequency>, settingDesiredTime: Repository<SettingDesiredTime>, settingSpecificSkills: Repository<SettingSpecificSkills>, settingLanguages: Repository<SettingLanguages>, settingLocalization: Repository<SettingLocalization>, settingPaymentTerms: Repository<SettingPaymentTerms>, settingCertification: Repository<SettingCertifications>, roles: Repository<Roles>, settingTypeProfil: Repository<SettingTypeProfil>, settingTypePaiement: Repository<settingSubscriptionTypes>, typeParameterRepository: Repository<TypeParameter>, parameterRepository: Repository<Parameter>);
     private removeDuplicatesByName;
     private createSeeder;
+    SeederParametreTypes(): Promise<{
+        setting: any;
+    }>;
     SeederAgeOfChildren(): Promise<{
         setting: any;
     }>;

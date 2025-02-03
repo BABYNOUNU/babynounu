@@ -18,6 +18,7 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("typeorm");
 const notification_gateway_1 = require("../notification/notification.gateway");
 const paiement_service_1 = require("../paiement/paiement.service");
+const axios_1 = require("axios");
 let AbonnementService = class AbonnementService {
     abonnementRepository;
     paymentService;
@@ -33,7 +34,20 @@ let AbonnementService = class AbonnementService {
         const paiement = await this.abonnementRepository.findOne({
             where: { paiement: { user: { id: createAbonnementDto.userId }, transaction_id: createAbonnementDto.transactionId } }
         });
-        if (!paiement) {
+        var config = {
+            method: 'post',
+            url: 'https://api-checkout.cinetpay.com/v2/payment/check',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            data: {
+                apikey: process.env.CINETPAY_API_KEY,
+                site_id: process.env.CINETPAY_SITE_ID,
+                transaction_id: createAbonnementDto.transactionId,
+            },
+        };
+        const { data: abonnementChecked } = await (0, axios_1.default)(config);
+        if (!abonnementChecked) {
             throw new common_1.NotFoundException(`Paiement with transaction ID ${createAbonnementDto.transactionId} not found`);
         }
         const abonnement = this.abonnementRepository.create({
@@ -44,7 +58,12 @@ let AbonnementService = class AbonnementService {
         if (!abonnementSave) {
             throw new common_1.NotFoundException(`Abonnement with transaction ID ${createAbonnementDto.transactionId} not found`);
         }
-        this.paymentService.updatePaymentStatus(createAbonnementDto.paiementId, 'completed');
+        this.paymentService.updatePayment(createAbonnementDto.paiementId, {
+            status: abonnementChecked.data.status,
+            paymentMethod: abonnementChecked.data.payment_method,
+            currency: abonnementChecked.data.currency,
+            operator_id: abonnementChecked.data.operator_id,
+        });
         this.NotificationService.createNotification({
             type: 'ABONNEMENT',
             userId: createAbonnementDto.userId.toString(),

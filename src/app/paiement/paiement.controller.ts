@@ -7,6 +7,7 @@ import {
   Patch,
   UsePipes,
   ValidationPipe,
+  Put,
 } from '@nestjs/common';
 import { PaymentService } from './paiement.service';
 import { CreatePaymentDto } from './dtos/create-payment.dto';
@@ -17,6 +18,7 @@ import {
   ApiBody,
   ApiParam,
 } from '@nestjs/swagger';
+import { UpdatePaymentDto } from './dtos/update-payment.dto';
 
 @ApiTags('payments') // Tag pour regrouper les endpoints dans Swagger UI
 @Controller('payments')
@@ -75,4 +77,23 @@ export class PaymentController {
   ) {
     return this.paymentService.updatePaymentStatus(paymentId, status);
   }
+
+
+  @Put(':paymentId')
+  @ApiOperation({ summary: 'Update a payment by ID' }) // Description de l'opération
+  @ApiParam({ name: 'paymentId', type: Number, description: 'ID of the payment' }) // Documenter le paramètre de route
+  @ApiBody({ schema: { example: { amount: 100.99, paymentMethod: 'CB' } } }) // Documenter le corps de la requête
+  @ApiResponse({
+    status: 200,
+    description: 'Payment updated successfully',
+  })
+  @ApiResponse({ status: 404, description: 'Payment not found' })
+  async updatePayment(
+    @Param('paymentId') paymentId: string,
+    @Body() updatePaymentDto: UpdatePaymentDto,
+  ) {
+    return this.paymentService.updatePayment(paymentId, updatePaymentDto);
+  }
 }
+
+ 

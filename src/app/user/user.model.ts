@@ -20,6 +20,7 @@ import { Conversation } from '../chat/models/conversation.model';
 import { JobApplication } from '../job-application/models/job-application.model';
 import { Preference } from '../Preference/models/preference.model';
 import { Parameter } from '../parameter/models/parameter.model';
+import { Profile } from '../profiles/models/profile.model';
 
 @Entity()
 export class User {
@@ -75,6 +76,9 @@ export class User {
   })
   job_to_apply: JobApplication[];
 
+  @OneToOne(() => Profile, profile => profile.user)
+  profile: Profile;
+
   @OneToMany(() => Job, (job) => job.user, {
     cascade: true,
   })
@@ -87,9 +91,6 @@ export class User {
 
   @OneToMany(() => Preference, (preference) => preference.user, {cascade: true})
   preference: Preference;
-
-  @OneToMany(() => Parameter, (parametre) => parametre.user, {cascade: true})
-  parametre: Parameter[]
   
 
   @ManyToOne(() => Roles, (role) => role.user, {  onDelete: 'CASCADE' })

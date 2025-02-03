@@ -15,7 +15,7 @@ const typeorm_1 = require("typeorm");
 let TypeParameter = class TypeParameter {
     id;
     slug;
-    title;
+    name;
     parameter;
     created_at;
     updated_at;
@@ -33,7 +33,7 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
-], TypeParameter.prototype, "title", void 0);
+], TypeParameter.prototype, "name", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => parameter_model_1.Parameter, (parameter) => parameter.type_parameter, { cascade: true }),
     __metadata("design:type", parameter_model_1.Parameter)

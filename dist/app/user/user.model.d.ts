@@ -8,7 +8,7 @@ import { Paiements } from '../paiement/models/paiement.model';
 import { Conversation } from '../chat/models/conversation.model';
 import { JobApplication } from '../job-application/models/job-application.model';
 import { Preference } from '../Preference/models/preference.model';
-import { Parameter } from '../parameter/models/parameter.model';
+import { Profile } from '../profiles/models/profile.model';
 export declare class User {
     id: string;
     slug: string;
@@ -23,9 +23,9 @@ export declare class User {
     sentNotifications: Notification[];
     conversations: Conversation[];
     job_to_apply: JobApplication[];
+    profile: Profile;
     jobs: Job[];
     paiements: Paiements[];
     preference: Preference;
-    parametre: Parameter[];
     role: Roles;
 }

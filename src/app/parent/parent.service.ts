@@ -94,6 +94,8 @@ export class ParentService {
     createParentDto: CreateParentDto,
     files: { profil_image?: Express.Multer.File[] },
   ) {
+
+    console.log(createParentDto)
     if (!files || !files.profil_image?.length) {
       throw new BadRequestException('At least one image is required');
     }
@@ -111,6 +113,7 @@ export class ParentService {
       availabilityServiceProvider: createParentDto.availabilityServiceProvider,
       description: createParentDto.description,
       photo: `/uploads/${files.profil_image[0].filename}`,
+      user: { id: createParentDto.user },
     });
 
     const saveParent = await this.parentsRepository.save(parent);
@@ -118,12 +121,6 @@ export class ParentService {
     if (!saveParent) {
       throw new BadRequestException({ message: 'Parent not created' });
     }
-
-    // Création des relations
-    await this.userRepository.update(
-      { id: createParentDto.user },
-      { parent: saveParent },
-    );
 
     // Fonction générique pour créer des relations
     async function createRelation(
@@ -136,8 +133,9 @@ export class ParentService {
       }
 
       return Promise.all(
-        items.map(async (item: string) => {
-          const entity = await repository.findOne({ where: { name: item } });
+        items.map(async (item: any) => {
+          item = JSON.parse(item);
+          const entity = await repository.findOne({ where: { id: item.id } });
           if (!entity) {
             throw new Error(`Entity not found for item: ${item}`);
           }
@@ -148,6 +146,7 @@ export class ParentService {
         }),
       );
     }
+    
 
     // Liste des relations à créer
     const relations: any = [

@@ -13,13 +13,13 @@ exports.Parameter = void 0;
 const typeorm_1 = require("typeorm");
 const parameter_type_model_1 = require("./parameter_type.model");
 const preference_model_1 = require("../../Preference/models/preference.model");
-const user_model_1 = require("../../user/user.model");
+const profile_model_1 = require("../../profiles/models/profile.model");
 let Parameter = class Parameter {
     id;
-    title;
+    name;
     type_parameter;
     preference;
-    user;
+    profiles;
     created_at;
     updated_at;
     deleted_at;
@@ -32,7 +32,7 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)({ nullable: false }),
     __metadata("design:type", String)
-], Parameter.prototype, "title", void 0);
+], Parameter.prototype, "name", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => parameter_type_model_1.TypeParameter, (type) => type.parameter, {
         onDelete: 'CASCADE',
@@ -40,15 +40,15 @@ __decorate([
     __metadata("design:type", parameter_type_model_1.TypeParameter)
 ], Parameter.prototype, "type_parameter", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => preference_model_1.Preference, (preference) => preference.parameter, {
+    (0, typeorm_1.OneToMany)(() => preference_model_1.Preference, (preference) => preference.localization, {
         cascade: true,
     }),
     __metadata("design:type", preference_model_1.Preference)
 ], Parameter.prototype, "preference", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => user_model_1.User, (p) => p.parametre, { onDelete: 'CASCADE' }),
-    __metadata("design:type", user_model_1.User)
-], Parameter.prototype, "user", void 0);
+    (0, typeorm_1.OneToMany)(() => profile_model_1.Profile, profile => profile.type),
+    __metadata("design:type", profile_model_1.Profile)
+], Parameter.prototype, "profiles", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)(),
     __metadata("design:type", Date)

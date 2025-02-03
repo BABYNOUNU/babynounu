@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const paiement_service_1 = require("./paiement.service");
 const create_payment_dto_1 = require("./dtos/create-payment.dto");
 const swagger_1 = require("@nestjs/swagger");
+const update_payment_dto_1 = require("./dtos/update-payment.dto");
 let PaymentController = class PaymentController {
     paymentService;
     constructor(paymentService) {
@@ -33,6 +34,9 @@ let PaymentController = class PaymentController {
     }
     async updatePaymentStatus(paymentId, status) {
         return this.paymentService.updatePaymentStatus(paymentId, status);
+    }
+    async updatePayment(paymentId, updatePaymentDto) {
+        return this.paymentService.updatePayment(paymentId, updatePaymentDto);
     }
 };
 exports.PaymentController = PaymentController;
@@ -95,6 +99,22 @@ __decorate([
     __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], PaymentController.prototype, "updatePaymentStatus", null);
+__decorate([
+    (0, common_1.Put)(':paymentId'),
+    (0, swagger_1.ApiOperation)({ summary: 'Update a payment by ID' }),
+    (0, swagger_1.ApiParam)({ name: 'paymentId', type: Number, description: 'ID of the payment' }),
+    (0, swagger_1.ApiBody)({ schema: { example: { amount: 100.99, paymentMethod: 'CB' } } }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Payment updated successfully',
+    }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Payment not found' }),
+    __param(0, (0, common_1.Param)('paymentId')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, update_payment_dto_1.UpdatePaymentDto]),
+    __metadata("design:returntype", Promise)
+], PaymentController.prototype, "updatePayment", null);
 exports.PaymentController = PaymentController = __decorate([
     (0, swagger_1.ApiTags)('payments'),
     (0, common_1.Controller)('payments'),

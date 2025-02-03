@@ -1,12 +1,12 @@
 import { TypeParameter } from './parameter_type.model';
 import { Preference } from 'src/app/Preference/models/preference.model';
-import { User } from 'src/app/user/user.model';
+import { Profile } from 'src/app/profiles/models/profile.model';
 export declare class Parameter {
     id: Number;
-    title: string;
+    name: string;
     type_parameter: TypeParameter;
     preference: Preference;
-    user: User;
+    profiles: Profile;
     created_at: Date;
     updated_at: Date;
     deleted_at: Date;

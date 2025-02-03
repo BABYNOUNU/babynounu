@@ -2,6 +2,7 @@ import { ManyToOne, Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, Up
 import { Parameter } from "src/app/parameter/models/parameter.model"
 import { User } from "src/app/user/user.model"
 import { TypeParameter } from "src/app/parameter/models/parameter_type.model"
+import { Profile } from "src/app/profiles/models/profile.model"
 
 
 @Entity("user_preferences")
@@ -11,10 +12,7 @@ export class Preference {
     id: Number
 
     @ManyToOne(() => Parameter, (type) => type.preference, {onDelete: 'CASCADE',})
-    parameter: Parameter[]
-
-    @ManyToOne(() => TypeParameter, (type) => type.parameter, {onDelete: 'CASCADE',})
-    parent: TypeParameter
+    localization: Parameter[]
 
     @ManyToOne(() => User, (type) => type.preference, {onDelete: 'CASCADE',})
     user: User

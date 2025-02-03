@@ -20,5 +20,5 @@ export class CreateParentDto {
   settingSpecificSkills?: string[]; // IDs des compétences spécifiques
   settingServiceFrequency?: string[]; // IDs des fréquences de service
   user?: string; // ID de l'utilisateur lié
-  photo: string;
+  photo: string; // URL de l'image
 }

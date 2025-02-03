@@ -17,6 +17,8 @@ const setting_payment_terms_model_1 = require("./models/setting_payment_terms.mo
 const role_model_1 = require("../role/models/role.model");
 const setting_type_profil_model_1 = require("./models/setting_type_profil.model");
 const setting_subscription_type_model_1 = require("./models/setting_subscription_type.model");
+const parameter_type_model_1 = require("../parameter/models/parameter_type.model");
+const parameter_model_1 = require("../parameter/models/parameter.model");
 exports.SettingProviders = [
     {
         provide: 'SETTING_GUARD_SCHEDULE_REPOSITORY',
@@ -106,6 +108,16 @@ exports.SettingProviders = [
     {
         provide: 'TYPE_PAIEMENT_REPOSITORY',
         useFactory: (dataSource) => dataSource.getRepository(setting_subscription_type_model_1.settingSubscriptionTypes),
+        inject: ['DATA_SOURCE'],
+    },
+    {
+        provide: 'TYPE_PARAMETER_REPOSITORY',
+        useFactory: (dataSource) => dataSource.getRepository(parameter_type_model_1.TypeParameter),
+        inject: ['DATA_SOURCE'],
+    },
+    {
+        provide: 'PARAMETER_REPOSITORY',
+        useFactory: (dataSource) => dataSource.getRepository(parameter_model_1.Parameter),
         inject: ['DATA_SOURCE'],
     }
 ];
