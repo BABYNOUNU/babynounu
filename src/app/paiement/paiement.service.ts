@@ -29,7 +29,7 @@ export class PaymentService {
       ...createPaymentDto,
       user: { id: createPaymentDto.userId },
     });
-    const paymentSave =await this.paymentRepository.save(payment);
+    const paymentSave = await this.paymentRepository.save(payment);
 
     var config = {
       method: 'post',
@@ -93,15 +93,17 @@ export class PaymentService {
     return this.getPaymentById(paymentId);
   }
 
-/**
- * Met à jour un paiement.
- * @param paymentId - ID du paiement.
- * @param updateData - Données pour mettre à jour le paiement.
- * @returns Le paiement mis à jour.
- */
-async updatePayment(paymentId: string, updateData: Partial<UpdatePaymentDto>) {
-  await this.paymentRepository.update(paymentId, updateData);
-  return this.getPaymentById(paymentId);
-}
-
+  /**
+   * Met à jour un paiement.
+   * @param paymentId - ID du paiement.
+   * @param updateData - Données pour mettre à jour le paiement.
+   * @returns Le paiement mis à jour.
+   */
+  async updatePayment(
+    paymentId: string,
+    updateData: Partial<UpdatePaymentDto>,
+  ) {
+    await this.paymentRepository.update(paymentId, updateData);
+    return this.getPaymentById(paymentId);
+  }
 }

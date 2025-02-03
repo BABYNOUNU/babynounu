@@ -34,10 +34,13 @@ let AbonnementService = class AbonnementService {
     }
     async createAbonnement(createAbonnementDto) {
         const paiement = await this.payRepository.findOne({
-            where: { user: { id: createAbonnementDto.userId }, transaction_id: createAbonnementDto.transactionId }
+            where: {
+                user: { id: createAbonnementDto.userId },
+                transaction_id: createAbonnementDto.transactionId,
+            },
         });
         if (!paiement) {
-            throw new common_1.NotFoundException(`Paiement with transaction ID ${createAbonnementDto.transactionId} not found`);
+            throw new common_1.NotFoundException(`Auccun paiement avec l'ID de transaction ${createAbonnementDto.transactionId} n'a pas été trouvé`);
         }
         var config = {
             method: 'post',
@@ -52,20 +55,22 @@ let AbonnementService = class AbonnementService {
             },
         };
         let abonnementChecked;
-        await (0, axios_1.default)(config).then((response) => {
+        await (0, axios_1.default)(config)
+            .then((response) => {
             abonnementChecked = response.data;
-        }).catch((error) => {
-            throw new common_1.NotFoundException(`Paiement with transaction ID ${createAbonnementDto.transactionId} not found`);
+        })
+            .catch((error) => {
+            throw new common_1.NotFoundException(`Le paiement avec l'ID de transaction ${createAbonnementDto.transactionId} n'a pas été trouvé`);
         });
         const abonnement = this.abonnementRepository.create({
             paiement: { id: paiement.id },
-            user: { id: createAbonnementDto.userId }
+            user: { id: createAbonnementDto.userId },
         });
         const abonnementSave = await this.abonnementRepository.save(abonnement);
         if (!abonnementSave) {
             throw new common_1.NotFoundException(`Abonnement with transaction ID ${createAbonnementDto.transactionId} not found`);
         }
-        this.paymentService.updatePayment(createAbonnementDto.paiementId, {
+        this.paymentService.updatePayment(paiement.id, {
             status: abonnementChecked.data.status,
             paymentMethod: abonnementChecked.data.payment_method,
             currency: abonnementChecked.data.currency,
@@ -76,7 +81,7 @@ let AbonnementService = class AbonnementService {
             userId: createAbonnementDto.userId.toString(),
             message: `Votre abonnement a bien été validé`,
             is_read: false,
-            senderUserId: createAbonnementDto.userId.toString()
+            senderUserId: createAbonnementDto.userId.toString(),
         });
         const GetAbonnement = await this.getAbonnementById(abonnementSave.id);
         this.notificationGateway.server.emit('abonnementValide', {
@@ -110,7 +115,8 @@ let AbonnementService = class AbonnementService {
         }
         const abonnementDate = new Date(abonnement.createdAt);
         const currentDate = new Date();
-        const daysSinceAbonnement = Math.floor((currentDate.getTime() - abonnementDate.getTime()) / (1000 * 60 * 60 * 24));
+        const daysSinceAbonnement = Math.floor((currentDate.getTime() - abonnementDate.getTime()) /
+            (1000 * 60 * 60 * 24));
         return daysSinceAbonnement <= 30;
     }
 };

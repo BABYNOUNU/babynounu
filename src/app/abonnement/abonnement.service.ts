@@ -18,7 +18,7 @@ export class AbonnementService {
     private readonly payRepository: Repository<Paiements>,
     private readonly paymentService: PaymentService,
     private readonly NotificationService: NotificationService,
-    private readonly notificationGateway: NotificationGateway
+    private readonly notificationGateway: NotificationGateway,
   ) {}
 
   /**
@@ -27,14 +27,17 @@ export class AbonnementService {
    * @returns L'abonnement créé.
    */
   async createAbonnement(createAbonnementDto: CreateAbonnementDto) {
-
     const paiement = await this.payRepository.findOne({
-        where: { user: { id: createAbonnementDto.userId }, transaction_id: createAbonnementDto.transactionId }
+      where: {
+        user: { id: createAbonnementDto.userId },
+        transaction_id: createAbonnementDto.transactionId,
+      },
     });
 
-
-    if(!paiement) {
-        throw new NotFoundException(`Paiement with transaction ID ${createAbonnementDto.transactionId} not found`);
+    if (!paiement) {
+      throw new NotFoundException(
+        `Auccun paiement avec l'ID de transaction ${createAbonnementDto.transactionId} n'a pas été trouvé`,
+      );
     }
 
     // var Getconfig = {
@@ -51,7 +54,6 @@ export class AbonnementService {
     // });
 
     // console.log(paiement)
-    
 
     var config = {
       method: 'post',
@@ -62,53 +64,57 @@ export class AbonnementService {
       data: {
         apikey: process.env.CINETPAY_API_KEY, // Remplacez par votre clé API
         site_id: process.env.CINETPAY_SITE_ID, // Remplacez par votre site ID
-        token : paiement.payment_token, // Remplacez par votre transaction ID
+        token: paiement.payment_token, // Remplacez par votre transaction ID
       },
     };
 
     let abonnementChecked: any;
 
-    await axios(config).then((response) => {
-      abonnementChecked = response.data;
-    }).catch((error) => {
-      throw new NotFoundException(`Paiement with transaction ID ${createAbonnementDto.transactionId} not found`);
-    });
-
-
+    await axios(config)
+      .then((response) => {
+        abonnementChecked = response.data;
+      })
+      .catch((error) => {
+        throw new NotFoundException(
+          `Le paiement avec l'ID de transaction ${createAbonnementDto.transactionId} n'a pas été trouvé`,
+        );
+      });
 
     const abonnement = this.abonnementRepository.create({
-        paiement: { id: paiement.id },
-        user: { id: createAbonnementDto.userId }
+      paiement: { id: paiement.id },
+      user: { id: createAbonnementDto.userId },
     });
     const abonnementSave = await this.abonnementRepository.save(abonnement);
 
-    if(!abonnementSave) {
-        throw new NotFoundException(`Abonnement with transaction ID ${createAbonnementDto.transactionId} not found`);
+    if (!abonnementSave) {
+      throw new NotFoundException(
+        `Abonnement with transaction ID ${createAbonnementDto.transactionId} not found`,
+      );
     }
 
     // Mettre à jour le paiement
 
-    this.paymentService.updatePayment(createAbonnementDto.paiementId, {
+    this.paymentService.updatePayment(paiement.id, {
       status: abonnementChecked.data.status,
       paymentMethod: abonnementChecked.data.payment_method,
       currency: abonnementChecked.data.currency,
       operator_id: abonnementChecked.data.operator_id,
     });
-    this.NotificationService.createNotification({ 
+    this.NotificationService.createNotification({
       type: 'ABONNEMENT',
       userId: createAbonnementDto.userId.toString(),
       message: `Votre abonnement a bien été validé`,
       is_read: false,
-      senderUserId: createAbonnementDto.userId.toString()
-     });
+      senderUserId: createAbonnementDto.userId.toString(),
+    });
 
-     // Émettre un événement Socket.IO
-     const GetAbonnement = await this.getAbonnementById(abonnementSave.id);
-     this.notificationGateway.server.emit('abonnementValide', {
+    // Émettre un événement Socket.IO
+    const GetAbonnement = await this.getAbonnementById(abonnementSave.id);
+    this.notificationGateway.server.emit('abonnementValide', {
       message: GetAbonnement,
     });
 
-    return abonnementSave
+    return abonnementSave;
   }
 
   /**
@@ -135,7 +141,9 @@ export class AbonnementService {
     });
 
     if (!abonnement) {
-      throw new NotFoundException(`Abonnement with ID ${abonnementId} not found`);
+      throw new NotFoundException(
+        `Abonnement with ID ${abonnementId} not found`,
+      );
     }
 
     return abonnement;
@@ -160,7 +168,8 @@ export class AbonnementService {
     const abonnementDate = new Date(abonnement.createdAt);
     const currentDate = new Date();
     const daysSinceAbonnement = Math.floor(
-      (currentDate.getTime() - abonnementDate.getTime()) / (1000 * 60 * 60 * 24),
+      (currentDate.getTime() - abonnementDate.getTime()) /
+        (1000 * 60 * 60 * 24),
     );
 
     // Supposons que l'abonnement est valide pendant 30 jours
