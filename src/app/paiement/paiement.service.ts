@@ -57,7 +57,7 @@ export class PaymentService {
       { payment_token: paymentData.data.payment_token },
     );
 
-    return paymentData; 
+    return paymentData;
   }
 
   /**

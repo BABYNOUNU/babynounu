@@ -6,12 +6,16 @@ import { CreateAbonnementDto } from './dtos/create-abonnement.dto';
 import { NotificationGateway } from '../notification/notification.gateway';
 import { PaymentService } from '../paiement/paiement.service';
 import axios from 'axios';
+import { Paiements } from '../paiement/models/paiement.model';
 
 @Injectable()
 export class AbonnementService {
   constructor(
     @Inject('ABONNEMENT_REPOSITORY')
     private readonly abonnementRepository: Repository<Abonnements>,
+
+    @Inject('PAYMENT_REPOSITORY')
+    private readonly payRepository: Repository<Paiements>,
     private readonly paymentService: PaymentService,
     private readonly NotificationService: NotificationService,
     private readonly notificationGateway: NotificationGateway
@@ -24,10 +28,29 @@ export class AbonnementService {
    */
   async createAbonnement(createAbonnementDto: CreateAbonnementDto) {
 
-    const paiement = await this.abonnementRepository.findOne({
-        where: { paiement: { user: { id: createAbonnementDto.userId }, transaction_id: createAbonnementDto.transactionId } }
+    const paiement = await this.payRepository.findOne({
+        where: { user: { id: createAbonnementDto.userId }, transaction_id: createAbonnementDto.transactionId }
     });
 
+
+    if(!paiement) {
+        throw new NotFoundException(`Paiement with transaction ID ${createAbonnementDto.transactionId} not found`);
+    }
+
+    // var Getconfig = {
+    //   method: 'get',
+    //   url: process.env.PAYMENT_NOTIFICATION,
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   }
+    // };
+    // await axios(config).then((response) => {
+    //   abonnementChecked = response.data;
+    // }).catch((error) => {
+    //   throw new NotFoundException(`Paiement with transaction ID ${createAbonnementDto.transactionId} not found`);
+    // });
+
+    // console.log(paiement)
     
 
     var config = {
@@ -39,15 +62,18 @@ export class AbonnementService {
       data: {
         apikey: process.env.CINETPAY_API_KEY, // Remplacez par votre clé API
         site_id: process.env.CINETPAY_SITE_ID, // Remplacez par votre site ID
-        transaction_id : createAbonnementDto.transactionId, // Remplacez par votre transaction ID
+        token : paiement.payment_token, // Remplacez par votre transaction ID
       },
     };
 
-    const { data: abonnementChecked } = await axios(config);
+    let abonnementChecked: any;
 
-    if (!abonnementChecked) {
-        throw new NotFoundException(`Paiement with transaction ID ${createAbonnementDto.transactionId} not found`);
-    }
+    await axios(config).then((response) => {
+      abonnementChecked = response.data;
+    }).catch((error) => {
+      throw new NotFoundException(`Paiement with transaction ID ${createAbonnementDto.transactionId} not found`);
+    });
+
 
 
     const abonnement = this.abonnementRepository.create({

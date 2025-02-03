@@ -21,4 +21,5 @@ export const AbonnementProviders = [
         useFactory: (dataSource: DataSource) => dataSource.getRepository(Notification),
         inject: ['DATA_SOURCE'],
       },
+      
 ]

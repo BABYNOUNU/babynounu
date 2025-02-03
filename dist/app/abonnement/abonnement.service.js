@@ -21,19 +21,24 @@ const paiement_service_1 = require("../paiement/paiement.service");
 const axios_1 = require("axios");
 let AbonnementService = class AbonnementService {
     abonnementRepository;
+    payRepository;
     paymentService;
     NotificationService;
     notificationGateway;
-    constructor(abonnementRepository, paymentService, NotificationService, notificationGateway) {
+    constructor(abonnementRepository, payRepository, paymentService, NotificationService, notificationGateway) {
         this.abonnementRepository = abonnementRepository;
+        this.payRepository = payRepository;
         this.paymentService = paymentService;
         this.NotificationService = NotificationService;
         this.notificationGateway = notificationGateway;
     }
     async createAbonnement(createAbonnementDto) {
-        const paiement = await this.abonnementRepository.findOne({
-            where: { paiement: { user: { id: createAbonnementDto.userId }, transaction_id: createAbonnementDto.transactionId } }
+        const paiement = await this.payRepository.findOne({
+            where: { user: { id: createAbonnementDto.userId }, transaction_id: createAbonnementDto.transactionId }
         });
+        if (!paiement) {
+            throw new common_1.NotFoundException(`Paiement with transaction ID ${createAbonnementDto.transactionId} not found`);
+        }
         var config = {
             method: 'post',
             url: 'https://api-checkout.cinetpay.com/v2/payment/check',
@@ -43,13 +48,15 @@ let AbonnementService = class AbonnementService {
             data: {
                 apikey: process.env.CINETPAY_API_KEY,
                 site_id: process.env.CINETPAY_SITE_ID,
-                transaction_id: createAbonnementDto.transactionId,
+                token: paiement.payment_token,
             },
         };
-        const { data: abonnementChecked } = await (0, axios_1.default)(config);
-        if (!abonnementChecked) {
+        let abonnementChecked;
+        await (0, axios_1.default)(config).then((response) => {
+            abonnementChecked = response.data;
+        }).catch((error) => {
             throw new common_1.NotFoundException(`Paiement with transaction ID ${createAbonnementDto.transactionId} not found`);
-        }
+        });
         const abonnement = this.abonnementRepository.create({
             paiement: { id: paiement.id },
             user: { id: createAbonnementDto.userId }
@@ -111,7 +118,9 @@ exports.AbonnementService = AbonnementService;
 exports.AbonnementService = AbonnementService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)('ABONNEMENT_REPOSITORY')),
+    __param(1, (0, common_1.Inject)('PAYMENT_REPOSITORY')),
     __metadata("design:paramtypes", [typeorm_1.Repository,
+        typeorm_1.Repository,
         paiement_service_1.PaymentService,
         notification_service_1.NotificationService,
         notification_gateway_1.NotificationGateway])
