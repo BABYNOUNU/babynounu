@@ -40,6 +40,14 @@ export class AbonnementService {
       );
     }
 
+    const IsAbonnementExist = this.abonnementRepository.findOne({
+      where: { user: { id: createAbonnementDto.userId }, paiement: { id: paiement.id } },
+    });
+
+    if (IsAbonnementExist) {
+      return IsAbonnementExist
+    }
+
     // var Getconfig = {
     //   method: 'get',
     //   url: process.env.PAYMENT_NOTIFICATION,
@@ -100,18 +108,25 @@ export class AbonnementService {
       currency: abonnementChecked.data.currency,
       operator_id: abonnementChecked.data.operator_id,
     });
+
+    // Émettre un événement Socket.IO
+    const GetAbonnement = await this.getAbonnementById(abonnementSave.id);
+    this.notificationGateway.server.emit('abonnementValide', {
+      message: GetAbonnement,
+    });
+
+    if (!GetAbonnement) {
+      throw new NotFoundException(
+        `Abonnement with transaction ID ${createAbonnementDto.transactionId} not found`,
+      );
+    }
+
     this.NotificationService.createNotification({
       type: 'ABONNEMENT',
       userId: createAbonnementDto.userId.toString(),
       message: `Votre abonnement a bien été validé`,
       is_read: false,
       senderUserId: createAbonnementDto.userId.toString(),
-    });
-
-    // Émettre un événement Socket.IO
-    const GetAbonnement = await this.getAbonnementById(abonnementSave.id);
-    this.notificationGateway.server.emit('abonnementValide', {
-      message: GetAbonnement,
     });
 
     return abonnementSave;

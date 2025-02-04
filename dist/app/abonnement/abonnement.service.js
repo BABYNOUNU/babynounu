@@ -42,6 +42,12 @@ let AbonnementService = class AbonnementService {
         if (!paiement) {
             throw new common_1.NotFoundException(`Auccun paiement avec l'ID de transaction ${createAbonnementDto.transactionId} n'a pas été trouvé`);
         }
+        const IsAbonnementExist = this.abonnementRepository.findOne({
+            where: { user: { id: createAbonnementDto.userId }, paiement: { id: paiement.id } },
+        });
+        if (IsAbonnementExist) {
+            return IsAbonnementExist;
+        }
         var config = {
             method: 'post',
             url: 'https://api-checkout.cinetpay.com/v2/payment/check',
@@ -76,16 +82,19 @@ let AbonnementService = class AbonnementService {
             currency: abonnementChecked.data.currency,
             operator_id: abonnementChecked.data.operator_id,
         });
+        const GetAbonnement = await this.getAbonnementById(abonnementSave.id);
+        this.notificationGateway.server.emit('abonnementValide', {
+            message: GetAbonnement,
+        });
+        if (!GetAbonnement) {
+            throw new common_1.NotFoundException(`Abonnement with transaction ID ${createAbonnementDto.transactionId} not found`);
+        }
         this.NotificationService.createNotification({
             type: 'ABONNEMENT',
             userId: createAbonnementDto.userId.toString(),
             message: `Votre abonnement a bien été validé`,
             is_read: false,
             senderUserId: createAbonnementDto.userId.toString(),
-        });
-        const GetAbonnement = await this.getAbonnementById(abonnementSave.id);
-        this.notificationGateway.server.emit('abonnementValide', {
-            message: GetAbonnement,
         });
         return abonnementSave;
     }
