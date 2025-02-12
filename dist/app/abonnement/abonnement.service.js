@@ -42,7 +42,7 @@ let AbonnementService = class AbonnementService {
         if (!paiement) {
             throw new common_1.NotFoundException(`Auccun paiement avec l'ID de transaction ${createAbonnementDto.transactionId} n'a pas été trouvé`);
         }
-        const IsAbonnementExist = this.abonnementRepository.findOne({
+        const IsAbonnementExist = await this.abonnementRepository.findOne({
             where: { user: { id: createAbonnementDto.userId }, paiement: { id: paiement.id } },
         });
         if (IsAbonnementExist) {

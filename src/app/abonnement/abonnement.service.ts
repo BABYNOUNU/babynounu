@@ -40,28 +40,13 @@ export class AbonnementService {
       );
     }
 
-    const IsAbonnementExist = this.abonnementRepository.findOne({
+    const IsAbonnementExist = await this.abonnementRepository.findOne({
       where: { user: { id: createAbonnementDto.userId }, paiement: { id: paiement.id } },
     });
 
     if (IsAbonnementExist) {
       return IsAbonnementExist
     }
-
-    // var Getconfig = {
-    //   method: 'get',
-    //   url: process.env.PAYMENT_NOTIFICATION,
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   }
-    // };
-    // await axios(config).then((response) => {
-    //   abonnementChecked = response.data;
-    // }).catch((error) => {
-    //   throw new NotFoundException(`Paiement with transaction ID ${createAbonnementDto.transactionId} not found`);
-    // });
-
-    // console.log(paiement)
 
     var config = {
       method: 'post',
