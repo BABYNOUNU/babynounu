@@ -66,7 +66,7 @@ __decorate([
     __metadata("design:type", parameter_model_1.Parameter)
 ], User.prototype, "type_profil", void 0);
 __decorate([
-    (0, typeorm_1.OneToOne)(() => nounu_model_1.Nounus, { eager: true, cascade: true, onDelete: 'CASCADE' }),
+    (0, typeorm_1.OneToMany)(() => nounu_model_1.Nounus, (nounu) => nounu.user, { cascade: true }),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", nounu_model_1.Nounus)
 ], User.prototype, "nounu", void 0);

@@ -11,6 +11,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  ManyToOne,
 } from 'typeorm';
 
 @Entity()
@@ -57,7 +58,7 @@ export class Nounus {
   })
   preferences: Preference[];
 
-  @OneToOne(() => User, (user) => user.nounu)
+  @ManyToOne(() => User, (user) => user.nounu, { onDelete: 'CASCADE' })
   @JoinColumn()
   user: User;
 

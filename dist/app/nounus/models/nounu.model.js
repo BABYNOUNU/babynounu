@@ -89,7 +89,7 @@ __decorate([
     __metadata("design:type", Array)
 ], Nounus.prototype, "preferences", void 0);
 __decorate([
-    (0, typeorm_1.OneToOne)(() => user_model_1.User, (user) => user.nounu),
+    (0, typeorm_1.ManyToOne)(() => user_model_1.User, (user) => user.nounu, { onDelete: 'CASCADE' }),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", user_model_1.User)
 ], Nounus.prototype, "user", void 0);

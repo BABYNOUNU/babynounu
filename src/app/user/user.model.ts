@@ -42,7 +42,7 @@ export class User {
   type_profil: Parameter;
   
 
-  @OneToOne(() => Nounus, { eager: true, cascade: true, onDelete: 'CASCADE' })
+  @OneToMany(() => Nounus,  (nounu) => nounu.user, { cascade: true})
   @JoinColumn()
   nounu: Nounus;
 
