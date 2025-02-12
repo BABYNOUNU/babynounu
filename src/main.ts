@@ -35,7 +35,7 @@ async function bootstrap() {
     .setTitle('Your Api Bady Nounu')
     .addBearerAuth()
     .setDescription('Your API description')
-    .setVersion('1.0')
+    .setVersion('0.3.51')
     .addServer(
       isProd ? 'https://api.babynounu.com/' : 'http://localhost:3000/',
       'Local environment',
