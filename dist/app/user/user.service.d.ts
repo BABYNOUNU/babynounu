@@ -17,5 +17,5 @@ export declare class UserService {
         message: string;
     }>;
     loggedUser(ID: any): Promise<User | null>;
-    ReturnN(datas: any[], preferenceKey: any[]): Promise<any[]>;
+    ReturnN(datas: any[], preferenceKey: any[], type_profil: any): Promise<any[]>;
 }

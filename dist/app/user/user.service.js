@@ -55,25 +55,26 @@ let UserService = class UserService {
         if (!User) {
             throw new common_1.BadRequestException({ message: 'user not exist in database' });
         }
-        const dataUser = await this.ReturnN([User], ['adress']);
+        const dataUser = await this.ReturnN([User], ['adress'], User.type_profil?.slug);
         return dataUser[0];
     }
-    async ReturnN(datas, preferenceKey) {
+    async ReturnN(datas, preferenceKey, type_profil) {
         return datas.map((data) => {
             const aggregatedPreferences = {};
             preferenceKey.forEach((key) => {
                 aggregatedPreferences[key] = [];
             });
-            data[data.type_profil.slug].preferences.forEach((pref) => {
+            data[type_profil][0]?.preferences?.forEach((pref) => {
                 preferenceKey.forEach((key) => {
+                    console.log(pref[key]);
                     if (pref[key])
                         aggregatedPreferences[key].push(pref[key]);
                 });
             });
+            data.nounu[0].preferences = aggregatedPreferences;
             return {
                 ...data,
-                image: data.user.medias.find((media) => media.type_media.slug === 'image-profil'),
-                preferences: aggregatedPreferences,
+                image: data.medias.find((media) => media.type_media?.slug === 'image-profil')
             };
         });
     }
