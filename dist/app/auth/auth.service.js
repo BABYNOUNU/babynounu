@@ -63,13 +63,12 @@ let AuthService = class AuthService {
         }
         const User = await this.userRepository.findOne({
             where: { id: userSave?.id },
-            relations: ['parent', 'type_profil', 'role'],
+            relations: ['parent', 'nounu', 'type_profil', 'role'],
         });
         return {
             user: {
                 ...User,
                 access_token: (await this.authentificate(userSave)).access_token,
-                profil: User.parent ? User.nounu : null,
             },
         };
     }
@@ -87,7 +86,7 @@ let AuthService = class AuthService {
         }
         const isUserExist = await this.userRepository.findOne({
             where: { id: user?.id },
-            relations: ['type_profil', 'parent'],
+            relations: ['type_profil', 'nounu', 'parent'],
         });
         return {
             user: {

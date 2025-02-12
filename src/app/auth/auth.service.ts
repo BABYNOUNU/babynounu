@@ -72,7 +72,7 @@ export class AuthService {
 
     const User = await this.userRepository.findOne({
       where: { id: userSave?.id },
-      relations: ['parent', 'type_profil', 'role'],
+      relations: ['parent', 'nounu', 'type_profil', 'role'],
     });
 
     // RETURN DATA USER CREATE
@@ -80,7 +80,6 @@ export class AuthService {
       user: {
         ...User, 
         access_token: (await this.authentificate(userSave)).access_token,
-        profil: User.parent ? User.nounu : null,
       },
     };
   }
@@ -112,7 +111,7 @@ export class AuthService {
     //Verify if nounu or parent exist
     const isUserExist = await this.userRepository.findOne({
       where: { id: user?.id },
-      relations: ['type_profil', 'parent'],
+      relations: ['type_profil', 'nounu', 'parent'],
     });
 
     // RETURN DATA USER CREATE

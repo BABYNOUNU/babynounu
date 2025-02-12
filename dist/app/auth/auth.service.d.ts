@@ -16,7 +16,6 @@ export declare class AuthService {
     }): Promise<{
         user: {
             access_token: string;
-            profil: import("../nounus/models/nounu.model").Nounus;
             id: string;
             slug: string;
             email: string;
