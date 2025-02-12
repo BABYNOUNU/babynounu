@@ -7,6 +7,7 @@ export declare class AuthController {
     SignUp(signUpBody: SginUpAuthDto): Promise<{
         user: {
             access_token: string;
+            profil: import("../nounus/models/nounu.model").Nounus;
             id: string;
             slug: string;
             email: string;
@@ -28,7 +29,7 @@ export declare class AuthController {
     SignIn(signInBody: SginInAuthDto): Promise<{
         user: {
             access_token: string;
-            profil: import("../parent/models/parent.model").Parents;
+            profil: import("../nounus/models/nounu.model").Nounus;
             id: string;
             slug: string;
             email: string;

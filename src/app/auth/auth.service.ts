@@ -80,6 +80,7 @@ export class AuthService {
       user: {
         ...User, 
         access_token: (await this.authentificate(userSave)).access_token,
+        profil: User.parent ? User.nounu : null,
       },
     };
   }
@@ -119,7 +120,7 @@ export class AuthService {
       user: {
         ...user,
         access_token: (await this.authentificate(user)).access_token,
-        profil: isUserExist.parent,
+        profil: isUserExist.parent ? isUserExist.nounu : null,
       },
     };
   }
