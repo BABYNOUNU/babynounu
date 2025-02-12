@@ -50,10 +50,37 @@ export class UserService {
   }
 
   async loggedUser(ID: any): Promise<User | null> {
-    const User = await this.userRepository.findOne({ where: { id: ID }, relations: ['role', 'type_profil', 'parent', 'nounu', 'abonnement'] });
+    const User = await this.userRepository.findOne({ where: { id: ID }, relations: ['role', 'medias', 'type_profil', 'parent', 'nounu', 'nounu.preferences.adress', 'abonnement'] });
     if (!User) {
       throw new BadRequestException({ message: 'user not exist in database' });
     }
-    return User
+
+    const dataUser = await this.ReturnN([User], ['adress']);
+    return dataUser[0];
   }
+
+
+  async ReturnN(datas: any[], preferenceKey: any[]): Promise<any[]> {
+      return datas.map((data) => {
+        // Regrouper les libellés similaires dans des tableaux distincts
+        const aggregatedPreferences = {};
+        preferenceKey.forEach((key) => {
+          aggregatedPreferences[key] = [];
+        });
+  
+        data[data.type_profil.slug].preferences.forEach((pref) => {
+          preferenceKey.forEach((key) => {
+            if (pref[key]) aggregatedPreferences[key].push(pref[key]);
+          });
+        });
+  
+        return {
+          ...data,
+          image: data.user.medias.find(
+            (media) => media.type_media.slug === 'image-profil',
+          ),
+          preferences: aggregatedPreferences, // Remplace les préférences par la version agrégée
+        };
+      })
+    }
 }
