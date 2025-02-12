@@ -1,20 +1,15 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { User } from './user.model';
-import { SettingGeneraleService } from '../setting/_partiels/general.service';
 
 @Injectable()
-export class UserService extends SettingGeneraleService {
+export class UserService {
   constructor(
     @Inject('USER_REPOSITORY') private userRepository: Repository<User>,
   ) {
-    super()
   }
 
   async user(slug: any): Promise<User | null> {
-
-    // Verify Slug
-    this.Verify_slug(this.userRepository, slug, "User")
 
     const IsUserExist = await this.userRepository.findOne({
       where: {slug},
@@ -55,7 +50,7 @@ export class UserService extends SettingGeneraleService {
   }
 
   async loggedUser(ID: any): Promise<User | null> {
-    const User = await this.userRepository.findOne({ where: { id: ID }, relations: ['role', 'type_profil', 'parent', 'nounu', 'abonnement'] });
+    const User = await this.userRepository.findOne({ where: { id: ID }, relations: ['role', 'type_profil', 'parent', 'abonnement'] });
     if (!User) {
       throw new BadRequestException({ message: 'user not exist in database' });
     }

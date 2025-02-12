@@ -13,7 +13,6 @@ const auth_module_1 = require("./app/auth/auth.module");
 const config_1 = require("@nestjs/config");
 const parent_module_1 = require("./app/parent/parent.module");
 const paiement_module_1 = require("./app/paiement/paiement.module");
-const nounu_module_1 = require("./app/nounu/nounu.module");
 const setting_module_1 = require("./app/setting/setting.module");
 const chat_module_1 = require("./app/chat/chat.module");
 const notification_module_1 = require("./app/notification/notification.module");
@@ -24,7 +23,8 @@ const serve_static_1 = require("@nestjs/serve-static");
 const path_1 = require("path");
 const job_module_1 = require("./app/job/job.module");
 const job_application_module_1 = require("./app/job-application/job-application.module");
-const profiles_module_1 = require("./app/profiles/profiles.module");
+const parameter_module_1 = require("./app/parameter/parameter.module");
+const nounus_module_1 = require("./app/nounus/nounus.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -42,7 +42,6 @@ exports.AppModule = AppModule = __decorate([
             auth_module_1.AuthModule,
             parent_module_1.ParentModule,
             paiement_module_1.PaiementModule,
-            nounu_module_1.NounuModule,
             setting_module_1.SettingModule,
             chat_module_1.ChatModule,
             notification_module_1.NotificationModule,
@@ -52,7 +51,8 @@ exports.AppModule = AppModule = __decorate([
             abonnement_module_1.AbonnementModule,
             job_module_1.JobModule,
             job_application_module_1.JobApplicationModule,
-            profiles_module_1.ProfilesModule,
+            parameter_module_1.ParameterModule,
+            nounus_module_1.NounusModule
         ],
         controllers: [],
         providers: [],

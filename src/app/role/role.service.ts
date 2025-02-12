@@ -3,16 +3,14 @@ import { Roles } from './models/role.model';
 import { Repository } from 'typeorm';
 import { RoleBody } from './types/role.type';
 import { SlugUtils } from 'src/utils/slug.utils';
-import { SettingGeneraleService } from '../setting/_partiels/general.service';
 import { RoleDto } from './dto/role.dto';
 
 @Injectable()
-export class RoleService extends SettingGeneraleService {
+export class RoleService {
   constructor(
     @Inject('ROLE_REPOSITORY')
     private readonly roleRepository: Repository<Roles>,
   ) {
-    super()
   }
 
   async role(roleWhereUniqueInput: any): Promise<Roles | null> {
@@ -59,7 +57,11 @@ export class RoleService extends SettingGeneraleService {
 
   async updateRole(updateRoleBody: RoleDto, {slug}): Promise<Roles> {
     //Verify if setting slug exist
-    await this.Verify_slug(this.roleRepository, { slug });
+
+   await new SlugUtils().all(
+      slug,
+      this.roleRepository,
+    );
 
     // UPDATE SETTING
     const updateRole = await this.roleRepository.update(
@@ -83,7 +85,10 @@ export class RoleService extends SettingGeneraleService {
   // Delete Setting
   async deleteRole({slug}) {
     //Verify if setting slug exist
-    await this.Verify_slug(this.roleRepository, { slug });
+     await new SlugUtils().all(
+      slug,
+      this.roleRepository,
+    );
 
     // DELETE SETTING
     const deleteRole = await this.roleRepository.delete({ slug });

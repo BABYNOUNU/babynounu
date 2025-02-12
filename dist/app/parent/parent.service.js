@@ -12,229 +12,127 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ParentService = void 0;
+exports.ParentsService = void 0;
+const media_service_1 = require("./../media/media.service");
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("typeorm");
-let ParentService = class ParentService {
-    parentSettingLanguagesRepository;
-    settingLanguagesRepository;
-    parentSettingLocalizationsRepository;
-    parentSettingAgeOfChildrensRepository;
-    parentSettingDesiredTimesRepository;
-    parentSettingAreaWorksRepository;
-    settingAgeOfChildrensRepository;
-    settingLocalizationsRepository;
-    settingDesiredTimesRepository;
-    settingSpecificSkillsRepository;
-    parentSettingSpecificSkillsRepository;
-    userRepository;
+const database_providers_1 = require("../../database/database.providers");
+const nounus_service_1 = require("../nounus/nounus.service");
+let ParentsService = class ParentsService {
     parentsRepository;
-    parentSettingSpecificNeedsRepository;
-    settingSpecificNeedsRepository;
-    parentSettingGuardSchedulesRepository;
-    settingGuardSchedulesRepository;
-    settingServiceFrequencyRepository;
-    parentServiceFrequencyRepository;
-    constructor(parentSettingLanguagesRepository, settingLanguagesRepository, parentSettingLocalizationsRepository, parentSettingAgeOfChildrensRepository, parentSettingDesiredTimesRepository, parentSettingAreaWorksRepository, settingAgeOfChildrensRepository, settingLocalizationsRepository, settingDesiredTimesRepository, settingSpecificSkillsRepository, parentSettingSpecificSkillsRepository, userRepository, parentsRepository, parentSettingSpecificNeedsRepository, settingSpecificNeedsRepository, parentSettingGuardSchedulesRepository, settingGuardSchedulesRepository, settingServiceFrequencyRepository, parentServiceFrequencyRepository) {
-        this.parentSettingLanguagesRepository = parentSettingLanguagesRepository;
-        this.settingLanguagesRepository = settingLanguagesRepository;
-        this.parentSettingLocalizationsRepository = parentSettingLocalizationsRepository;
-        this.parentSettingAgeOfChildrensRepository = parentSettingAgeOfChildrensRepository;
-        this.parentSettingDesiredTimesRepository = parentSettingDesiredTimesRepository;
-        this.parentSettingAreaWorksRepository = parentSettingAreaWorksRepository;
-        this.settingAgeOfChildrensRepository = settingAgeOfChildrensRepository;
-        this.settingLocalizationsRepository = settingLocalizationsRepository;
-        this.settingDesiredTimesRepository = settingDesiredTimesRepository;
-        this.settingSpecificSkillsRepository = settingSpecificSkillsRepository;
-        this.parentSettingSpecificSkillsRepository = parentSettingSpecificSkillsRepository;
-        this.userRepository = userRepository;
+    preferenceRepository;
+    mediaService;
+    nounuService;
+    constructor(parentsRepository, preferenceRepository, mediaService, nounuService) {
         this.parentsRepository = parentsRepository;
-        this.parentSettingSpecificNeedsRepository = parentSettingSpecificNeedsRepository;
-        this.settingSpecificNeedsRepository = settingSpecificNeedsRepository;
-        this.parentSettingGuardSchedulesRepository = parentSettingGuardSchedulesRepository;
-        this.settingGuardSchedulesRepository = settingGuardSchedulesRepository;
-        this.settingServiceFrequencyRepository = settingServiceFrequencyRepository;
-        this.parentServiceFrequencyRepository = parentServiceFrequencyRepository;
+        this.preferenceRepository = preferenceRepository;
+        this.mediaService = mediaService;
+        this.nounuService = nounuService;
     }
-    async Parents() {
-        return this.parentsRepository.find();
+    async findAll() {
+        return await this.parentsRepository.find({ relations: ['preferences'] });
     }
-    async Parent(ParentsWhereUniqueInput) {
+    async findOne(id) {
         const parent = await this.parentsRepository.findOne({
-            where: { id: ParentsWhereUniqueInput },
+            where: { id },
             relations: [
-                'settingLanguages.language',
-                'settingAgeOfChildrens.AgeOfChildrens',
-                'settingDesiredTimes.time',
-                'settingAreaWorks.area',
-                'settingSpecificSkills.skill',
-                'settingSpecificNeeds.SpecificNeeds',
-                'settingGuardSchedules.GuardSchedules',
-                'settingHousekeepers.Housekeepers',
+                'user',
+                'user.medias',
+                'user.medias.type_media',
+                'preferences',
+                'preferences.besions_specifiques',
+                'preferences.garde_enfants',
+                'preferences.aide_menagere',
+                'preferences.frequence_des_services',
+                'preferences.horaire_souhaites',
+                'preferences.adress',
+                'preferences.zone_geographique_prestataire',
+                'preferences.competance_specifique',
+                'preferences.langue_parler',
+                'preferences.disponibility_du_prestataire',
             ],
         });
         if (!parent) {
-            throw new common_1.BadRequestException({ message: 'Parent not found' });
+            throw new common_1.NotFoundException(`Parent with id ${id} not found`);
         }
-        return parent;
+        const ParentGet = await this.nounuService.ReturnN([parent], [
+            'besions_specifiques',
+            'garde_enfants',
+            'aide_menagere',
+            'frequence_des_services',
+            'horaire_souhaites',
+            'adress',
+            'zone_geographique_prestataire',
+            'competance_specifique',
+            'langue_parler',
+            'disponibility_du_prestataire',
+        ]);
+        return ParentGet[0];
     }
     async create(createParentDto, files) {
-        console.log(createParentDto);
-        if (!files || !files.profil_image?.length) {
-            throw new common_1.BadRequestException('At least one image is required');
-        }
-        const parent = this.parentsRepository.create({
-            fullname: createParentDto.fullname,
-            phone: createParentDto.phone,
-            number_of_children: createParentDto.number_of_children,
-            localization: createParentDto.localization,
-            adresse: createParentDto.adresse,
-            payment_terms: createParentDto.payment_terms,
-            budget_min: createParentDto.budget_min,
-            budget_max: createParentDto.budget_max,
-            availabilityServiceProvider: createParentDto.availabilityServiceProvider,
-            description: createParentDto.description,
-            photo: `/uploads/${files.profil_image[0].filename}`,
-            user: { id: createParentDto.user },
+        const { userId, ...parentData } = createParentDto;
+        const savedParent = await this.parentsRepository.save({
+            ...parentData,
+            user: { id: userId },
         });
-        const saveParent = await this.parentsRepository.save(parent);
-        if (!saveParent) {
-            throw new common_1.BadRequestException({ message: 'Parent not created' });
+        if (!savedParent) {
+            throw new common_1.BadRequestException('Parent not created');
         }
-        async function createRelation(items, repository, relationName) {
-            if (!Array.isArray(items) || items.length === 0) {
-                return [];
-            }
-            return Promise.all(items.map(async (item) => {
-                item = JSON.parse(item);
-                const entity = await repository.findOne({ where: { id: item.id } });
-                if (!entity) {
-                    throw new Error(`Entity not found for item: ${item}`);
-                }
-                return {
-                    [relationName]: entity,
-                    parent: saveParent,
-                };
-            }));
+        if (files.imageParent?.length > 0) {
+            const imageParent = files.imageParent[0];
+            await this.mediaService.create({
+                originalName: imageParent.originalname,
+                filename: imageParent.filename,
+                path: imageParent.path,
+                originalUrl: `${database_providers_1.HOST}/${imageParent.filename}`,
+                userId: userId,
+                typeMedia: 'image-profil',
+            });
         }
-        const relations = [
-            {
-                items: createParentDto.settingLanguages,
-                repository: this.settingLanguagesRepository,
-                relationName: 'language',
-                targetRepository: this.parentSettingLanguagesRepository,
-                targetField: 'settingLanguages',
-            },
-            {
-                items: createParentDto.settingAgeOfChildrens,
-                repository: this.settingAgeOfChildrensRepository,
-                relationName: 'AgeOfChildrens',
-                targetRepository: this.parentSettingAgeOfChildrensRepository,
-                targetField: 'settingAgeOfChildrens',
-            },
-            {
-                items: createParentDto.settingDesiredTimes,
-                repository: this.settingDesiredTimesRepository,
-                relationName: 'time',
-                targetRepository: this.parentSettingDesiredTimesRepository,
-                targetField: 'settingDesiredTimes',
-            },
-            {
-                items: createParentDto.settingAreaWorks,
-                repository: this.settingLocalizationsRepository,
-                relationName: 'area',
-                targetRepository: this.parentSettingAreaWorksRepository,
-                targetField: 'settingAreaWorks',
-            },
-            {
-                items: createParentDto.settingSpecificSkills,
-                repository: this.settingSpecificSkillsRepository,
-                relationName: 'skill',
-                targetRepository: this.parentSettingSpecificSkillsRepository,
-                targetField: 'settingSpecificSkills',
-            },
-            {
-                items: createParentDto.settingSpecificNeeds,
-                repository: this.settingSpecificNeedsRepository,
-                relationName: 'SpecificNeeds',
-                targetRepository: this.parentSettingSpecificNeedsRepository,
-                targetField: 'settingSpecificNeeds',
-            },
-            {
-                items: createParentDto.settingGuardSchedules,
-                repository: this.settingGuardSchedulesRepository,
-                relationName: 'GuardSchedules',
-                targetRepository: this.parentSettingGuardSchedulesRepository,
-                targetField: 'settingGuardSchedules',
-            },
-            {
-                items: createParentDto.settingServiceFrequency,
-                repository: this.settingServiceFrequencyRepository,
-                relationName: 'service',
-                targetRepository: this.parentServiceFrequencyRepository,
-                targetField: 'settingServiceFrequency',
-            },
+        const preferenceKeys = [
+            'besions_specifiques',
+            'garde_enfants',
+            'aide_menagere',
+            'frequence_des_services',
+            'horaire_souhaites',
+            'adress',
+            'zone_geographique_prestataire',
+            'competance_specifique',
+            'langue_parler',
+            'disponibility_du_prestataire',
         ];
-        for (const relation of relations) {
-            const objects = await createRelation(relation.items, relation.repository, relation.relationName);
-            const entities = relation.targetRepository.create(objects);
-            saveParent[relation.targetField] =
-                await relation.targetRepository.save(entities);
+        for (const key of preferenceKeys) {
+            const value = JSON.parse(createParentDto[key]);
+            if (Array.isArray(value)) {
+                const preferenceEntities = value.map((el) => ({
+                    parents: savedParent,
+                    [key]: el.id,
+                }));
+                await this.preferenceRepository.save(preferenceEntities);
+            }
         }
-        const GetProfilParent = await this.parentsRepository.findOne({
-            where: { id: saveParent.id },
-            relations: ['user'],
-        });
-        return GetProfilParent;
+        return savedParent;
     }
-    async UpdateParent() {
-        const newParents = this.parentsRepository.create({});
-        return await this.parentsRepository.save(newParents);
+    async update(id, updateParentDto) {
+        const { ...parentData } = updateParentDto;
+        const parent = await this.findOne(id);
+        const updatedParent = Object.assign(parent, { ...parentData });
+        return await this.parentsRepository.save(updatedParent);
     }
-    async DeleteParent(where) {
-        this.parentsRepository.delete({ id: where });
-        return { message: 'Parents deleted' };
+    async remove(id) {
+        const result = await this.parentsRepository.delete(id);
+        if (result.affected === 0) {
+            throw new common_1.NotFoundException(`Parent with id ${id} not found`);
+        }
     }
 };
-exports.ParentService = ParentService;
-exports.ParentService = ParentService = __decorate([
+exports.ParentsService = ParentsService;
+exports.ParentsService = ParentsService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, common_1.Inject)('PARENT_SEETING_LANGUAGE_REPOSITORY')),
-    __param(1, (0, common_1.Inject)('SEETING_LANGUAGE_REPOSITORY')),
-    __param(2, (0, common_1.Inject)('PARENT_SETTING_LOCALIZATION_REPOSITORY')),
-    __param(3, (0, common_1.Inject)('PARENT_SETTING_AGE_OF_CHILDRENS_REPOSITORY')),
-    __param(4, (0, common_1.Inject)('PARENT_SETTING_DESIREDTIMES_REPOSITORY')),
-    __param(5, (0, common_1.Inject)('PARENT_SETTING_AREA_WORK_REPOSITORY')),
-    __param(6, (0, common_1.Inject)('SETTING_AGE_OF_CHILDRENS_REPOSITORY')),
-    __param(7, (0, common_1.Inject)('SETTING_LOCALIZATION_REPOSITORY')),
-    __param(8, (0, common_1.Inject)('SETTING_DESIRED_TIME_REPOSITORY')),
-    __param(9, (0, common_1.Inject)('SETTING_SPECIFIC_SKILLS_REPOSITORY')),
-    __param(10, (0, common_1.Inject)('PARENT_SETTING_SPECIFIC_SKILLS_REPOSITORY')),
-    __param(11, (0, common_1.Inject)('USER_REPOSITORY')),
-    __param(12, (0, common_1.Inject)('PARENT_REPOSITORY')),
-    __param(13, (0, common_1.Inject)('PARENT_SETTING_SPECIFIC_NEEDS_REPOSITORY')),
-    __param(14, (0, common_1.Inject)('SETTING_SPECIFIC_NEEDS_REPOSITORY')),
-    __param(15, (0, common_1.Inject)('PARENT_SETTING_GUARD_SCHEDULES_REPOSITORY')),
-    __param(16, (0, common_1.Inject)('SETTING_GUARD_SCHEDULE_REPOSITORY')),
-    __param(17, (0, common_1.Inject)('SETTING_SERVICE_FREQUENCY_REPOSITORY')),
-    __param(18, (0, common_1.Inject)('PARENT_SETTING_SERVICE_FREQUENCY_REPOSITORY')),
+    __param(0, (0, common_1.Inject)('PARENT_REPOSITORY')),
+    __param(1, (0, common_1.Inject)('PREFERENCE_REPOSITORY')),
     __metadata("design:paramtypes", [typeorm_1.Repository,
         typeorm_1.Repository,
-        typeorm_1.Repository,
-        typeorm_1.Repository,
-        typeorm_1.Repository,
-        typeorm_1.Repository,
-        typeorm_1.Repository,
-        typeorm_1.Repository,
-        typeorm_1.Repository,
-        typeorm_1.Repository,
-        typeorm_1.Repository,
-        typeorm_1.Repository,
-        typeorm_1.Repository,
-        typeorm_1.Repository,
-        typeorm_1.Repository,
-        typeorm_1.Repository,
-        typeorm_1.Repository,
-        typeorm_1.Repository,
-        typeorm_1.Repository])
-], ParentService);
+        media_service_1.MediaService,
+        nounus_service_1.NounusService])
+], ParentsService);

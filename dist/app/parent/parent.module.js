@@ -12,6 +12,13 @@ const parent_controller_1 = require("./parent.controller");
 const parent_service_1 = require("./parent.service");
 const parent_provider_1 = require("./parent.provider");
 const database_module_1 = require("../../database/database.module");
+const media_service_1 = require("../media/media.service");
+const parameter_service_1 = require("../parameter/parameter.service");
+const nounus_service_1 = require("../nounus/nounus.service");
+const preference_1 = require("../Preference/preference");
+const media_1 = require("../media/media");
+const parameter_1 = require("../parameter/parameter");
+const nounus_1 = require("../nounus/nounus");
 let ParentModule = class ParentModule {
 };
 exports.ParentModule = ParentModule;
@@ -19,6 +26,16 @@ exports.ParentModule = ParentModule = __decorate([
     (0, common_1.Module)({
         imports: [database_module_1.DatabaseModule],
         controllers: [parent_controller_1.ParentController],
-        providers: [parent_service_1.ParentService, ...parent_provider_1.ParentProviders]
+        providers: [
+            parent_service_1.ParentsService,
+            media_service_1.MediaService,
+            parameter_service_1.ParameterService,
+            nounus_service_1.NounusService,
+            ...parent_provider_1.ParentProviders,
+            ...media_1.MediaProviders,
+            ...preference_1.PreferenceProvider,
+            ...parameter_1.ParameterProviders,
+            ...nounus_1.NounusProviders
+        ],
     })
 ], ParentModule);

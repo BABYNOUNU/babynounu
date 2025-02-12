@@ -36,18 +36,18 @@ export class SginUpAuthDto {
   password: string;
 
   @ApiProperty({
-    example: '1',
+    example: 'user',
     required: true
   })
-  @IsNotEmpty({ message: 'Ce champ est requis' })
-  @IsNumber({}, { message: 'Ce champ doit être un nombre' })
-  role: number;
+  @IsNotEmpty({ message: 'Le role est requis' })
+  @IsString({ message: 'Le role doit être une chaine de caractères' })
+  role: string;
 
   @ApiProperty({
-    example: '1',
+    example: 'Nounu',
     required: true
   })
-  @IsNotEmpty({ message: 'Ce champ est requis' })
-  @IsNumber({}, { message: 'Ce champ doit être un nombre' })
-  type_profil: number;
+  @IsNotEmpty({ message: 'Type du profil champ est requis' })
+  @IsString({ message: 'Type du profil doit être une chaine de caractères' })
+  type_profil: string;
 }

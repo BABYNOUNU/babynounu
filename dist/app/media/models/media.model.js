@@ -10,12 +10,19 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Medias = void 0;
-const nounu_model_1 = require("../../nounu/models/nounu.model");
+const job_model_1 = require("../../job/models/job.model");
+const parameter_model_1 = require("../../parameter/models/parameter.model");
+const user_model_1 = require("../../user/user.model");
 const typeorm_1 = require("typeorm");
 let Medias = class Medias {
     id;
-    url;
-    media_nounu;
+    originalName;
+    filename;
+    path;
+    originalUrl;
+    user;
+    job;
+    type_media;
 };
 exports.Medias = Medias;
 __decorate([
@@ -23,13 +30,33 @@ __decorate([
     __metadata("design:type", String)
 ], Medias.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.Column)('text', { unique: false, nullable: false }),
+    (0, typeorm_1.Column)(),
     __metadata("design:type", String)
-], Medias.prototype, "url", void 0);
+], Medias.prototype, "originalName", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => nounu_model_1.Nounus, (nounu) => nounu.media, { onDelete: 'CASCADE' }),
-    __metadata("design:type", nounu_model_1.Nounus)
-], Medias.prototype, "media_nounu", void 0);
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Medias.prototype, "filename", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Medias.prototype, "path", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Medias.prototype, "originalUrl", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => user_model_1.User, (user) => user.medias),
+    __metadata("design:type", user_model_1.User)
+], Medias.prototype, "user", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => job_model_1.Job, (job) => job.medias),
+    __metadata("design:type", job_model_1.Job)
+], Medias.prototype, "job", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => parameter_model_1.Parameter, (parameter) => parameter.type_media),
+    __metadata("design:type", parameter_model_1.Parameter)
+], Medias.prototype, "type_media", void 0);
 exports.Medias = Medias = __decorate([
     (0, typeorm_1.Entity)()
 ], Medias);

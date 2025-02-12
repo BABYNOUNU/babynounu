@@ -42,6 +42,26 @@ let ParameterController = class ParameterController {
             return res.status(500).send({ message: 'Server error' });
         }
     }
+    async findAllBySlug(typeParmaSlug, res) {
+        try {
+            const parameters = await this.parameterService.findAllBySlug(typeParmaSlug);
+            return res.send({ parameter: parameters });
+        }
+        catch (error) {
+            console.error(error);
+            return res.status(500).send({ message: 'Server error' });
+        }
+    }
+    async findOneBySlug(typeParmaSlug, res) {
+        try {
+            const parameter = await this.parameterService.findOneBySlug(typeParmaSlug);
+            return res.send({ parameter });
+        }
+        catch (error) {
+            console.error(error);
+            return res.status(500).send({ message: 'Server error' });
+        }
+    }
     async create(createParameterDto, res) {
         try {
             const newParameter = await this.parameterService.create(createParameterDto);
@@ -96,6 +116,32 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], ParameterController.prototype, "indexQuery", null);
+__decorate([
+    (0, common_1.Get)('slug/:slug'),
+    (0, swagger_1.ApiOperation)({ summary: 'Obtenir les paramètres par slug' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Liste des paramètres filtrés par slug.',
+    }),
+    __param(0, (0, common_1.Param)('slug')),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], ParameterController.prototype, "findAllBySlug", null);
+__decorate([
+    (0, common_1.Get)('slug/one/:slug'),
+    (0, swagger_1.ApiOperation)({ summary: 'Obtenir un paramètre par slug' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Paramètre filtré par slug.',
+    }),
+    __param(0, (0, common_1.Param)('slug')),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], ParameterController.prototype, "findOneBySlug", null);
 __decorate([
     (0, common_1.Post)(),
     (0, swagger_1.ApiOperation)({ summary: 'Créer un nouveau paramètre' }),

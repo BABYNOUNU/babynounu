@@ -48,19 +48,19 @@ __decorate([
 ], SginUpAuthDto.prototype, "password", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
-        example: '1',
+        example: 'user',
         required: true
     }),
-    (0, class_validator_1.IsNotEmpty)({ message: 'Ce champ est requis' }),
-    (0, class_validator_1.IsNumber)({}, { message: 'Ce champ doit être un nombre' }),
-    __metadata("design:type", Number)
+    (0, class_validator_1.IsNotEmpty)({ message: 'Le role est requis' }),
+    (0, class_validator_1.IsString)({ message: 'Le role doit être une chaine de caractères' }),
+    __metadata("design:type", String)
 ], SginUpAuthDto.prototype, "role", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
-        example: '1',
+        example: 'Nounu',
         required: true
     }),
-    (0, class_validator_1.IsNotEmpty)({ message: 'Ce champ est requis' }),
-    (0, class_validator_1.IsNumber)({}, { message: 'Ce champ doit être un nombre' }),
-    __metadata("design:type", Number)
+    (0, class_validator_1.IsNotEmpty)({ message: 'Type du profil champ est requis' }),
+    (0, class_validator_1.IsString)({ message: 'Type du profil doit être une chaine de caractères' }),
+    __metadata("design:type", String)
 ], SginUpAuthDto.prototype, "type_profil", void 0);

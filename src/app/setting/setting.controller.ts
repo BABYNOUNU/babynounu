@@ -6,147 +6,118 @@ import {
   Inject,
   Post,
 } from '@nestjs/common';
-import { SettingGuardScheduleController } from './_partiels/controllers/setting_guard_schedule.controller';
 import { ApiTags } from '@nestjs/swagger';
-import { SettingGeneraleService } from './_partiels/general.service';
+
 import { Repository } from 'typeorm';
-import { SettingAgeOfChildren } from './models/setting_age_of_children.model';
 import { SettingDto } from './dto/setting.dto';
 import { SlugUtils } from 'src/utils/slug.utils';
 import specificNeeds from 'src/database/seeders/specificNeed.seed';
-import { SettingSpecificNeed } from './models/setting_specific_need.model';
 import agesOfChildrenSeeders from 'src/database/seeders/agesOfChildren.seed';
 import specificNeedSeeders from 'src/database/seeders/specificNeed.seed';
-import { SettingGuardSchedules } from './models/setting_guard_schedule.model';
 import GuardScheduleSeeders from 'src/database/seeders/guardSchedule.seed';
-import { SettingHousekeeper } from './models/setting_housekeeper.model';
 import HouseKeeperSeeders from 'src/database/seeders/houseKeepers.seed';
-import { SettingServiceFrequency } from './models/setting_service_frequency.model';
 import { ServiceFrequencieSeeders } from 'src/database/seeders/serviceFrequencies.seed';
-import { SettingDesiredTime } from './models/setting_desired_time.model';
-import { SettingSpecificSkills } from './models/setting_specific_skill.model';
 import { SpecificSkillSeeders } from 'src/database/seeders/specificSkills.seed';
-import { SettingLanguages } from './models/setting_language.model';
 import { SpokenLanguageSeeders } from 'src/database/seeders/spokenLanguage.seed';
-import { SettingLocalization } from './models/setting_localization.model';
 import { LocalizationSeeders } from 'src/database/seeders/localization.seed';
 import { DesiredTimesSeeders } from 'src/database/seeders/schedule.seed';
-import { SettingPaymentTerms } from './models/setting_payment_terms.model';
 import { PaymentTermSeeders } from 'src/database/seeders/paymentTerms.seed';
-import { SettingCertifications } from './models/setting_certification.model';
 import { CertificationSeeders } from 'src/database/seeders/certification.seed';
 import { RoleSeeders } from 'src/database/seeders/role.seed';
 import { Roles } from '../role/models/role.model';
-import { SettingTypeProfil } from './models/setting_type_profil.model';
 import { TypeProfilSeeders } from 'src/database/seeders/typesProfil.seed';
-import { settingSubscriptionTypes } from './models/setting_subscription_type.model';
 import { TypePaiementSeeders } from 'src/database/seeders/type.seed';
 import { TypeParameter } from '../parameter/models/parameter_type.model';
 import { typeParametresSeeders } from 'src/database/seeders/parameters/type.parameter.seed';
 import { Parameter } from '../parameter/models/parameter.model';
+import { Abonnements } from '../abonnement/models/abonnement.model';
+import { Notification } from '../notification/models/notification.model';
+import DisponibilyOfPrestataireSeeders from 'src/database/seeders/disponibly.seed';
+import { TypeMediaSeeders } from 'src/database/seeders/typeMedia.seeder';
+import { TaskSeeders } from 'src/database/seeders/tasks.seed';
+import { CleaningSuppliesSeeders } from 'src/database/seeders/parameters/cleaningSupplies.seed';
+import CandidateCriteriaSeeders from 'src/database/seeders/candidateCriteria.seed';
+import { TypeServiceSeeders } from 'src/database/seeders/typeServices.seed';
 
 @ApiTags('Setting')
 @Controller('setting')
 export class SettingController {
   constructor(
-    @Inject('SETTING_AGE_OF_CHILDREN_REPOSITORY')
-    private readonly settingAgeOfChildrenRepository: Repository<SettingAgeOfChildren>,
-    @Inject('SETTING_SPECIFIC_NEED_REPOSITORY')
-    private readonly settingSpecificNeed: Repository<SettingSpecificNeed>,
-    @Inject('SETTING_GUARD_SCHEDULE_REPOSITORY')
-    private readonly settingGuardSchelude: Repository<SettingGuardSchedules>,
-    @Inject('SETTING_HOUSEKEEPER_REPOSITORY')
-    private readonly settingHousekeeper: Repository<SettingHousekeeper>,
-    @Inject('SETTING_SERVICE_FREQUENCY_REPOSITORY')
-    private readonly settingServiceFrequency: Repository<SettingServiceFrequency>,
-    @Inject('SETTING_DESIRE_TIMES_REPOSITORY')
-    private readonly settingDesiredTime: Repository<SettingDesiredTime>,
-    @Inject('SETTING_SPECIFIC_SKILL_REPOSITORY')
-    private readonly settingSpecificSkills: Repository<SettingSpecificSkills>,
-    @Inject('SETTING_LANGUAGE_REPOSITORY')
-    private readonly settingLanguages: Repository<SettingLanguages>,
-    @Inject('SETTING_LOCALIZATION_REPOSITORY')
-    private readonly settingLocalization: Repository<SettingLocalization>,
-    @Inject('SETTING_PAYMENT_TERMS_REPOSITORY')
-    private readonly settingPaymentTerms: Repository<SettingPaymentTerms>,
-    @Inject('SETTING_CERTIFICATION_REPOSITORY')
-    private readonly settingCertification: Repository<SettingCertifications>,
-
     @Inject('ROLE_REPOSITORY')
     private readonly roles: Repository<Roles>,
-    @Inject('TYPE_PROFIL_REPOSITORY')
-    private readonly settingTypeProfil: Repository<SettingTypeProfil>,
-    @Inject('TYPE_PAIEMENT_REPOSITORY')
-    private readonly settingTypePaiement: Repository<settingSubscriptionTypes>,
 
     @Inject('TYPE_PARAMETER_REPOSITORY')
     private readonly typeParameterRepository: Repository<TypeParameter>,
     @Inject('PARAMETER_REPOSITORY')
     private readonly parameterRepository: Repository<Parameter>,
-    
-    
+
+    @Inject('ABONNEMENT_REPOSITORY')
+    private readonly settingSubscriptionTypes: Repository<Abonnements>,
+
+    @Inject('NOTIFICATION_REPOSITORY')
+    private readonly notificationRepository: Repository<Notification>,
   ) {}
 
-  private removeDuplicatesByName(array1, array2) {
-    // Créer un Set contenant les valeurs de "name" dans le second tableau
-    const namesInArray2 = new Set(array2.map((item) => item.name));
-  
-    // Filtrer le premier tableau pour ne conserver que les objets avec un "name" absent dans le second tableau
-    const filteredArray1 = array1.filter((item) => !namesInArray2.has(item.name));
-  
-    // Créer un Set contenant les valeurs de "name" dans le premier tableau
-    const namesInArray1 = new Set(array1.map((item) => item.name));
-  
-    // Filtrer le second tableau pour ne conserver que les objets avec un "name" absent dans le premier tableau
-    const filteredArray2 = array2.filter((item) => !namesInArray1.has(item.name));
-  
-    // Fusionner les deux tableaux filtrés
-    return [...filteredArray1, ...filteredArray2];
-  }
-
-  private async createSeeder(
-    Repository: Repository<any>,
-    createSeederBody: any,
+  private async VerifyInParameter(
+    Repository: any,
+    AllParametre: {
+      name: string;
+      description: string;
+      slug: string;
+    }[],
   ) {
-    let settingSave: any;
-    let isNext = 0;
+    let ToAdd = [];
 
-    const IsNameExist = await Repository.find();
-    console.log(IsNameExist);
-    for (let index = 0; index < this.removeDuplicatesByName(createSeederBody, IsNameExist).length; index++) {
-      const Seeder = this.removeDuplicatesByName(createSeederBody, IsNameExist)[index];
-
-      
-      Seeder.slug = await new SlugUtils().all(Seeder.name, Repository);
-
-      // CREATE NEW SETTING
-      const newSetting = Repository.create({
-        slug: Seeder.slug,
-        name: Seeder.name,
-        description: Seeder.description,  
-        type_parameter: Seeder.type_parameter,
+    for (let index = 0; index < AllParametre.length; index++) {
+      const element = AllParametre[index];
+      const IsExistDb = await Repository.find({
+        where: {
+          name: element.name,
+        },
       });
-      settingSave = await Repository.save(newSetting);
+
+      if (
+        IsExistDb.length === 0 ||
+        !IsExistDb.find((db: any) => db.slug === element.slug)
+      )
+        ToAdd.push(element);
     }
 
-    if (!settingSave) {
-      throw new BadRequestException({ message: 'Setting not created' });
-    }
+    console.log(ToAdd);
 
-    // RETURN DATA USER CREATE
-    return {
-      setting: {
-        ...settingSave,
-      },
-    };
+    return ToAdd;
   }
 
+  private async addAllTypeParametres(
+    Repository: any,
+    AllParametre: {
+      name: string;
+      description: string;
+      slug: string;
+    }[],
+  ) {
+    return Repository.insert(
+      await this.VerifyInParameter(Repository, AllParametre),
+    );
+  }
 
- 
+  private async addAllParametres(
+    Repository: any,
+    AllParametre: {
+      name: string;
+      description: string;
+      type_parameter: string;
+      slug: string;
+    }[],
+  ) {
+    return Repository.insert(
+      await this.VerifyInParameter(Repository, AllParametre),
+    );
+  }
 
   @Post('seed/parametres/types')
   SeederParametreTypes() {
-    return this.createSeeder(
+    return this.addAllTypeParametres(
       this.typeParameterRepository,
       typeParametresSeeders,
     );
@@ -155,7 +126,7 @@ export class SettingController {
   // Get All Parents
   @Post('seed/age-of-children')
   SeederAgeOfChildren() {
-    return this.createSeeder(
+    return this.addAllParametres(
       this.parameterRepository,
       agesOfChildrenSeeders,
     );
@@ -163,15 +134,12 @@ export class SettingController {
 
   @Post('seed/specific-need')
   SeederSpecificNeed() {
-    return this.createSeeder(
-      this.parameterRepository,
-      specificNeedSeeders,
-    );
+    return this.addAllParametres(this.parameterRepository, specificNeedSeeders);
   }
 
   @Post('seed/guard-schedule')
   SeederGuardSchedule() {
-    return this.createSeeder(
+    return this.addAllParametres(
       this.parameterRepository,
       GuardScheduleSeeders,
     );
@@ -179,33 +147,25 @@ export class SettingController {
 
   @Post('seed/housekeeper')
   SeederHousekeeper() {
-    return this.createSeeder(
-      this.parameterRepository,
-      HouseKeeperSeeders,
-    );
+    return this.addAllParametres(this.parameterRepository, HouseKeeperSeeders);
   }
-
 
   @Post('seed/service-frequency')
   SeederServiceFrequency() {
-    return this.createSeeder(
+    return this.addAllParametres(
       this.parameterRepository,
       ServiceFrequencieSeeders,
     );
   }
 
-
   @Post('seed/desired-times')
   SeederDesiredTimes() {
-    return this.createSeeder(
-      this.parameterRepository,
-      DesiredTimesSeeders,
-    );
+    return this.addAllParametres(this.parameterRepository, DesiredTimesSeeders);
   }
 
   @Post('seed/specific-skills')
   SeederSpecificSkills() {
-    return this.createSeeder(
+    return this.addAllParametres(
       this.parameterRepository,
       SpecificSkillSeeders,
     );
@@ -213,7 +173,7 @@ export class SettingController {
 
   @Post('seed/languages')
   SeederLanguages() {
-    return this.createSeeder(
+    return this.addAllParametres(
       this.parameterRepository,
       SpokenLanguageSeeders,
     );
@@ -221,51 +181,151 @@ export class SettingController {
 
   @Post('seed/localization')
   SeederLocalization() {
-    return this.createSeeder(
-      this.parameterRepository,
-      LocalizationSeeders,
-    );
+    return this.addAllParametres(this.parameterRepository, LocalizationSeeders);
   }
 
   @Post('seed/payment-terms')
   SeederPaymentTerms() {
-    return this.createSeeder(
-      this.parameterRepository,
-      PaymentTermSeeders,
-    );
+    return this.addAllParametres(this.parameterRepository, PaymentTermSeeders);
   }
-
 
   @Post('seed/certifications')
   SeederCertifications() {
-    return this.createSeeder(
+    return this.addAllParametres(
       this.parameterRepository,
-      CertificationSeeders, 
+      CertificationSeeders,
     );
   }
 
   @Post('seed/roles')
   SeederRoles() {
-    return this.createSeeder(
-      this.roles,
-      RoleSeeders, 
-    );
+    return this.addAllParametres(this.parameterRepository, RoleSeeders);
   }
 
   @Post('seed/type_profil')
   SeederTypeProfil() {
-    return this.createSeeder(
-      this.settingTypeProfil,
-      TypeProfilSeeders, 
+    return this.addAllParametres(this.parameterRepository, TypeProfilSeeders);
+  }
+
+  @Post('seed/disponibility_of_prestataire')
+  SeederDisponibilityOfPrestataire() {
+    return this.addAllParametres(
+      this.parameterRepository,
+      DisponibilyOfPrestataireSeeders,
     );
   }
 
-  @Post('seed/setting-type')
-  SeederSettingTypePaiement() {
-    return this.createSeeder(
-      this.settingTypePaiement,
-      TypePaiementSeeders, 
+  @Post('seed/type_de_medias')
+  SeederTypeMedia() {
+    return this.addAllParametres(this.parameterRepository, TypeMediaSeeders);
+  }
+
+  @Post('seed/cleaning-supplies')
+  SeederCleaningSupplies() {
+    return this.addAllParametres(
+      this.parameterRepository,
+      CleaningSuppliesSeeders,
     );
   }
 
+  @Post('seed/tasks')
+  SeederTasks() {
+    return this.addAllParametres(this.parameterRepository, TaskSeeders);
+  }
+
+  @Post('seed/candidate-criteria')
+  SeederCandidateCriteria() {
+    return this.addAllParametres(
+      this.parameterRepository,
+      CandidateCriteriaSeeders,
+    );
+  }
+
+  @Post('seed/type-de-services')
+  SeederTypeDeServices() {
+    return this.addAllParametres(this.parameterRepository, TypeServiceSeeders);
+  }
+
+  @Post('seed/remove-doublon-abonnements')
+  async RemoveDoublonAbonnements() {
+    return this.settingSubscriptionTypes
+      .createQueryBuilder('abonnements')
+      .select([
+        'COUNT(abonnements.id) as count',
+        'abonnements.userId',
+        'abonnements.paiementId',
+      ])
+      .groupBy('abonnements.userId, abonnements.paiementId')
+      .having('count > 1')
+      .getRawMany()
+      .then(async (result) => {
+        for (const row of result) {
+          // Les noms de colonnes brutes utilisent des underscores
+          const userId = row.abonnements_userId;
+          const paiementId = row.abonnements_paiementId;
+
+          // Recherche des doublons avec les relations
+          const subscriptions = await this.settingSubscriptionTypes.find({
+            where: {
+              user: { id: userId },
+              paiement: { id: paiementId },
+            },
+            relations: ['user', 'paiement', 'type'],
+          });
+
+          if (subscriptions.length > 1) {
+            const toKeep = subscriptions[0];
+            const toRemove = subscriptions.slice(1);
+
+            // Suppression des doublons
+            await this.settingSubscriptionTypes.remove(toRemove);
+
+            // Mise à jour de l'entrée conservée si nécessaire
+            toKeep.updatedAt = new Date();
+            await this.settingSubscriptionTypes.save(toKeep);
+          }
+        }
+      });
+  }
+
+  @Post('seed/remove-doublon-notifications')
+  async RemoveDoublonNotifications() {
+    return this.notificationRepository
+      .createQueryBuilder('notifications')
+      .select([
+        'COUNT(notifications.id) as count',
+        'notifications.user',
+        'notifications.type',
+        'notifications.job',
+      ]) // Incluez les champs nécessaires
+      .groupBy('notifications.user, notifications.type, notifications.job') // Groupe par user, type et job
+      .having('count > 1')
+      .getRawMany()
+      .then(async (result) => {
+        for (const row of result) {
+          const userId = row.notifications_user; // Utilisez les noms avec underscores
+          const type = row.notifications_type;
+          const jobId = row.notifications_job; // Assurez-vous que le nom correspond à votre relation
+
+          const notifications = await this.notificationRepository.find({
+            where: {
+              user: { id: userId },
+              type: type,
+              job: { id: jobId }, // Utilisez l'ID du job si la relation est avec un Job
+            },
+            relations: ['user', 'job', 'sender'], // Incluez les relations nécessaires
+          });
+
+          if (notifications.length > 1) {
+            const toKeep = notifications[0];
+            const toRemove = notifications.slice(1);
+
+            await this.notificationRepository.remove(toRemove);
+
+            toKeep.updatedAt = new Date();
+            await this.notificationRepository.save(toKeep);
+          }
+        }
+      });
+  }
 }

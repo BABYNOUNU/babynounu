@@ -19,7 +19,7 @@ export class JobApplication {
   @ManyToOne(() => User, (user) => user.job_to_apply, { onDelete: 'CASCADE' })
   user: User;
 
-  @ManyToOne(() => Job, (job) => job.job_application, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Job, (job) => job.jobApplications, { onDelete: 'CASCADE' })
   jobs: Job; // Tableau d'instances de Job
 
   @Column({ default: 0 })

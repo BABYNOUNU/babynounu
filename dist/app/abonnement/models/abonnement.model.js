@@ -11,7 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Abonnements = void 0;
 const paiement_model_1 = require("../../paiement/models/paiement.model");
-const setting_subscription_type_model_1 = require("../../setting/models/setting_subscription_type.model");
+const parameter_model_1 = require("../../parameter/models/parameter.model");
 const user_model_1 = require("../../user/user.model");
 const typeorm_1 = require("typeorm");
 let Abonnements = class Abonnements {
@@ -35,10 +35,10 @@ __decorate([
     __metadata("design:type", paiement_model_1.Paiements)
 ], Abonnements.prototype, "paiement", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => setting_subscription_type_model_1.settingSubscriptionTypes, (SN) => SN.abonnement, {
+    (0, typeorm_1.ManyToOne)(() => parameter_model_1.Parameter, (parameter) => parameter.type_abonnements, {
         onDelete: 'CASCADE',
     }),
-    __metadata("design:type", setting_subscription_type_model_1.settingSubscriptionTypes)
+    __metadata("design:type", parameter_model_1.Parameter)
 ], Abonnements.prototype, "type", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => user_model_1.User, (user) => user.abonnement, {

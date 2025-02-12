@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.databaseProviders = exports.HOST = exports.isProd = void 0;
 const typeorm_1 = require("typeorm");
 exports.isProd = true;
-exports.HOST = exports.isProd ? 'https://api.babynounu.com' : 'https://api.babynounu.com';
+exports.HOST = exports.isProd ? 'https://api.babynounu.com' : 'http://localhost:3000';
 const ProdDatabase = (dbProd, dbTest) => {
     return exports.isProd ? dbProd : dbTest;
 };

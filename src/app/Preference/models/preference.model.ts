@@ -1,28 +1,95 @@
-import { ManyToOne, Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, OneToMany } from "typeorm"
-import { Parameter } from "src/app/parameter/models/parameter.model"
-import { User } from "src/app/user/user.model"
-import { TypeParameter } from "src/app/parameter/models/parameter_type.model"
-import { Profile } from "src/app/profiles/models/profile.model"
+import {
+  ManyToOne,
+  Entity,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+} from 'typeorm';
+import { Parameter } from 'src/app/parameter/models/parameter.model';
+import { Parents } from 'src/app/parent/models/parent.model';
+import { Job } from 'src/app/job/models/job.model';
+import { Nounus } from 'src/app/nounus/models/nounu.model';
 
-
-@Entity("user_preferences")
+@Entity('user_preferences')
 export class Preference {
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @PrimaryGeneratedColumn()
-    id: Number
+  @ManyToOne(() => Parameter, { onDelete: 'CASCADE' })
+  horaire_disponible: Parameter[];
 
-    @ManyToOne(() => Parameter, (type) => type.preference, {onDelete: 'CASCADE',})
-    localization: Parameter[]
+  @ManyToOne(() => Parameter, { onDelete: 'CASCADE' })
+  zone_de_travail: Parameter[];
 
-    @ManyToOne(() => User, (type) => type.preference, {onDelete: 'CASCADE',})
-    user: User
+  @ManyToOne(() => Parameter, { onDelete: 'CASCADE' })
+  type_services: Parameter[];
 
-    @CreateDateColumn()
-    created_at: Date
+  @ManyToOne(() => Parameter, { onDelete: 'CASCADE' })
+  equipement_menager: Parameter[];
 
-    @UpdateDateColumn()
-    updated_at: Date
+  @ManyToOne(() => Parameter, { onDelete: 'CASCADE' })
+  criteres_specifiques: Parameter[];
 
-    @DeleteDateColumn()
-    deleted_at: Date
+  @ManyToOne(() => Parameter, { onDelete: 'CASCADE' })
+  certifications_criteres: Parameter[];
+
+  @ManyToOne(() => Parameter, { onDelete: 'CASCADE' })
+  tranche_age_enfants: Parameter[];
+
+  @ManyToOne(() => Parameter, { onDelete: 'CASCADE' })
+  besions_specifiques: Parameter[];
+
+  @ManyToOne(() => Parameter, { onDelete: 'CASCADE' })
+  garde_enfants: Parameter[];
+
+  @ManyToOne(() => Parameter, { onDelete: 'CASCADE' })
+  aide_menagere: Parameter[];
+
+  @ManyToOne(() => Parameter, { onDelete: 'CASCADE' })
+  frequence_des_services: Parameter[];
+
+  @ManyToOne(() => Parameter, { onDelete: 'CASCADE' })
+  horaire_souhaites: Parameter[];
+
+  @ManyToOne(() => Parameter, { onDelete: 'CASCADE' })
+  adress: Parameter[];
+
+  @ManyToOne(() => Parameter, { onDelete: 'CASCADE' })
+  disponibility_du_prestataire: Parameter[];
+
+  @ManyToOne(() => Parameter, { onDelete: 'CASCADE' })
+  zone_geographique_prestataire: Parameter[];
+
+  @ManyToOne(() => Parameter, { onDelete: 'CASCADE' })
+  competance_specifique: Parameter[];
+
+
+  @ManyToOne(() => Parameter, { onDelete: 'CASCADE' })
+  langue_parler: Parameter[];
+
+  @ManyToOne(() => Parameter, { onDelete: 'CASCADE' })
+  criteres_selections: Parameter[];
+
+  @ManyToOne(() => Parents, (parent) => parent.preferences, {
+    onDelete: 'CASCADE',
+  })
+  parents: Parents;
+
+  @ManyToOne(() => Nounus, (nounu) => nounu.preferences, {
+    onDelete: 'CASCADE',
+  })
+  nounus: Nounus;
+
+  @ManyToOne(() => Job, (job) => job.preferences, { onDelete: 'CASCADE' })
+  jobs: Job;
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
+
+  @DeleteDateColumn()
+  deleted_at: Date;
 }

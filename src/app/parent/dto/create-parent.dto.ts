@@ -1,24 +1,91 @@
+import { ApiProperty } from '@nestjs/swagger';
+import {
+  IsString,
+  IsOptional,
+  IsEmail,
+  IsArray,
+  IsNotEmpty,
+} from 'class-validator';
+
 export class CreateParentDto {
+  @ApiProperty()
+  @IsString()
   fullname: string;
+
+  @ApiProperty()
+  @IsEmail()
+  adresse_mail: string;
+
+  @ApiProperty()
+  @IsString()
   phone: string;
-  adresse: string;
-  budget_min: string;
-  budget_max: string;
+
+  @ApiProperty()
+  @IsString()
   number_of_children: string;
-  payment_terms: string;
-  localization: string;
-  description: string;
-  availabilityServiceProvider: string;
-  settingAgeOfChildrens?: string[]; // IDs des enfants liés
-  settingSpecificNeeds?: string[]; // IDs des besoins spécifiques
-  settingGuardSchedules?: string[]; // IDs des horaires de garde
-  settingDesiredTimes?: string[]; // IDs des horaires désirés
-  settingHousekeepers?: string[]; // IDs des housekeepers
-  settingAreaWorks?: string[]; // IDs des zones de travail
-  settingLanguages?: string[]; // IDs des langues
-  settingLocalizations?: string[]; // IDs des localisations
-  settingSpecificSkills?: string[]; // IDs des compétences spécifiques
-  settingServiceFrequency?: string[]; // IDs des fréquences de service
-  user?: string; // ID de l'utilisateur lié
-  photo: string; // URL de l'image
+
+  @ApiProperty()
+  @IsString()
+  budget_estimated: string;
+
+  @ApiProperty({ type: [] })
+  // @IsArray()
+  @IsOptional()
+  disponibility_du_prestataire?: any;
+
+  @ApiProperty({ type: [] })
+  @IsArray()
+  @IsOptional()
+  besions_specifiques?: any;
+
+  @ApiProperty({ type: [] })
+  @IsArray()
+  @IsOptional()
+  garde_enfants?: any;
+
+  @ApiProperty({ type: [] })
+  @IsArray()
+  @IsOptional()
+  aide_menagere?: any;
+
+  @ApiProperty({ type: [] })
+  @IsArray()
+  @IsOptional()
+  frequence_des_services?: any;
+
+  @ApiProperty({ type: [] })
+  @IsArray()
+  @IsOptional()
+  horaire_souhaites?: any;
+
+  @ApiProperty({ type: [] })
+  // @IsArray()
+  @IsOptional()
+  adress?: any;
+
+  @ApiProperty({ type: [] })
+  @IsArray()
+  @IsOptional()
+  zone_geographique_prestataire?: any;
+
+  @ApiProperty({ type: [] })
+  @IsArray()
+  @IsOptional()
+  competance_specifique?: any;
+
+  @ApiProperty({ type: [] })
+  @IsArray()
+  @IsOptional()
+  langue_parler?: any;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsString()
+  informations_complementaires?: string;
+
+  @ApiProperty()
+  @IsString()
+  userId: string;
 }
+
+export class UpdateParentDto extends CreateParentDto {}

@@ -11,12 +11,16 @@ import {
     NotFoundException,
     UseGuards,
     Req,
+    UploadedFiles,
+    UseInterceptors,
   } from '@nestjs/common';
   import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam } from '@nestjs/swagger';
   import { JobsService } from './job.service';
   import { CreateJobDto } from './dtos/create-job.dto';
   import { UpdateJobDto } from './dtos/update-job.dto';
 import { JwtAuthGuard } from '../auth/auh.guard';
+import { storageMedia } from 'src/config/media.config';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
   
   @ApiTags('jobs') // Tag pour Swagger
   @Controller('jobs')
@@ -24,13 +28,23 @@ import { JwtAuthGuard } from '../auth/auh.guard';
     constructor(private readonly jobsService: JobsService) {}
   
     @Post('create')
+          @UseInterceptors(
+              FileFieldsInterceptor(
+                [
+                  { name: 'Images_videos', maxCount: 10 },
+                ],
+                {
+                  storage: storageMedia
+                }
+              )
+            )
     @ApiOperation({ summary: 'Create a new job posting' })
     @ApiBody({ type: CreateJobDto }) // Schéma du corps de la requête
     @ApiResponse({ status: 201, description: 'Job created successfully' })
     @ApiResponse({ status: 400, description: 'Bad request' })
     @UsePipes(new ValidationPipe())
-    async createJob(@Body() createJobDto: CreateJobDto) {
-      return this.jobsService.createJob(createJobDto);
+    async createJob(@Body() createJobDto: CreateJobDto, @UploadedFiles() files) {
+      return this.jobsService.createJob(createJobDto, files);
     }
   
     @Get()
@@ -71,7 +85,7 @@ import { JwtAuthGuard } from '../auth/auh.guard';
       return this.jobsService.updateJob(id, updateJobDto);
     }
   
-    @Delete(':id')
+    @Post('delete/:id')
     @ApiOperation({ summary: 'Delete a job posting' })
     @ApiParam({ name: 'id', type: Number }) // Paramètre de route
     @ApiResponse({ status: 200, description: 'Job deleted successfully' })

@@ -19,6 +19,7 @@ exports.ParameterModule = ParameterModule = __decorate([
     (0, common_1.Module)({
         imports: [database_module_1.DatabaseModule],
         controllers: [parameter_controller_1.ParameterController],
-        providers: [parameter_service_1.ParameterService, ...parameter_1.ParameterProviders]
+        providers: [parameter_service_1.ParameterService, ...parameter_1.ParameterProviders],
+        exports: [parameter_service_1.ParameterService],
     })
 ], ParameterModule);

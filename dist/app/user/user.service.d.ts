@@ -1,7 +1,6 @@
 import { Repository } from 'typeorm';
 import { User } from './user.model';
-import { SettingGeneraleService } from '../setting/_partiels/general.service';
-export declare class UserService extends SettingGeneraleService {
+export declare class UserService {
     private userRepository;
     constructor(userRepository: Repository<User>);
     user(slug: any): Promise<User | null>;

@@ -8,21 +8,48 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MediaService = void 0;
 const common_1 = require("@nestjs/common");
+const typeorm_1 = require("typeorm");
+const parameter_service_1 = require("../parameter/parameter.service");
 let MediaService = class MediaService {
-    constructor() { }
-    async createMedia(media, mediaRepository) {
-        const newMedia = mediaRepository.create({
-            url: media.url,
-            media_nounu: media.media_nounu,
+    mediaRepository;
+    parameterService;
+    constructor(mediaRepository, parameterService) {
+        this.mediaRepository = mediaRepository;
+        this.parameterService = parameterService;
+    }
+    async create(createMediaDto) {
+        const newMedia = this.mediaRepository.create({
+            ...createMediaDto,
+            type_media: await this.parameterService.findOneBySlug(createMediaDto.typeMedia),
+            [createMediaDto.userId ? 'user' : 'job']: { id: createMediaDto.userId ? createMediaDto.userId : createMediaDto.JobId },
         });
-        return mediaRepository.save(newMedia);
+        const savedMedia = await this.mediaRepository.save(newMedia);
+        return savedMedia;
+    }
+    async findOne(id) {
+        return this.mediaRepository.findOne({ where: { id: id.toString() } });
+    }
+    async findAll() {
+        return this.mediaRepository.find();
+    }
+    async update(id, updateMediaDto) {
+        await this.mediaRepository.update(id, updateMediaDto);
+        return this.findOne(id);
+    }
+    async remove(id) {
+        await this.mediaRepository.delete(id);
     }
 };
 exports.MediaService = MediaService;
 exports.MediaService = MediaService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [])
+    __param(0, (0, common_1.Inject)('MEDIA_REPOSITORY')),
+    __metadata("design:paramtypes", [typeorm_1.Repository,
+        parameter_service_1.ParameterService])
 ], MediaService);

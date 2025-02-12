@@ -1,8 +1,7 @@
 import { Roles } from './models/role.model';
 import { Repository } from 'typeorm';
-import { SettingGeneraleService } from '../setting/_partiels/general.service';
 import { RoleDto } from './dto/role.dto';
-export declare class RoleService extends SettingGeneraleService {
+export declare class RoleService {
     private readonly roleRepository;
     constructor(roleRepository: Repository<Roles>);
     role(roleWhereUniqueInput: any): Promise<Roles | null>;

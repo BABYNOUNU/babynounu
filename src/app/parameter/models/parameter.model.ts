@@ -8,32 +8,55 @@ import {
   DeleteDateColumn,
   OneToMany,
 } from 'typeorm';
-import { TypeParameter } from './parameter_type.model';
 import { Preference } from 'src/app/Preference/models/preference.model';
+import { TypeParameter } from './parameter_type.model';
 import { User } from 'src/app/user/user.model';
-import { Profile } from 'src/app/profiles/models/profile.model';
-// import { ActivityLog } from "./userActivityLog"
+import { Abonnements } from 'src/app/abonnement/models/abonnement.model';
+import { Medias } from 'src/app/media/models/media.model';
 
 @Entity('parameters')
 export class Parameter {
   @PrimaryGeneratedColumn()
-  id: Number;
+  id: number;
 
   @Column({ nullable: false })
   name: string;
 
-  @ManyToOne(() => TypeParameter, (type) => type.parameter, {
-    onDelete: 'CASCADE',
-  })
+  @Column({ nullable: true })
+  slug: string;
+
+  @Column({ nullable: true })
+  description: string;
+
+  @Column({ default: 0 })
+  priority: number;
+
+  @ManyToOne(() => TypeParameter, (type) => type.parameter, { onDelete: 'CASCADE' })
   type_parameter: TypeParameter;
 
-  @OneToMany(() => Preference, (preference) => preference.localization, {
-    cascade: true,
-  })
-  preference: Preference;
+  @OneToMany(() => User, (user) => user.type_profil, { cascade: true })
+  type_profil: User[];
 
-  @OneToMany(() => Profile, profile => profile.type)
-   profiles: Profile;
+  @OneToMany(() => User, (user) => user.role, { cascade: true })
+  role: User[];
+
+  @OneToMany(() => Abonnements, (abonnement) => abonnement.type, { cascade: true })
+  type_abonnements: Abonnements[];
+
+  @OneToMany(() => Medias, (media) => media.type_media, { cascade: true })
+  type_media: Medias;
+
+  @OneToMany(() => Preference, (preference) => preference.horaire_disponible, { cascade: true })
+  horaire_disponible: Preference;
+
+  @OneToMany(() => Preference, (preference) => preference.zone_de_travail, { cascade: true })
+  zone_de_travail: Preference;
+
+  @OneToMany(() => Preference, (preference) => preference.tranche_age_enfants, { cascade: true })
+  tranche_age_enfants: Preference;
+
+  @OneToMany(() => Preference, (preference) => preference.besions_specifiques, { cascade: true })
+  besions_specifiques: Preference;
 
   @CreateDateColumn()
   created_at: Date;

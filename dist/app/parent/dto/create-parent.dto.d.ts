@@ -1,24 +1,21 @@
 export declare class CreateParentDto {
     fullname: string;
+    adresse_mail: string;
     phone: string;
-    adresse: string;
-    budget_min: string;
-    budget_max: string;
     number_of_children: string;
-    payment_terms: string;
-    localization: string;
-    description: string;
-    availabilityServiceProvider: string;
-    settingAgeOfChildrens?: string[];
-    settingSpecificNeeds?: string[];
-    settingGuardSchedules?: string[];
-    settingDesiredTimes?: string[];
-    settingHousekeepers?: string[];
-    settingAreaWorks?: string[];
-    settingLanguages?: string[];
-    settingLocalizations?: string[];
-    settingSpecificSkills?: string[];
-    settingServiceFrequency?: string[];
-    user?: string;
-    photo: string;
+    budget_estimated: string;
+    disponibility_du_prestataire?: any;
+    besions_specifiques?: any;
+    garde_enfants?: any;
+    aide_menagere?: any;
+    frequence_des_services?: any;
+    horaire_souhaites?: any;
+    adress?: any;
+    zone_geographique_prestataire?: any;
+    competance_specifique?: any;
+    langue_parler?: any;
+    informations_complementaires?: string;
+    userId: string;
+}
+export declare class UpdateParentDto extends CreateParentDto {
 }

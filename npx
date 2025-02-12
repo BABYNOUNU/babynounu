@@ -1,13 +1,13 @@
-mkdir ./src/app/profiles &&
-npx nest generate module app/profiles --no-spec &&
-npx nest generate controller app/profiles --no-spec &&
-npx nest generate service app/profiles --no-spec &&
-npx nest generate provider app/profiles --no-spec &&
-mkdir ./src/app/profiles/models &&
-mkdir ./src/app/profiles/dtos &&
-touch ./src/app/profiles/dtos/create-profile.dto.ts &&
-touch ./src/app/profiles/dtos/update-profile.dto.ts &&
-touch ./src/app/profiles/models/profile.model.ts
+mkdir ./src/app/nounus &&
+npx nest generate module app/nounus --no-spec &&
+npx nest generate controller app/nounus --no-spec &&
+npx nest generate service app/nounus --no-spec &&
+npx nest generate provider app/nounus --no-spec &&
+mkdir ./src/app/nounus/models &&
+mkdir ./src/app/nounus/dtos &&
+touch ./src/app/nounus/dtos/create-nounu.dto.ts &&
+touch ./src/app/nounus/dtos/update-nounu.dto.ts &&
+touch ./src/app/nounus/models/nounu.model.ts
 
 git init
 git add ./

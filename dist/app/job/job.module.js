@@ -12,6 +12,10 @@ const job_controller_1 = require("./job.controller");
 const job_service_1 = require("./job.service");
 const job_1 = require("./job");
 const database_module_1 = require("../../database/database.module");
+const media_service_1 = require("../media/media.service");
+const media_1 = require("../media/media");
+const parameter_1 = require("../parameter/parameter");
+const parameter_service_1 = require("../parameter/parameter.service");
 let JobModule = class JobModule {
 };
 exports.JobModule = JobModule;
@@ -19,6 +23,6 @@ exports.JobModule = JobModule = __decorate([
     (0, common_1.Module)({
         imports: [database_module_1.DatabaseModule],
         controllers: [job_controller_1.JobsController],
-        providers: [job_service_1.JobsService, ...job_1.JobProviders]
+        providers: [job_service_1.JobsService, media_service_1.MediaService, parameter_service_1.ParameterService, ...media_1.MediaProviders, ...parameter_1.ParameterProviders, ...job_1.JobProviders]
     })
 ], JobModule);

@@ -12,17 +12,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
 const typeorm_1 = require("typeorm");
 const parent_model_1 = require("../parent/models/parent.model");
-const role_model_1 = require("../role/models/role.model");
-const nounu_model_1 = require("../nounu/models/nounu.model");
 const abonnement_model_1 = require("../abonnement/models/abonnement.model");
-const setting_type_profil_model_1 = require("../setting/models/setting_type_profil.model");
 const notification_model_1 = require("../notification/models/notification.model");
 const job_model_1 = require("../job/models/job.model");
 const paiement_model_1 = require("../paiement/models/paiement.model");
 const conversation_model_1 = require("../chat/models/conversation.model");
 const job_application_model_1 = require("../job-application/models/job-application.model");
-const preference_model_1 = require("../Preference/models/preference.model");
-const profile_model_1 = require("../profiles/models/profile.model");
+const parameter_model_1 = require("../parameter/models/parameter.model");
+const nounu_model_1 = require("../nounus/models/nounu.model");
+const media_model_1 = require("../media/models/media.model");
 let User = class User {
     id;
     slug;
@@ -33,14 +31,13 @@ let User = class User {
     nounu;
     parent;
     abonnement;
+    medias;
     notifications;
     sentNotifications;
     conversations;
     job_to_apply;
-    profile;
     jobs;
     paiements;
-    preference;
     role;
 };
 exports.User = User;
@@ -65,8 +62,8 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "access_token", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => setting_type_profil_model_1.SettingTypeProfil, (SN) => SN.userType, { onDelete: 'CASCADE' }),
-    __metadata("design:type", setting_type_profil_model_1.SettingTypeProfil)
+    (0, typeorm_1.ManyToOne)(() => parameter_model_1.Parameter, (SN) => SN.type_profil, { onDelete: 'CASCADE' }),
+    __metadata("design:type", parameter_model_1.Parameter)
 ], User.prototype, "type_profil", void 0);
 __decorate([
     (0, typeorm_1.OneToOne)(() => nounu_model_1.Nounus, { eager: true, cascade: true, onDelete: 'CASCADE' }),
@@ -74,7 +71,7 @@ __decorate([
     __metadata("design:type", nounu_model_1.Nounus)
 ], User.prototype, "nounu", void 0);
 __decorate([
-    (0, typeorm_1.OneToOne)(() => parent_model_1.Parents, { eager: true, cascade: true, onDelete: 'CASCADE' }),
+    (0, typeorm_1.OneToMany)(() => parent_model_1.Parents, (parent) => parent.user, { cascade: true }),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", parent_model_1.Parents)
 ], User.prototype, "parent", void 0);
@@ -82,8 +79,15 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => abonnement_model_1.Abonnements, (abonnement) => abonnement.user, {
         cascade: true,
     }),
-    __metadata("design:type", nounu_model_1.Nounus)
+    __metadata("design:type", abonnement_model_1.Abonnements)
 ], User.prototype, "abonnement", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => media_model_1.Medias, (media) => media.user, {
+        cascade: true,
+        onDelete: 'CASCADE',
+    }),
+    __metadata("design:type", Array)
+], User.prototype, "medias", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => notification_model_1.Notification, (notification) => notification.user, {
         cascade: true,
@@ -109,10 +113,6 @@ __decorate([
     __metadata("design:type", Array)
 ], User.prototype, "job_to_apply", void 0);
 __decorate([
-    (0, typeorm_1.OneToOne)(() => profile_model_1.Profile, profile => profile.user),
-    __metadata("design:type", profile_model_1.Profile)
-], User.prototype, "profile", void 0);
-__decorate([
     (0, typeorm_1.OneToMany)(() => job_model_1.Job, (job) => job.user, {
         cascade: true,
     }),
@@ -125,12 +125,8 @@ __decorate([
     __metadata("design:type", Array)
 ], User.prototype, "paiements", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => preference_model_1.Preference, (preference) => preference.user, { cascade: true }),
-    __metadata("design:type", preference_model_1.Preference)
-], User.prototype, "preference", void 0);
-__decorate([
-    (0, typeorm_1.ManyToOne)(() => role_model_1.Roles, (role) => role.user, { onDelete: 'CASCADE' }),
-    __metadata("design:type", role_model_1.Roles)
+    (0, typeorm_1.ManyToOne)(() => parameter_model_1.Parameter, (parameter) => parameter.role, { onDelete: 'CASCADE' }),
+    __metadata("design:type", parameter_model_1.Parameter)
 ], User.prototype, "role", void 0);
 exports.User = User = __decorate([
     (0, typeorm_1.Entity)()

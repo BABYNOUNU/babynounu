@@ -15,105 +15,170 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.JobsService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("typeorm");
+const media_service_1 = require("../media/media.service");
+const database_providers_1 = require("../../database/database.providers");
 let JobsService = class JobsService {
     jobRepository;
-    settingDesiredTimesRepository;
-    settingServiceFrequencyRepository;
-    constructor(jobRepository, settingDesiredTimesRepository, settingServiceFrequencyRepository) {
+    preferenceRepository;
+    mediaService;
+    constructor(jobRepository, preferenceRepository, mediaService) {
         this.jobRepository = jobRepository;
-        this.settingDesiredTimesRepository = settingDesiredTimesRepository;
-        this.settingServiceFrequencyRepository = settingServiceFrequencyRepository;
+        this.preferenceRepository = preferenceRepository;
+        this.mediaService = mediaService;
     }
-    async createJob(createJobDto) {
-        const job = this.jobRepository.create({
-            title: createJobDto.title,
-            description: createJobDto.description,
-            budget_min: createJobDto.budget_min,
-            budget_max: createJobDto.budget_max,
-            schedules_available: createJobDto.schedules_available,
-            service_frequency: createJobDto.service_frequency,
-            user: { id: createJobDto.user },
+    RelationShip = [
+        'user',
+        'user.parent',
+        'medias',
+        'user.medias.type_media',
+        'preferences',
+        'preferences.besions_specifiques',
+        'preferences.garde_enfants',
+        'preferences.aide_menagere',
+        'preferences.frequence_des_services',
+        'preferences.horaire_souhaites',
+        'preferences.adress',
+        'preferences.zone_geographique_prestataire',
+        'preferences.competance_specifique',
+        'preferences.langue_parler',
+        'preferences.disponibility_du_prestataire',
+        'preferences.equipement_menager',
+        'preferences.criteres_specifiques',
+        'preferences.criteres_selections',
+        'preferences.certifications_criteres',
+        'preferences.zone_de_travail',
+        'preferences.type_services',
+        'jobApplications',
+    ];
+    preferenceKeys = [
+        'adress',
+        'zone_de_travail',
+        'type_services',
+        'frequence_des_services',
+        'horaire_souhaites',
+        'garde_enfants',
+        'competance_specifique',
+        'besions_specifiques',
+        'langue_parler',
+        'aide_menagere',
+        'equipement_menager',
+        'certifications_criteres',
+        'criteres_selections',
+    ];
+    async createJob(createJobDto, files) {
+        const { user_id, ...jobData } = createJobDto;
+        const saveJob = await this.jobRepository.save({
+            titre: jobData.titre,
+            description: jobData.description,
+            moyens_de_contact: jobData.moyens_de_contact,
+            inclusWeekend: jobData.inclus_weekend == 'true' ? true : false,
+            nombreEnfants: jobData.nombre_enfants,
+            experience_minimun: jobData.experience_minimun == 'true' ? true : false,
+            annee_experience: jobData.annee_experience,
+            tarifPropose: jobData.tarif,
+            negociable: jobData.negociable == 'true' ? true : false,
+            dateDebut: jobData.date_debut,
+            missionUrgente: jobData.mission_urgente == 'true' ? true : false,
+            descriptionComplementaire: jobData.description_complementaire,
+            user: { id: user_id },
         });
-        const saveJob = await this.jobRepository.save(job);
         if (!saveJob) {
-            throw new common_1.BadRequestException({ message: 'Parent not created' });
+            throw new common_1.BadRequestException('Job not created');
         }
-        const GetJob = await this.jobRepository.findOne({
-            where: { id: saveJob.id },
-            relations: ['user', 'user.parent'],
-        });
-        return GetJob;
-    }
-    async findAllJobs() {
-        return this.jobRepository.find({
-            relations: [
-                'user',
-                'user.parent',
-                'user.parent.settingLanguages.language',
-                'user.parent.settingAgeOfChildrens.AgeOfChildrens',
-                'user.parent.settingDesiredTimes.time',
-                'user.parent.settingAreaWorks.area',
-                'user.parent.settingSpecificSkills.skill',
-                'user.parent.settingSpecificNeeds.SpecificNeeds',
-                'user.parent.settingGuardSchedules.GuardSchedules',
-                'user.parent.settingHousekeepers.Housekeepers'
-            ],
-        });
-    }
-    async findJobById(id) {
-        const job = await this.jobRepository.findOne({ where: { id }, relations: [
-                'user',
-                'user.parent',
-                'user.parent.settingLanguages.language',
-                'user.parent.settingAgeOfChildrens.AgeOfChildrens',
-                'user.parent.settingDesiredTimes.time',
-                'user.parent.settingAreaWorks.area',
-                'user.parent.settingSpecificSkills.skill',
-                'user.parent.settingSpecificNeeds.SpecificNeeds',
-                'user.parent.settingGuardSchedules.GuardSchedules',
-                'user.parent.settingHousekeepers.Housekeepers',
-                'job_application'
-            ] });
+        if (files.Images_videos?.length > 0) {
+            const Images_videos = files.Images_videos;
+            Images_videos.forEach(async (file) => {
+                await this.mediaService.create({
+                    originalName: file.originalname,
+                    filename: file.filename,
+                    path: file.path,
+                    originalUrl: `${database_providers_1.HOST}/uploads/${file.filename}`,
+                    JobId: saveJob.id.toString(),
+                    typeMedia: 'image-video-presentation',
+                });
+            });
+        }
+        const preferenceKeys = this.preferenceKeys;
+        for (const key of preferenceKeys) {
+            const value = JSON.parse(createJobDto[key]);
+            if (value != undefined && Array.isArray(value)) {
+                const preferenceEntities = value.map((el) => ({
+                    jobs: saveJob,
+                    [key]: el.id,
+                }));
+                await this.preferenceRepository.save(preferenceEntities);
+            }
+        }
+        const job = await this.findJobById(saveJob.id);
         if (!job) {
-            throw new common_1.NotFoundException(`Job with ID ${id} not found`);
+            throw new common_1.NotFoundException(`Job with ID ${saveJob.id} not found`);
         }
         return job;
     }
+    async findAllJobs() {
+        const job = await this.jobRepository.find({
+            relations: this.RelationShip,
+        });
+        const DataJobs = await this.ReturnN(job, this.preferenceKeys);
+        return DataJobs;
+    }
+    async findJobById(id) {
+        const job = await this.jobRepository.findOne({
+            where: { id },
+            relations: this.RelationShip,
+        });
+        if (!job) {
+            throw new common_1.NotFoundException(`Job with ID ${id} not found`);
+        }
+        const DataJob = await this.ReturnN([job], this.preferenceKeys);
+        return DataJob[0];
+    }
     async findAllJobByUser(userId) {
-        const jobUser = await this.jobRepository.find({ where: { user: { id: userId } }, relations: [
-                'user',
-                'user.parent',
-                'user.parent.settingLanguages.language',
-                'user.parent.settingAgeOfChildrens.AgeOfChildrens',
-                'user.parent.settingDesiredTimes.time',
-                'user.parent.settingAreaWorks.area',
-                'user.parent.settingSpecificSkills.skill',
-                'user.parent.settingSpecificNeeds.SpecificNeeds',
-                'user.parent.settingGuardSchedules.GuardSchedules',
-                'user.parent.settingHousekeepers.Housekeepers'
-            ] });
+        const jobUser = await this.jobRepository.find({
+            where: { user: { id: userId } },
+            relations: this.RelationShip,
+        });
         if (!jobUser) {
             throw new common_1.NotFoundException(`Job with ID ${jobUser} not found`);
         }
         return jobUser;
     }
     async updateJob(id, updateJobDto) {
-        const job = await this.findJobById(id);
+        const job = await this.findJobById(id)[0];
         Object.assign(job, updateJobDto);
         return this.jobRepository.save(job);
     }
     async deleteJob(id) {
         const job = await this.findJobById(id);
-        return this.jobRepository.remove(job);
+        console.log(job);
+        return this.jobRepository.softDelete({ id: job.id });
+    }
+    async ReturnN(datas, preferenceKey) {
+        return datas.map((data) => {
+            const aggregatedPreferences = {};
+            preferenceKey.forEach((key) => {
+                aggregatedPreferences[key] = [];
+            });
+            data.preferences.forEach((pref) => {
+                preferenceKey.forEach((key) => {
+                    if (pref[key])
+                        aggregatedPreferences[key].push(pref[key]);
+                });
+            });
+            return {
+                ...data,
+                image: data.user.medias.find((media) => media.type_media.slug === 'image-profil'),
+                preferences: aggregatedPreferences,
+            };
+        });
     }
 };
 exports.JobsService = JobsService;
 exports.JobsService = JobsService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)('JOB_REPOSITORY')),
-    __param(1, (0, common_1.Inject)('SETTING_DESIRED_TIME_REPOSITORY')),
-    __param(2, (0, common_1.Inject)('SETTING_SERVICE_FREQUENCY_REPOSITORY')),
+    __param(1, (0, common_1.Inject)('PREFERENCE_REPOSITORY')),
     __metadata("design:paramtypes", [typeorm_1.Repository,
         typeorm_1.Repository,
-        typeorm_1.Repository])
+        media_service_1.MediaService])
 ], JobsService);

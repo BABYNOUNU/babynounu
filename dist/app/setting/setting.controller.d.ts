@@ -1,83 +1,39 @@
 import { Repository } from 'typeorm';
-import { SettingAgeOfChildren } from './models/setting_age_of_children.model';
-import { SettingSpecificNeed } from './models/setting_specific_need.model';
-import { SettingGuardSchedules } from './models/setting_guard_schedule.model';
-import { SettingHousekeeper } from './models/setting_housekeeper.model';
-import { SettingServiceFrequency } from './models/setting_service_frequency.model';
-import { SettingDesiredTime } from './models/setting_desired_time.model';
-import { SettingSpecificSkills } from './models/setting_specific_skill.model';
-import { SettingLanguages } from './models/setting_language.model';
-import { SettingLocalization } from './models/setting_localization.model';
-import { SettingPaymentTerms } from './models/setting_payment_terms.model';
-import { SettingCertifications } from './models/setting_certification.model';
 import { Roles } from '../role/models/role.model';
-import { SettingTypeProfil } from './models/setting_type_profil.model';
-import { settingSubscriptionTypes } from './models/setting_subscription_type.model';
 import { TypeParameter } from '../parameter/models/parameter_type.model';
 import { Parameter } from '../parameter/models/parameter.model';
+import { Abonnements } from '../abonnement/models/abonnement.model';
+import { Notification } from '../notification/models/notification.model';
 export declare class SettingController {
-    private readonly settingAgeOfChildrenRepository;
-    private readonly settingSpecificNeed;
-    private readonly settingGuardSchelude;
-    private readonly settingHousekeeper;
-    private readonly settingServiceFrequency;
-    private readonly settingDesiredTime;
-    private readonly settingSpecificSkills;
-    private readonly settingLanguages;
-    private readonly settingLocalization;
-    private readonly settingPaymentTerms;
-    private readonly settingCertification;
     private readonly roles;
-    private readonly settingTypeProfil;
-    private readonly settingTypePaiement;
     private readonly typeParameterRepository;
     private readonly parameterRepository;
-    constructor(settingAgeOfChildrenRepository: Repository<SettingAgeOfChildren>, settingSpecificNeed: Repository<SettingSpecificNeed>, settingGuardSchelude: Repository<SettingGuardSchedules>, settingHousekeeper: Repository<SettingHousekeeper>, settingServiceFrequency: Repository<SettingServiceFrequency>, settingDesiredTime: Repository<SettingDesiredTime>, settingSpecificSkills: Repository<SettingSpecificSkills>, settingLanguages: Repository<SettingLanguages>, settingLocalization: Repository<SettingLocalization>, settingPaymentTerms: Repository<SettingPaymentTerms>, settingCertification: Repository<SettingCertifications>, roles: Repository<Roles>, settingTypeProfil: Repository<SettingTypeProfil>, settingTypePaiement: Repository<settingSubscriptionTypes>, typeParameterRepository: Repository<TypeParameter>, parameterRepository: Repository<Parameter>);
-    private removeDuplicatesByName;
-    private createSeeder;
-    SeederParametreTypes(): Promise<{
-        setting: any;
-    }>;
-    SeederAgeOfChildren(): Promise<{
-        setting: any;
-    }>;
-    SeederSpecificNeed(): Promise<{
-        setting: any;
-    }>;
-    SeederGuardSchedule(): Promise<{
-        setting: any;
-    }>;
-    SeederHousekeeper(): Promise<{
-        setting: any;
-    }>;
-    SeederServiceFrequency(): Promise<{
-        setting: any;
-    }>;
-    SeederDesiredTimes(): Promise<{
-        setting: any;
-    }>;
-    SeederSpecificSkills(): Promise<{
-        setting: any;
-    }>;
-    SeederLanguages(): Promise<{
-        setting: any;
-    }>;
-    SeederLocalization(): Promise<{
-        setting: any;
-    }>;
-    SeederPaymentTerms(): Promise<{
-        setting: any;
-    }>;
-    SeederCertifications(): Promise<{
-        setting: any;
-    }>;
-    SeederRoles(): Promise<{
-        setting: any;
-    }>;
-    SeederTypeProfil(): Promise<{
-        setting: any;
-    }>;
-    SeederSettingTypePaiement(): Promise<{
-        setting: any;
-    }>;
+    private readonly settingSubscriptionTypes;
+    private readonly notificationRepository;
+    constructor(roles: Repository<Roles>, typeParameterRepository: Repository<TypeParameter>, parameterRepository: Repository<Parameter>, settingSubscriptionTypes: Repository<Abonnements>, notificationRepository: Repository<Notification>);
+    private VerifyInParameter;
+    private addAllTypeParametres;
+    private addAllParametres;
+    SeederParametreTypes(): Promise<any>;
+    SeederAgeOfChildren(): Promise<any>;
+    SeederSpecificNeed(): Promise<any>;
+    SeederGuardSchedule(): Promise<any>;
+    SeederHousekeeper(): Promise<any>;
+    SeederServiceFrequency(): Promise<any>;
+    SeederDesiredTimes(): Promise<any>;
+    SeederSpecificSkills(): Promise<any>;
+    SeederLanguages(): Promise<any>;
+    SeederLocalization(): Promise<any>;
+    SeederPaymentTerms(): Promise<any>;
+    SeederCertifications(): Promise<any>;
+    SeederRoles(): Promise<any>;
+    SeederTypeProfil(): Promise<any>;
+    SeederDisponibilityOfPrestataire(): Promise<any>;
+    SeederTypeMedia(): Promise<any>;
+    SeederCleaningSupplies(): Promise<any>;
+    SeederTasks(): Promise<any>;
+    SeederCandidateCriteria(): Promise<any>;
+    SeederTypeDeServices(): Promise<any>;
+    RemoveDoublonAbonnements(): Promise<void>;
+    RemoveDoublonNotifications(): Promise<void>;
 }

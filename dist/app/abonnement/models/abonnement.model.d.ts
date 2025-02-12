@@ -1,10 +1,10 @@
 import { Paiements } from 'src/app/paiement/models/paiement.model';
-import { settingSubscriptionTypes } from 'src/app/setting/models/setting_subscription_type.model';
+import { Parameter } from 'src/app/parameter/models/parameter.model';
 import { User } from 'src/app/user/user.model';
 export declare class Abonnements {
     id: string;
     paiement: Paiements;
-    type: settingSubscriptionTypes;
+    type: Parameter;
     user: User;
     createdAt: Date;
     updatedAt: Date;

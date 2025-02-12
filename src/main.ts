@@ -4,13 +4,20 @@ import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { ValidationError } from 'class-validator';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { isProd } from './database/database.providers';
+import bodyParser from 'body-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors({
-    origin: '*',
+    origin: true, // ou spécifie l'URL de ton frontend
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
+
+  // Augmente la limite de la taille des requêtes
+  // app.use(bodyParser.json({ limit: '50mb' }));
+  // app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+
   app.useGlobalPipes(
     new ValidationPipe({
       exceptionFactory: (validationErrors: ValidationError[] = []) => {
@@ -29,15 +36,14 @@ async function bootstrap() {
     .addBearerAuth()
     .setDescription('Your API description')
     .setVersion('1.0')
-    .addServer(isProd ? 'https://api.babynounu.com/' : 'http://localhost:3000/', 'Local environment')
+    .addServer(
+      isProd ? 'https://api.babynounu.com/' : 'http://localhost:3000/',
+      'Local environment',
+    )
     .addServer('https://staging.yourapi.com/', 'Staging')
     .addServer('https://api.babynounu.com/', 'Production')
     .addTag('Baby Nounu')
     .build();
-
- 
-
-  
 
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api-docs', app, document);

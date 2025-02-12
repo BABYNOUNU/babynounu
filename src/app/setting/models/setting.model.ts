@@ -8,12 +8,6 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
 } from 'typeorm';
-import { SettingAgeOfChildren } from './setting_age_of_children.model';
-import { SettingGuardSchedules } from './setting_guard_schedule.model';
-import { SettingSpecificNeed } from './setting_specific_need.model';
-import { SettingSpecificSkills } from './setting_specific_skill.model';
-import { SettingLanguages } from './setting_language.model';
-import { SettingLocalization } from './setting_localization.model';
 
 @Entity()
 export class Settings {

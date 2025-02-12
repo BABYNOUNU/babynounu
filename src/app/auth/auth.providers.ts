@@ -1,8 +1,7 @@
 import { DataSource } from 'typeorm';
 import { User } from '../user/user.model';
-import { Nounus } from '../nounu/models/nounu.model';
-import { SettingTypeProfil } from '../setting/models/setting_type_profil.model';
 import { Parents } from '../parent/models/parent.model';
+import { Parameter } from '../parameter/models/parameter.model';
 
 export const AuthProviders = [
   {
@@ -11,18 +10,13 @@ export const AuthProviders = [
     inject: ['DATA_SOURCE'],
   },
   {
-    provide: 'NOUNU_REPOSITORY',
-    useFactory: (dataSource: DataSource) => dataSource.getRepository(Nounus),
-    inject: ['DATA_SOURCE'],
-  },
-  {
     provide: 'PARENT_REPOSITORY',
     useFactory: (dataSource: DataSource) => dataSource.getRepository(Parents),
     inject: ['DATA_SOURCE'],
   },
   {
-    provide: 'TYPE_PROFIL_REPOSITORY',
-    useFactory: (dataSource: DataSource) => dataSource.getRepository(SettingTypeProfil),
+    provide: 'PARAMETER_PROFILE_REPOSITORY',
+    useFactory: (dataSource: DataSource) => dataSource.getRepository(Parameter),
     inject: ['DATA_SOURCE'],
   },
 ];

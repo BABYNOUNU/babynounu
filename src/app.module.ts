@@ -6,7 +6,6 @@ import { AuthModule } from './app/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { ParentModule } from './app/parent/parent.module';
 import { PaiementModule } from './app/paiement/paiement.module';
-import { NounuModule } from './app/nounu/nounu.module';
 import { SettingModule } from './app/setting/setting.module';
 import { ChatModule } from './app/chat/chat.module';
 import { NotificationModule } from './app/notification/notification.module';
@@ -17,7 +16,8 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { JobModule } from './app/job/job.module';
 import { JobApplicationModule } from './app/job-application/job-application.module';
-import { ProfilesModule } from './app/profiles/profiles.module';
+import { ParameterModule } from './app/parameter/parameter.module';
+import { NounusModule } from './app/nounus/nounus.module';
 
 
 
@@ -34,7 +34,6 @@ import { ProfilesModule } from './app/profiles/profiles.module';
     AuthModule,
     ParentModule,
     PaiementModule,
-    NounuModule,
     SettingModule,
     ChatModule,
     NotificationModule,
@@ -44,7 +43,8 @@ import { ProfilesModule } from './app/profiles/profiles.module';
     AbonnementModule,
     JobModule,
     JobApplicationModule,
-    ProfilesModule,
+    ParameterModule,
+    NounusModule
   ],
   controllers: [],
   providers: [],

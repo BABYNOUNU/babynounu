@@ -54,6 +54,47 @@ export class ParameterController {
     }
   }
 
+
+  // Récupère les paramètres en fonction du slug
+  @Get('slug/:slug')
+  @ApiOperation({ summary: 'Obtenir les paramètres par slug' })
+  @ApiResponse({
+    status: 200,
+    description: 'Liste des paramètres filtrés par slug.',
+  })
+  async findAllBySlug(
+    @Param('slug') typeParmaSlug: string,
+    @Res() res: Response,
+  ) {
+    try {
+      const parameters = await this.parameterService.findAllBySlug(typeParmaSlug);
+      return res.send({ parameter: parameters });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).send({ message: 'Server error' });
+    }
+  }
+
+  // Récupère un paramètre en fonction du slug
+  @Get('slug/one/:slug')
+  @ApiOperation({ summary: 'Obtenir un paramètre par slug' })
+  @ApiResponse({
+    status: 200,
+    description: 'Paramètre filtré par slug.',
+  })
+  async findOneBySlug(
+    @Param('slug') typeParmaSlug: string,
+    @Res() res: Response,
+  ) {
+    try {
+      const parameter = await this.parameterService.findOneBySlug(typeParmaSlug);
+      return res.send({ parameter });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).send({ message: 'Server error' });
+    }
+  }
+
   // Créer un paramètre
   @Post()
   @ApiOperation({ summary: 'Créer un nouveau paramètre' })

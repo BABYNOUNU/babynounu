@@ -1,62 +1,104 @@
 export const typeParametresSeeders = [
     {
-        name: "type-de-profil",
+        name: "Rôles",
+        slug: "roles",
+        description: "Catégorie définissant le profil de l'utilisateur."
+    },
+    { 
+        name: "Profils",
+        slug: "profils",
         description: "Catégorie définissant le profil de l'utilisateur."
     },
     {
-        name: "tranche-d'âge-des-enfants",
+        name: "Age des enfants",
+        slug: "age-des-enfants",
         description: "Catégorie définissant les groupes d'âge des enfants."
     },
     {
-        name: "besoin-spécifique",
+        name: "Besoins spécifique",
+        slug: "besoins-specifique",
         description: "Catégorie pour les besoins particuliers des enfants."
     },
     {
-        name: "emploi-du-temps-garde",
+        name: "Garde d’enfants",
+        slug: "garde-d-enfants",
         description: "Catégorie pour les horaires de garde d'enfants."
     },
     {
-        name: "service-de-ménage",
+        name: "Aide menagère",
+        slug: "aide-menagere",
         description: "Catégorie pour les différents services de ménage."
     },
     {
-        name: "fréquence-de-service",
+        name: "Fréquence De Services",
+        slug: "frequence-de-services",
         description: "Catégorie définissant la fréquence des services proposés."
     },
     {
-        name: "horaires-souhaités",
+        name: "Horaires Souhaités",
+        slug: "horaires-souhaites",
         description: "Catégorie pour les horaires de disponibilité souhaités."
     },
     {
-        name: "compétences-spécifiques",
-        description: "Catégorie pour les compétences particulières requises."
-    },
-    {
-        name: "langues-parlées",
-        description: "Catégorie pour les langues que le prestataire peut parler."
-    },
-    {
-        name: "localisation",
+        name: "Localisations",
+        slug: "localisations",
         description: "Catégorie définissant les zones géographiques couvertes."
     },
     {
-        name: "conditions-de-paiement",
-        description: "Catégorie pour les termes et modalités de paiement."
+        name: "compétences spécifiques",
+        slug: "competences-specifiques",
+        description: "Catégorie pour les compétences particulières requises."
     },
     {
-        name: "certifications",
+        name: "Langues parlées",
+        slug: "langues-parlees",
+        description: "Catégorie pour les langues que le prestataire peut parler."
+    },
+    {
+        name: "Mode de paiement",
+        slug: "mode-de-paiement",
+        description: "Catégorie définissant les modes de paiement acceptés par le prestataire."
+    },
+    {
+        name: "Disponibilité du prestataire",
+        slug: "disponibilite-du-prestataire",
+        description: "Catégorie définissant les disponibilités du prestataire."
+    },
+    {
+        name: "Certifications",
+        slug: "certifications",
         description: "Catégorie pour les certifications et qualifications obtenues."
     },
     {
-        name: "type-de-service-recherché",
-        description: "Catégorie pour le type de service que le client recherche."
-    },
-    {
-        name: "type-de-profil",
-        description: "Catégorie définissant le profil spécifique de l'utilisateur."
-    },
-    {
-        name: "notification",
+        name: "Notification",
+        slug: "notification",
         description: "Catégorie pour les paramètres de notification utilisateur."
-    }
+    },
+    {
+        name: "Type de médias",
+        slug: "type-de-medias",
+        description: "Catégorie définissant les types de médias acceptés par le prestataire."
+    },
+    {
+        name: "Taches",
+        slug: "taches",
+        description: "Catégorie définissant les taches pouvant être effectuées par le prestataire."
+    },
+    {
+        name: "Equipement ménager",
+        slug: "equipement-menager",
+        description: "Catégorie définissant les équipements ménagers."
+    },
+    {
+        name: "Critères de selection des candidats",
+        slug: "candidate-criteria",
+        description: "Catégorie définissant les critères de selection des candidats."
+    },
+    {
+        name: "Type de services",
+        slug: "type-de-services",
+        description: "Catégorie définissant les types de services proposés par le prestataire."
+    },
 ]
+
+

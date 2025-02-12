@@ -2,8 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JobProviders = void 0;
 const job_model_1 = require("./models/job.model");
-const setting_desired_time_model_1 = require("../setting/models/setting_desired_time.model");
-const setting_service_frequency_model_1 = require("../setting/models/setting_service_frequency.model");
+const preference_model_1 = require("../Preference/models/preference.model");
 exports.JobProviders = [
     {
         provide: 'JOB_REPOSITORY',
@@ -11,13 +10,8 @@ exports.JobProviders = [
         inject: ['DATA_SOURCE'],
     },
     {
-        provide: 'SETTING_DESIRED_TIME_REPOSITORY',
-        useFactory: (dataSource) => dataSource.getRepository(setting_desired_time_model_1.SettingDesiredTime),
-        inject: ['DATA_SOURCE'],
-    },
-    {
-        provide: 'SETTING_SERVICE_FREQUENCY_REPOSITORY',
-        useFactory: (dataSource) => dataSource.getRepository(setting_service_frequency_model_1.SettingServiceFrequency),
+        provide: 'PREFERENCE_REPOSITORY',
+        useFactory: (dataSource) => dataSource.getRepository(preference_model_1.Preference),
         inject: ['DATA_SOURCE'],
     },
 ];

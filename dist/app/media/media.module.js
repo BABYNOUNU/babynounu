@@ -11,12 +11,16 @@ const common_1 = require("@nestjs/common");
 const media_controller_1 = require("./media.controller");
 const media_service_1 = require("./media.service");
 const media_1 = require("./media");
+const database_module_1 = require("../../database/database.module");
+const parameter_service_1 = require("../parameter/parameter.service");
+const parameter_1 = require("../parameter/parameter");
 let MediaModule = class MediaModule {
 };
 exports.MediaModule = MediaModule;
 exports.MediaModule = MediaModule = __decorate([
     (0, common_1.Module)({
+        imports: [database_module_1.DatabaseModule],
         controllers: [media_controller_1.MediaController],
-        providers: [media_service_1.MediaService, media_1.Media]
+        providers: [media_service_1.MediaService, parameter_service_1.ParameterService, ...parameter_1.ParameterProviders, ...media_1.MediaProviders,]
     })
 ], MediaModule);

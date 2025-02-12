@@ -18,13 +18,15 @@ const swagger_1 = require("@nestjs/swagger");
 const job_service_1 = require("./job.service");
 const create_job_dto_1 = require("./dtos/create-job.dto");
 const update_job_dto_1 = require("./dtos/update-job.dto");
+const media_config_1 = require("../../config/media.config");
+const platform_express_1 = require("@nestjs/platform-express");
 let JobsController = class JobsController {
     jobsService;
     constructor(jobsService) {
         this.jobsService = jobsService;
     }
-    async createJob(createJobDto) {
-        return this.jobsService.createJob(createJobDto);
+    async createJob(createJobDto, files) {
+        return this.jobsService.createJob(createJobDto, files);
     }
     async findAllJobs() {
         return this.jobsService.findAllJobs();
@@ -46,14 +48,20 @@ let JobsController = class JobsController {
 exports.JobsController = JobsController;
 __decorate([
     (0, common_1.Post)('create'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileFieldsInterceptor)([
+        { name: 'Images_videos', maxCount: 10 },
+    ], {
+        storage: media_config_1.storageMedia
+    })),
     (0, swagger_1.ApiOperation)({ summary: 'Create a new job posting' }),
     (0, swagger_1.ApiBody)({ type: create_job_dto_1.CreateJobDto }),
     (0, swagger_1.ApiResponse)({ status: 201, description: 'Job created successfully' }),
     (0, swagger_1.ApiResponse)({ status: 400, description: 'Bad request' }),
     (0, common_1.UsePipes)(new common_1.ValidationPipe()),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.UploadedFiles)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_job_dto_1.CreateJobDto]),
+    __metadata("design:paramtypes", [create_job_dto_1.CreateJobDto, Object]),
     __metadata("design:returntype", Promise)
 ], JobsController.prototype, "createJob", null);
 __decorate([
@@ -101,7 +109,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], JobsController.prototype, "updateJob", null);
 __decorate([
-    (0, common_1.Delete)(':id'),
+    (0, common_1.Post)('delete/:id'),
     (0, swagger_1.ApiOperation)({ summary: 'Delete a job posting' }),
     (0, swagger_1.ApiParam)({ name: 'id', type: Number }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Job deleted successfully' }),

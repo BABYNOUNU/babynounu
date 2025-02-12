@@ -14,8 +14,24 @@ export class ParameterService {
   // Récupère tous les paramètres
   async findAll() {
     return this.parameterRepository.find({
-      relations: { type_parameter: true },
+      relations: { type_parameter: true,  },
     });
+  }
+
+  async findAllBySlug(typeParmaSlug: string) {
+    return this.parameterRepository.find({ where: { type_parameter: {slug: typeParmaSlug}  },
+      relations: { type_parameter: true  },
+    });
+  }
+
+  
+  // Récupère un paramètre par son slug
+  async findOneBySlug(slug: string) {
+    const parameter = await this.parameterRepository.findOne({ where: { slug }, relations: ['type_parameter'] });
+    if (!parameter) {
+      throw new NotFoundException(`Parameter with slug ${slug} not found`);
+    }
+    return parameter;
   }
 
   // Récupère les paramètres en fonction du type
@@ -25,6 +41,7 @@ export class ParameterService {
       relations: { type_parameter: true },
     });
   }
+  
 
   // Créer un nouveau paramètre
   async create(createParameterDto: CreateParameterDto) {

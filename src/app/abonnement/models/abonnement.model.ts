@@ -1,6 +1,6 @@
 import { Paiements } from 'src/app/paiement/models/paiement.model';
+import { Parameter } from 'src/app/parameter/models/parameter.model';
 import { Parents } from 'src/app/parent/models/parent.model';
-import { settingSubscriptionTypes } from 'src/app/setting/models/setting_subscription_type.model';
 import { User } from 'src/app/user/user.model';
 import {
   Entity,
@@ -23,10 +23,10 @@ export class Abonnements {
   paiement: Paiements;
   
 
-  @ManyToOne(() => settingSubscriptionTypes, (SN) => SN.abonnement, {
+  @ManyToOne(() => Parameter, (parameter) => parameter.type_abonnements, {
      onDelete: 'CASCADE',
   })
-  type: settingSubscriptionTypes;
+  type: Parameter;
 
   @ManyToOne(() => User, (user) => user.abonnement, {
      onDelete: 'CASCADE',

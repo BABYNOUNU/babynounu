@@ -33,7 +33,7 @@ __decorate([
     __metadata("design:type", user_model_1.User)
 ], JobApplication.prototype, "user", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => job_model_1.Job, (job) => job.job_application, { onDelete: 'CASCADE' }),
+    (0, typeorm_1.ManyToOne)(() => job_model_1.Job, (job) => job.jobApplications, { onDelete: 'CASCADE' }),
     __metadata("design:type", job_model_1.Job)
 ], JobApplication.prototype, "jobs", void 0);
 __decorate([

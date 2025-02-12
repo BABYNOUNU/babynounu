@@ -8,8 +8,7 @@ import { SlugUtils } from 'src/utils/slug.utils';
 import * as bcryptjs from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { Roles } from '../role/models/role.model';
-import { Nounus } from '../nounu/models/nounu.model';
-import { SettingTypeProfil } from '../setting/models/setting_type_profil.model';
+import { Parameter } from '../parameter/models/parameter.model';
 
 @Injectable()
 export class AuthService {
@@ -18,12 +17,8 @@ export class AuthService {
     private readonly userRepository: Repository<User>,
     @Inject('ROLE_REPOSITORY')
     private readonly roleRepository: Repository<Roles>,
-    @Inject('NOUNU_REPOSITORY')
-    private readonly nounuRepository: Repository<Nounus>,
-    @Inject('PARENT_REPOSITORY')
-    private readonly parentRepository: Repository<Nounus>,
-    @Inject('TYPE_PROFIL_REPOSITORY')
-    private readonly settingTypeProfil: Repository<SettingTypeProfil>,
+    @Inject('PARAMETER_PROFILE_REPOSITORY')
+    private readonly paremeterProfileRepository: Repository<Parameter>,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -44,13 +39,17 @@ export class AuthService {
     }
 
     // Checked if role exist
-    const isRole = await this.roleRepository.findOne({ where: { id: signUpBody.role } })
+    const isRole = await this.paremeterProfileRepository.findOne({
+      where: { slug: signUpBody.role },
+    });
     if (!isRole) {
       throw new BadRequestException('The role enter not exists');
     }
 
     // Checked if type_profil exist
-    const isTypeProfil = await this.settingTypeProfil.findOne({ where: { id: signUpBody.type_profil } })
+    const isTypeProfil = await this.paremeterProfileRepository.findOne({
+      where: { slug: signUpBody.type_profil }, 
+    });
     if (!isTypeProfil) {
       throw new BadRequestException('The type_profil enter not exists');
     }
@@ -63,8 +62,8 @@ export class AuthService {
       slug: signUpBody.slug,
       email: signUpBody.email,
       password: signUpBody.password,
-      role: isRole,
-      type_profil: isTypeProfil
+      role: {id: isRole.id},
+      type_profil: {id: isTypeProfil.id}
     });
     const userSave = await this.userRepository.save(newUser);
     if (!userSave) {
@@ -72,13 +71,14 @@ export class AuthService {
     }
 
     const User = await this.userRepository.findOne({
-      where: { id: user?.id }, relations: ['type_profil', 'parent', 'nounu']
-    })
+      where: { id: userSave?.id },
+      relations: ['parent', 'type_profil', 'role'],
+    });
 
     // RETURN DATA USER CREATE
     return {
       user: {
-        ...User,
+        ...User, 
         access_token: (await this.authentificate(userSave)).access_token,
       },
     };
@@ -88,10 +88,13 @@ export class AuthService {
   async signIn({ signInBody }: { signInBody: SginInAuthDto }) {
     // CHECK IF USER ALREADY EXISTS
     const user = await this.userRepository.findOne({
-      where: { email: signInBody.email }, relations: ['type_profil',]
+      where: { email: signInBody.email },
+      relations: ['type_profil'],
     });
     if (!user) {
-      throw new BadRequestException("L'addresse email ou mot de passe est incorrect"); 
+      throw new BadRequestException(
+        "L'addresse email ou mot de passe est incorrect",
+      );
     }
 
     // CHECK IF PASSWORD IS CORRECT
@@ -100,22 +103,23 @@ export class AuthService {
       user.password,
     );
     if (!isPasswordCorrect) {
-      throw new BadRequestException("L'addresse email ou mot de passe est incorrect");
+      throw new BadRequestException(
+        "L'addresse email ou mot de passe est incorrect",
+      );
     }
 
     //Verify if nounu or parent exist
     const isUserExist = await this.userRepository.findOne({
-      where: { id: user?.id }, relations: ['type_profil', 'parent', 'nounu']
-    })
-      
+      where: { id: user?.id },
+      relations: ['type_profil', 'parent'],
+    });
 
     // RETURN DATA USER CREATE
-    console.log(isUserExist.nounu, isUserExist.parent);
     return {
       user: {
         ...user,
         access_token: (await this.authentificate(user)).access_token,
-        profil: isUserExist.nounu ? isUserExist.nounu : isUserExist.parent ? isUserExist.parent  : null 
+        profil: isUserExist.parent,
       },
     };
   }

@@ -16,11 +16,9 @@ exports.RoleService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("typeorm");
 const slug_utils_1 = require("../../utils/slug.utils");
-const general_service_1 = require("../setting/_partiels/general.service");
-let RoleService = class RoleService extends general_service_1.SettingGeneraleService {
+let RoleService = class RoleService {
     roleRepository;
     constructor(roleRepository) {
-        super();
         this.roleRepository = roleRepository;
     }
     async role(roleWhereUniqueInput) {
@@ -53,7 +51,7 @@ let RoleService = class RoleService extends general_service_1.SettingGeneraleSer
         };
     }
     async updateRole(updateRoleBody, { slug }) {
-        await this.Verify_slug(this.roleRepository, { slug });
+        await new slug_utils_1.SlugUtils().all(slug, this.roleRepository);
         const updateRole = await this.roleRepository.update({ slug }, {
             name: updateRoleBody.name,
             description: updateRoleBody.description,
@@ -66,7 +64,7 @@ let RoleService = class RoleService extends general_service_1.SettingGeneraleSer
         };
     }
     async deleteRole({ slug }) {
-        await this.Verify_slug(this.roleRepository, { slug });
+        await new slug_utils_1.SlugUtils().all(slug, this.roleRepository);
         const deleteRole = await this.roleRepository.delete({ slug });
         if (!deleteRole.affected) {
             throw new common_1.BadRequestException({ message: 'Role not deleted' });

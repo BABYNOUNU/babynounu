@@ -21,16 +21,12 @@ const jwt_1 = require("@nestjs/jwt");
 let AuthService = class AuthService {
     userRepository;
     roleRepository;
-    nounuRepository;
-    parentRepository;
-    settingTypeProfil;
+    paremeterProfileRepository;
     jwtService;
-    constructor(userRepository, roleRepository, nounuRepository, parentRepository, settingTypeProfil, jwtService) {
+    constructor(userRepository, roleRepository, paremeterProfileRepository, jwtService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
-        this.nounuRepository = nounuRepository;
-        this.parentRepository = parentRepository;
-        this.settingTypeProfil = settingTypeProfil;
+        this.paremeterProfileRepository = paremeterProfileRepository;
         this.jwtService = jwtService;
     }
     async signUp({ signUpBody }) {
@@ -41,11 +37,15 @@ let AuthService = class AuthService {
         if (user) {
             throw new common_1.BadRequestException('User already exists');
         }
-        const isRole = await this.roleRepository.findOne({ where: { id: signUpBody.role } });
+        const isRole = await this.paremeterProfileRepository.findOne({
+            where: { slug: signUpBody.role },
+        });
         if (!isRole) {
             throw new common_1.BadRequestException('The role enter not exists');
         }
-        const isTypeProfil = await this.settingTypeProfil.findOne({ where: { id: signUpBody.type_profil } });
+        const isTypeProfil = await this.paremeterProfileRepository.findOne({
+            where: { slug: signUpBody.type_profil },
+        });
         if (!isTypeProfil) {
             throw new common_1.BadRequestException('The type_profil enter not exists');
         }
@@ -54,15 +54,16 @@ let AuthService = class AuthService {
             slug: signUpBody.slug,
             email: signUpBody.email,
             password: signUpBody.password,
-            role: isRole,
-            type_profil: isTypeProfil
+            role: { id: isRole.id },
+            type_profil: { id: isTypeProfil.id }
         });
         const userSave = await this.userRepository.save(newUser);
         if (!userSave) {
             throw new common_1.BadRequestException({ message: 'User not created' });
         }
         const User = await this.userRepository.findOne({
-            where: { id: user?.id }, relations: ['type_profil', 'parent', 'nounu']
+            where: { id: userSave?.id },
+            relations: ['parent', 'type_profil', 'role'],
         });
         return {
             user: {
@@ -73,7 +74,8 @@ let AuthService = class AuthService {
     }
     async signIn({ signInBody }) {
         const user = await this.userRepository.findOne({
-            where: { email: signInBody.email }, relations: ['type_profil',]
+            where: { email: signInBody.email },
+            relations: ['type_profil'],
         });
         if (!user) {
             throw new common_1.BadRequestException("L'addresse email ou mot de passe est incorrect");
@@ -83,14 +85,14 @@ let AuthService = class AuthService {
             throw new common_1.BadRequestException("L'addresse email ou mot de passe est incorrect");
         }
         const isUserExist = await this.userRepository.findOne({
-            where: { id: user?.id }, relations: ['type_profil', 'parent', 'nounu']
+            where: { id: user?.id },
+            relations: ['type_profil', 'parent'],
         });
-        console.log(isUserExist.nounu, isUserExist.parent);
         return {
             user: {
                 ...user,
                 access_token: (await this.authentificate(user)).access_token,
-                profil: isUserExist.nounu ? isUserExist.nounu : isUserExist.parent ? isUserExist.parent : null
+                profil: isUserExist.parent,
             },
         };
     }
@@ -112,12 +114,8 @@ exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)('USER_REPOSITORY')),
     __param(1, (0, common_1.Inject)('ROLE_REPOSITORY')),
-    __param(2, (0, common_1.Inject)('NOUNU_REPOSITORY')),
-    __param(3, (0, common_1.Inject)('PARENT_REPOSITORY')),
-    __param(4, (0, common_1.Inject)('TYPE_PROFIL_REPOSITORY')),
+    __param(2, (0, common_1.Inject)('PARAMETER_PROFILE_REPOSITORY')),
     __metadata("design:paramtypes", [typeorm_1.Repository,
-        typeorm_1.Repository,
-        typeorm_1.Repository,
         typeorm_1.Repository,
         typeorm_1.Repository,
         jwt_1.JwtService])
