@@ -50,7 +50,7 @@ export class UserService {
   }
 
   async loggedUser(ID: any): Promise<User | null> {
-    const User = await this.userRepository.findOne({ where: { id: ID }, relations: ['role', 'type_profil', 'parent', 'abonnement'] });
+    const User = await this.userRepository.findOne({ where: { id: ID }, relations: ['role', 'type_profil', 'parent', 'nounu', 'abonnement'] });
     if (!User) {
       throw new BadRequestException({ message: 'user not exist in database' });
     }

@@ -51,7 +51,7 @@ let UserService = class UserService {
         return { message: 'User deleted' };
     }
     async loggedUser(ID) {
-        const User = await this.userRepository.findOne({ where: { id: ID }, relations: ['role', 'type_profil', 'parent', 'abonnement'] });
+        const User = await this.userRepository.findOne({ where: { id: ID }, relations: ['role', 'type_profil', 'parent', 'nounu', 'abonnement'] });
         if (!User) {
             throw new common_1.BadRequestException({ message: 'user not exist in database' });
         }
