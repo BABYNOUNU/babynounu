@@ -46,11 +46,11 @@ __decorate([
     __metadata("design:type", String)
 ], Medias.prototype, "originalUrl", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => user_model_1.User, (user) => user.medias),
+    (0, typeorm_1.ManyToOne)(() => user_model_1.User, (user) => user.medias, { onDelete: 'CASCADE' }),
     __metadata("design:type", user_model_1.User)
 ], Medias.prototype, "user", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => job_model_1.Job, (job) => job.medias),
+    (0, typeorm_1.ManyToOne)(() => job_model_1.Job, (job) => job.medias, { onDelete: 'CASCADE' }),
     __metadata("design:type", job_model_1.Job)
 ], Medias.prototype, "job", void 0);
 __decorate([

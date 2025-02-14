@@ -50,7 +50,8 @@ export class UserService {
   }
 
   async loggedUser(ID: any): Promise<User | null> {
-    const User = await this.userRepository.findOne({ where: { id: ID }, relations: ['role', 'medias', 'type_profil', 'parent', 'nounu', 'nounu.preferences.adress', 'abonnement'] });
+    const User = await this.userRepository.findOne({ where: { id: ID }, relations: ['role', 'medias.type_media', 'type_profil', 'parent', 'nounu', 'nounu.preferences.adress', 'parent.preferences.adress', 'abonnement'] });
+    console.log(User)
     if (!User) {
       throw new BadRequestException({ message: 'user not exist in database' });
     }
@@ -72,15 +73,18 @@ export class UserService {
 
         data[type_profil][0]?.preferences?.forEach((pref) => {
           preferenceKey.forEach((key) => {
-            console.log(pref[key])
             if (pref[key]) aggregatedPreferences[key].push(pref[key]);
           });
         });
 
-        data.nounu[0].preferences = aggregatedPreferences
+        data[type_profil][0].preferences = aggregatedPreferences
+
+        const profil = data.nounu.length > 0 ? data.nounu[0] : data.parent[0];
+        profil.image = data.medias.find((media) => media.type_media?.slug === 'image-profil');
   
         return {
           ...data,
+          profil,
           image: data.medias.find(
             (media) => media.type_media?.slug === 'image-profil',
           )

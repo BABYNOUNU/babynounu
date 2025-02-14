@@ -84,7 +84,7 @@ let ParentsService = class ParentsService {
                 originalName: imageParent.originalname,
                 filename: imageParent.filename,
                 path: imageParent.path,
-                originalUrl: `${database_providers_1.HOST}/${imageParent.filename}`,
+                originalUrl: `${database_providers_1.HOST}/uploads/${imageParent.filename}`,
                 userId: userId,
                 typeMedia: 'image-profil',
             });

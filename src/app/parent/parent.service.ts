@@ -96,7 +96,7 @@ export class ParentsService {
         originalName: imageParent.originalname,
         filename: imageParent.filename,
         path: imageParent.path,
-        originalUrl: `${HOST}/${imageParent.filename}`,
+        originalUrl: `${HOST}/uploads/${imageParent.filename}`,
         userId: userId,
         typeMedia: 'image-profil',
       });

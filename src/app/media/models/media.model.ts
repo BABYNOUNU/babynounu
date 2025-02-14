@@ -22,10 +22,10 @@ export class Medias {
   @Column({nullable: true})
   originalUrl: string;
 
-  @ManyToOne(() => User, (user) => user.medias)
+  @ManyToOne(() => User, (user) => user.medias, {onDelete: 'CASCADE'})
   user: User;
 
-  @ManyToOne(() => Job, (job) => job.medias)
+  @ManyToOne(() => Job, (job) => job.medias, {onDelete: 'CASCADE'})
   job: Job;
 
 
