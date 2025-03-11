@@ -9,7 +9,7 @@ export declare class NounusController {
     create(createNounuDto: CreateNounuDto, files: any): Promise<Nounus>;
     findAll(userId: string): Promise<Nounus[]>;
     findOne(id: number): Promise<Nounus>;
-    update(id: number, updateNounuDto: UpdateNounuDto, files: any): Promise<Nounus>;
+    update(id: string, updateNounuDto: UpdateNounuDto, files: any): Promise<Nounus>;
     remove(id: number): Promise<void>;
     searchNounu(searchCriteria: SearchNounuCriteriaDto): Promise<any[]>;
 }

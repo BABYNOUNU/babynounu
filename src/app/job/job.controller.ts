@@ -74,7 +74,7 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
       return this.jobsService.findAllJobByUser(userId);
     }
   
-    @Post(':id')
+    @Post('update/:id')
     @UseInterceptors(
       FileFieldsInterceptor(
         [

@@ -48,6 +48,7 @@ let JobsService = class JobsService {
         'preferences.certifications_criteres',
         'preferences.zone_de_travail',
         'preferences.type_services',
+        'preferences.taches',
         'jobApplications',
     ];
     preferenceKeys = [
@@ -168,14 +169,14 @@ let JobsService = class JobsService {
             negociable: jobData.negociable === 'true' ? true : false,
             dateDebut: jobData.date_debut || existingJob.dateDebut,
             missionUrgente: jobData.mission_urgente === 'true' ? true : false,
-            descriptionComplementaire: jobData.description_complementaire || existingJob.descriptionComplementaire,
+            descriptionComplementaire: jobData.description_complementaire ||
+                existingJob.descriptionComplementaire,
             user: { id: user_id || existingJob.user.id },
         });
         if (!updatedJob) {
             throw new common_1.BadRequestException('Job not updated');
         }
         if (files.Images_videos?.length > 0) {
-            await this.mediaService.deleteManyJob({ JobId: updatedJob.id.toString(), typeMedia: 'image-video-presentation' });
             const Images_videos = files.Images_videos;
             Images_videos.forEach(async (file) => {
                 await this.mediaService.create({
@@ -193,6 +194,11 @@ let JobsService = class JobsService {
             const value = JSON.parse(updateJobDto[key]);
             if (value != undefined && Array.isArray(value)) {
                 await this.preferenceRepository.delete({ jobs: updatedJob });
+            }
+        }
+        for (const key of preferenceKeys) {
+            const value = JSON.parse(updateJobDto[key]);
+            if (value != undefined && Array.isArray(value)) {
                 const preferenceEntities = value.map((el) => ({
                     jobs: updatedJob,
                     [key]: el.id,

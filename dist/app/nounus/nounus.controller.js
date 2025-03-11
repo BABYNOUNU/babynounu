@@ -37,7 +37,7 @@ let NounusController = class NounusController {
         return await this.nounuService.findOne(id);
     }
     async update(id, updateNounuDto, files) {
-        return await this.nounuService.update(id.toString(), updateNounuDto, files);
+        return await this.nounuService.update(id, updateNounuDto, files);
     }
     async remove(id) {
         return await this.nounuService.remove(id);
@@ -101,7 +101,7 @@ __decorate([
     __param(1, (0, common_1.Body)()),
     __param(2, (0, common_1.UploadedFiles)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, update_nounu_dto_1.UpdateNounuDto, Object]),
+    __metadata("design:paramtypes", [String, update_nounu_dto_1.UpdateNounuDto, Object]),
     __metadata("design:returntype", Promise)
 ], NounusController.prototype, "update", null);
 __decorate([

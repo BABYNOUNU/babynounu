@@ -21,6 +21,7 @@ export declare class Preference {
     zone_geographique_prestataire: Parameter[];
     competance_specifique: Parameter[];
     mode_de_paiement: Parameter[];
+    taches: Parameter[];
     langue_parler: Parameter[];
     criteres_selections: Parameter[];
     parents: Parents;

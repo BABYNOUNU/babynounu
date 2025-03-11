@@ -44,11 +44,11 @@ export class AbonnementService {
       where: { user: { id: createAbonnementDto.userId }, paiement: { id: paiement.id } },
     });
 
-    if (!IsAbonnementExist) {
-      throw new NotFoundException(
-        `Auccun abonnement avec l'ID de transaction ${createAbonnementDto.transactionId} n'a pas été rencontré`,
-      );
-    }
+    // if (!IsAbonnementExist) {
+    //   throw new NotFoundException(
+    //     `Auccun abonnement avec l'ID de transaction ${createAbonnementDto.transactionId} n'a pas été rencontré`,
+    //   );
+    // }
 
     if (IsAbonnementExist) {
       return IsAbonnementExist

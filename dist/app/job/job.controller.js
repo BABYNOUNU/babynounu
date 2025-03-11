@@ -98,7 +98,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], JobsController.prototype, "findAllJobByUser", null);
 __decorate([
-    (0, common_1.Post)(':id'),
+    (0, common_1.Post)('update/:id'),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileFieldsInterceptor)([
         { name: 'Images_videos', maxCount: 10 },
     ], {

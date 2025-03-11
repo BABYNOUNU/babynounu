@@ -78,10 +78,10 @@ import { SearchNounuCriteriaDto } from './dtos/search-nounu-criteria.dto';
     @ApiResponse({ status: 200, description: 'Nounus updated successfully', type: Nounus })
     @ApiResponse({ status: 404, description: 'Nounus not found' })
     async update(
-      @Param('id') id: number,
+      @Param('id') id: string,
       @Body() updateNounuDto: UpdateNounuDto, @UploadedFiles() files
     ): Promise<Nounus> {
-      return await this.nounuService.update(id.toString(), updateNounuDto, files);
+      return await this.nounuService.update(id, updateNounuDto, files);
     }
   
     @Delete(':id')
