@@ -29,6 +29,9 @@ export class Job {
   @Column({  type: 'text' })
   moyens_de_contact: string;
 
+  @Column({  type: 'boolean', default: false  })
+  combinaison_service: boolean;
+
   @Column({ name: 'inclus_weekend', type: 'boolean', default: false })
   inclusWeekend: boolean;
 

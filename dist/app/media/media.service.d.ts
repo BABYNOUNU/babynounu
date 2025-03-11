@@ -10,6 +10,17 @@ export declare class MediaService {
     create(createMediaDto: CreateMediaDto): Promise<Medias>;
     findOne(id: number): Promise<Medias | undefined>;
     findAll(): Promise<Medias[]>;
-    update(id: number, updateMediaDto: UpdateMediaDto): Promise<Medias | undefined>;
-    remove(id: number): Promise<void>;
+    update({ id, typeMedia }: {
+        id: string;
+        typeMedia: string;
+    }, updateMediaDto: UpdateMediaDto): Promise<Medias | undefined>;
+    deleteMany({ userId, typeMedia }: {
+        userId: string;
+        typeMedia: string;
+    }): Promise<void>;
+    deleteManyJob({ JobId, typeMedia }: {
+        JobId: string;
+        typeMedia: string;
+    }): Promise<void>;
+    remove(id: string): Promise<Medias>;
 }

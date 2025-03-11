@@ -35,8 +35,6 @@ let ChatGateway = class ChatGateway {
     }
     async handleMessage(data, client) {
         const { sender, content, room } = data;
-        const message = await this.chatService.saveMessage(sender, content, room);
-        this.server.to(room).emit('newMessage', message);
     }
 };
 exports.ChatGateway = ChatGateway;

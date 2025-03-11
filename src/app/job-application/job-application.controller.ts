@@ -53,4 +53,14 @@ export class JobApplicationController {
   remove(@Param('id') id: string) {
     return this.jobApplicationService.remove(+id);
   }
+
+  @Get('user/:userId')
+  @ApiOperation({ summary: 'Récupérer les candidatures d\'un utilisateur par ID' })
+  @ApiParam({ name: 'userId', description: 'ID de l\'utilisateur', example: '1' })
+  @ApiResponse({ status: 200, description: 'Liste des candidatures de l\'utilisateur.', type: [JobApplication] })
+  @ApiResponse({ status: 404, description: 'Utilisateur non trouvé ou aucune candidature.' })
+  getJobApplyByUser(@Param('userId') userId: string) {
+    return this.jobApplicationService.getJobApplyByUser(userId);
+  }
+
 }

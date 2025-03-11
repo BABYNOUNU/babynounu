@@ -8,6 +8,7 @@ export declare class Job {
     titre: string;
     description: string;
     moyens_de_contact: string;
+    combinaison_service: boolean;
     inclusWeekend: boolean;
     nombreEnfants?: string;
     experience_minimun: boolean;

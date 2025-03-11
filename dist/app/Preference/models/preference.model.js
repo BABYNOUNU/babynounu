@@ -33,6 +33,7 @@ let Preference = class Preference {
     disponibility_du_prestataire;
     zone_geographique_prestataire;
     competance_specifique;
+    mode_de_paiement;
     langue_parler;
     criteres_selections;
     parents;
@@ -111,6 +112,10 @@ __decorate([
     (0, typeorm_1.ManyToOne)(() => parameter_model_1.Parameter, { onDelete: 'CASCADE' }),
     __metadata("design:type", Array)
 ], Preference.prototype, "competance_specifique", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => parameter_model_1.Parameter, { onDelete: 'CASCADE' }),
+    __metadata("design:type", Array)
+], Preference.prototype, "mode_de_paiement", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => parameter_model_1.Parameter, { onDelete: 'CASCADE' }),
     __metadata("design:type", Array)

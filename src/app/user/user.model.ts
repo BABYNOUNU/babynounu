@@ -43,12 +43,10 @@ export class User {
   
 
   @OneToMany(() => Nounus,  (nounu) => nounu.user, { cascade: true})
-  @JoinColumn()
-  nounu: Nounus;
+  nounu: Nounus[];
 
   @OneToMany(() => Parents, (parent) => parent.user, { cascade: true })
-  @JoinColumn()
-  parent: Parents;
+  parent: Parents[];
 
   @OneToMany(() => Abonnements, (abonnement) => abonnement.user, {
     cascade: true,

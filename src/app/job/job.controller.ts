@@ -74,15 +74,25 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
       return this.jobsService.findAllJobByUser(userId);
     }
   
-    @Patch(':id')
+    @Post(':id')
+    @UseInterceptors(
+      FileFieldsInterceptor(
+        [
+          { name: 'Images_videos', maxCount: 10 },
+        ],
+        {
+          storage: storageMedia
+        }
+      )
+    )
     @ApiOperation({ summary: 'Update a job posting' })
     @ApiParam({ name: 'id', type: Number }) // Paramètre de route
     @ApiBody({ type: UpdateJobDto }) // Schéma du corps de la requête
     @ApiResponse({ status: 200, description: 'Job updated successfully' })
     @ApiResponse({ status: 404, description: 'Job not found' })
     @UsePipes(new ValidationPipe())
-    async updateJob(@Param('id') id: number, @Body() updateJobDto: UpdateJobDto) {
-      return this.jobsService.updateJob(id, updateJobDto);
+    async updateJob(@Param('id') id: number, @Body() updateJobDto: UpdateJobDto, @UploadedFiles() files) {
+      return this.jobsService.updateJob(id.toString(), updateJobDto, files);
     }
   
     @Post('delete/:id')
@@ -93,4 +103,14 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
     async deleteJob(@Param('id') id: number) {
       return this.jobsService.deleteJob(id);
     }
+
+@Get('job-applications/user/:userId')
+@ApiOperation({ summary: 'Get job applications by user ID' })
+@ApiParam({ name: 'userId', type: String }) // Paramètre de route
+@ApiResponse({ status: 200, description: 'Job applications retrieved successfully' })
+@ApiResponse({ status: 404, description: 'User not found or no job applications' })
+async getJobApplyByUserId(@Param('userId') userId: string) {
+  return this.jobsService.getJobApplyByUserId(userId);
+}
+
   }

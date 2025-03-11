@@ -80,6 +80,7 @@ let NounusService = class NounusService {
             'tranche_age_enfants',
             'competance_specifique',
             'langue_parler',
+            'certifications_criteres'
         ];
         for (const key of preferenceKeys) {
             const value = JSON.parse(createNounuDto[key]);
@@ -93,20 +94,28 @@ let NounusService = class NounusService {
         }
         return savedNounu;
     }
-    async findAll() {
-        const nounus = await this.nounuRepository
-            .createQueryBuilder('nounu')
-            .leftJoinAndSelect('nounu.user', 'user')
-            .leftJoinAndSelect('user.medias', 'medias')
-            .leftJoinAndSelect('medias.type_media', 'type_media')
-            .leftJoinAndSelect('nounu.preferences', 'preferences')
-            .leftJoinAndSelect('preferences.zone_de_travail', 'zone_de_travail')
-            .leftJoinAndSelect('preferences.horaire_disponible', 'horaire_disponible')
-            .leftJoinAndSelect('preferences.adress', 'adress')
-            .leftJoinAndSelect('preferences.tranche_age_enfants', 'tranche_age_enfants')
-            .leftJoinAndSelect('preferences.competance_specifique', 'competance_specifique')
-            .leftJoinAndSelect('preferences.langue_parler', 'langue_parler')
-            .getMany();
+    async findAll(userId) {
+        console.log(userId);
+        const nounus = await this.nounuRepository.find({
+            relations: [
+                'user',
+                'user.medias',
+                'user.medias.type_media',
+                'preferences',
+                'preferences.zone_de_travail',
+                'preferences.horaire_disponible',
+                'preferences.adress',
+                'preferences.tranche_age_enfants',
+                'preferences.competance_specifique',
+                'preferences.langue_parler',
+                'preferences.certifications_criteres',
+            ],
+            where: {
+                user: {
+                    id: (0, typeorm_1.Not)(userId.userId),
+                },
+            },
+        });
         return await this.ReturnN(nounus, [
             'zone_de_travail',
             'horaire_disponible',
@@ -128,6 +137,7 @@ let NounusService = class NounusService {
                 'preferences.adress',
                 'preferences.tranche_age_enfants',
                 'preferences.competance_specifique',
+                'preferences.certifications_criteres',
                 'preferences.langue_parler',
                 'user.medias.type_media',
             ],
@@ -142,17 +152,127 @@ let NounusService = class NounusService {
             'tranche_age_enfants',
             'competance_specifique',
             'langue_parler',
+            'certifications_criteres'
         ]);
         return nounuOne[0];
     }
-    async update(id, updateNounuDto) {
-        const nounu = await this.findOne(id);
-        Object.assign(nounu, updateNounuDto);
-        return await this.nounuRepository.save(nounu);
+    async update(id, updateNounuDto, files) {
+        const { userId, ...nounuData } = updateNounuDto;
+        const existingNounu = await this.nounuRepository.findOne({
+            where: { id: +id },
+            relations: ['user'],
+        });
+        if (!existingNounu) {
+            throw new common_1.NotFoundException('Nounu not found');
+        }
+        const updatedNounu = await this.nounuRepository.save({
+            ...existingNounu,
+            ...nounuData,
+            urgences: nounuData.urgences === 'true' ? true : false,
+            flexibilite_tarifaire: nounuData.flexibilite_tarifaire === 'true' ? true : false,
+            user: { id: userId },
+        });
+        if (!updatedNounu) {
+            throw new common_1.BadRequestException('Nounu not updated');
+        }
+        if (files.imageNounu?.length > 0) {
+            const imageNounu = files.imageNounu[0];
+            await this.mediaService.update({ id: existingNounu.user.id, typeMedia: 'image-profil' }, {
+                originalName: imageNounu.originalname,
+                filename: imageNounu.filename,
+                path: imageNounu.path,
+                originalUrl: `${database_providers_1.HOST}/uploads/${imageNounu.filename}`,
+            });
+        }
+        if (files.documents?.length > 0) {
+            for (const document of files.documents) {
+                await this.mediaService.create({
+                    originalName: document.originalname,
+                    filename: document.filename,
+                    path: document.path,
+                    originalUrl: `${database_providers_1.HOST}/uploads/${document.filename}`,
+                    userId: userId,
+                    typeMedia: 'document-verification',
+                });
+            }
+        }
+        if (files.gallery?.length > 0) {
+            for (const gallery of files.gallery) {
+                await this.mediaService.create({
+                    originalName: gallery.originalname,
+                    filename: gallery.filename,
+                    path: gallery.path,
+                    originalUrl: `${database_providers_1.HOST}/uploads/${gallery.filename}`,
+                    userId: userId,
+                    typeMedia: 'gallery-image',
+                });
+            }
+        }
+        const preferenceKeys = [
+            'zone_de_travail',
+            'horaire_disponible',
+            'adress',
+            'tranche_age_enfants',
+            'competance_specifique',
+            'langue_parler',
+            'certifications_criteres'
+        ];
+        for (const key of preferenceKeys) {
+            const value = JSON.parse(updateNounuDto[key]);
+            if (Array.isArray(value)) {
+                await this.preferenceRepository.delete({ nounus: updatedNounu });
+            }
+        }
+        for (const key of preferenceKeys) {
+            const value = JSON.parse(updateNounuDto[key]);
+            if (Array.isArray(value)) {
+                const preferenceEntities = value.map((el) => ({
+                    nounus: updatedNounu,
+                    [key]: el.id,
+                }));
+                await this.preferenceRepository.save(preferenceEntities);
+            }
+        }
+        return updatedNounu;
     }
     async remove(id) {
         const nounu = await this.findOne(id);
         await this.nounuRepository.remove(nounu);
+    }
+    async search(searchCriteria) {
+        const { fullname, description, zone_de_travail, horaire_disponible, adress, tranche_age_enfants, competance_specifique, langue_parler, } = searchCriteria;
+        const whereConditions = {};
+        if (fullname) {
+            whereConditions.fullname = (0, typeorm_1.Like)(`%${fullname}%`);
+        }
+        const nounus = await this.nounuRepository.find({
+            where: {
+                ...whereConditions,
+            },
+            relations: [
+                'user',
+                'user.medias',
+                'user.medias.type_media',
+                'preferences',
+                'preferences.zone_de_travail',
+                'preferences.horaire_disponible',
+                'preferences.adress',
+                'preferences.tranche_age_enfants',
+                'preferences.competance_specifique',
+                'preferences.langue_parler',
+                'preferences.certifications_criteres',
+            ],
+        });
+        const nounuOne = await this.ReturnN(nounus, [
+            'zone_de_travail',
+            'horaire_disponible',
+            'adress',
+            'tranche_age_enfants',
+            'competance_specifique',
+            'langue_parler',
+            'certifications_criteres'
+        ]);
+        return nounuOne;
     }
     async ReturnN(datas, preferenceKey) {
         return datas.map((data) => {

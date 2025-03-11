@@ -67,13 +67,11 @@ __decorate([
 ], User.prototype, "type_profil", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => nounu_model_1.Nounus, (nounu) => nounu.user, { cascade: true }),
-    (0, typeorm_1.JoinColumn)(),
-    __metadata("design:type", nounu_model_1.Nounus)
+    __metadata("design:type", Array)
 ], User.prototype, "nounu", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => parent_model_1.Parents, (parent) => parent.user, { cascade: true }),
-    (0, typeorm_1.JoinColumn)(),
-    __metadata("design:type", parent_model_1.Parents)
+    __metadata("design:type", Array)
 ], User.prototype, "parent", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => abonnement_model_1.Abonnements, (abonnement) => abonnement.user, {

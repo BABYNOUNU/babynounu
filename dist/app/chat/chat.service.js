@@ -20,12 +20,18 @@ let ChatService = class ChatService {
     constructor(messageRepository) {
         this.messageRepository = messageRepository;
     }
-    async saveMessage(sender, content, room) {
-        const message = this.messageRepository.create({ sender, content, room });
+    async saveMessage(sendMessageDto) {
+        const message = this.messageRepository.create({});
         return this.messageRepository.save(message);
     }
     async getMessages(room) {
         return this.messageRepository.find({ where: { room }, order: { createdAt: 'ASC' } });
+    }
+    async listRooms() {
+        return this.messageRepository.createQueryBuilder('chat')
+            .select('DISTINCT chat.room')
+            .getRawMany()
+            .then(data => data.map(x => x.room));
     }
 };
 exports.ChatService = ChatService;

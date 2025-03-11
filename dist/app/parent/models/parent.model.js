@@ -61,7 +61,6 @@ __decorate([
 ], Parents.prototype, "preferences", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => user_model_1.User, (user) => user.parent, { onDelete: 'CASCADE' }),
-    (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", user_model_1.User)
 ], Parents.prototype, "user", void 0);
 __decorate([

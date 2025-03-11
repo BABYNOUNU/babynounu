@@ -45,7 +45,6 @@ export class Parents {
   preferences: Preference[];
 
   @ManyToOne(() => User, (user) => user.parent, { onDelete: 'CASCADE' })
-  @JoinColumn() 
   user: User;
 
   @Column({ type: 'text', nullable: true }) 

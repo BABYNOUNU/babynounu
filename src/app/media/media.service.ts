@@ -40,14 +40,41 @@ export class MediaService {
   }
 
   async update(
-    id: number,
+    {id, typeMedia}: {id: string, typeMedia: string},
     updateMediaDto: UpdateMediaDto,
   ): Promise<Medias | undefined> {
-    await this.mediaRepository.update(id, updateMediaDto);
-    return this.findOne(id); // Return the updated entity
+
+    const media = await this.mediaRepository.find({where: {user: { id}, type_media: {slug: typeMedia}} });
+
+    if (!media) {
+      throw new Error('Media not found');
+    }
+
+    for (let i = 0; i < media.length; i++) {
+      const el = media[i];
+      await this.mediaRepository.update(el.id, updateMediaDto);
+    }
+
+    return this.findOne(+id); // Return the updated entity
   }
 
-  async remove(id: number): Promise<void> {
+  async deleteMany({ userId, typeMedia }: { userId: string, typeMedia: string }): Promise<void> {
+    await this.mediaRepository.delete({ user: { id: userId }, type_media: { slug: typeMedia } });
+  }
+
+  async deleteManyJob({ JobId, typeMedia }: { JobId: string, typeMedia: string }): Promise<void> {
+    await this.mediaRepository.delete({job: {id: +JobId}, type_media: {slug: typeMedia}});
+  }
+
+
+  async remove(id: string): Promise<Medias> {
+
+    const media = await this.mediaRepository.findOne({ where: { id: id.toString() } });
+
+    if(!media) {
+      throw new Error('Media not found');
+    }
     await this.mediaRepository.delete(id);
+    return media
   }
 }

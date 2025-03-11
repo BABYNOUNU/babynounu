@@ -14,8 +14,7 @@ export declare class CreateParentDto {
     zone_geographique_prestataire?: any;
     competance_specifique?: any;
     langue_parler?: any;
+    mode_de_paiement?: any;
     informations_complementaires?: string;
     userId: string;
-}
-export declare class UpdateParentDto extends CreateParentDto {
 }

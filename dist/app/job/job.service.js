@@ -64,6 +64,7 @@ let JobsService = class JobsService {
         'equipement_menager',
         'certifications_criteres',
         'criteres_selections',
+        'taches',
     ];
     async createJob(createJobDto, files) {
         const { user_id, ...jobData } = createJobDto;
@@ -141,17 +142,86 @@ let JobsService = class JobsService {
         if (!jobUser) {
             throw new common_1.NotFoundException(`Job with ID ${jobUser} not found`);
         }
-        return jobUser;
+        console.log(jobUser);
+        const DataJob = await this.ReturnN(jobUser, this.preferenceKeys);
+        return DataJob;
     }
-    async updateJob(id, updateJobDto) {
-        const job = await this.findJobById(id)[0];
-        Object.assign(job, updateJobDto);
-        return this.jobRepository.save(job);
+    async updateJob(id, updateJobDto, files) {
+        const { user_id, ...jobData } = updateJobDto;
+        const existingJob = await this.jobRepository.findOne({
+            where: { id: +id },
+            relations: ['user'],
+        });
+        if (!existingJob) {
+            throw new common_1.NotFoundException('Job not found');
+        }
+        const updatedJob = await this.jobRepository.save({
+            ...existingJob,
+            titre: jobData.titre || existingJob.titre,
+            description: jobData.description || existingJob.description,
+            moyens_de_contact: jobData.moyens_de_contact || existingJob.moyens_de_contact,
+            inclusWeekend: jobData.inclus_weekend === 'true' ? true : false,
+            nombreEnfants: jobData.nombre_enfants || existingJob.nombreEnfants,
+            experience_minimun: jobData.experience_minimun === 'true' ? true : false,
+            annee_experience: jobData.annee_experience || existingJob.annee_experience,
+            tarifPropose: jobData.tarif || existingJob.tarifPropose,
+            negociable: jobData.negociable === 'true' ? true : false,
+            dateDebut: jobData.date_debut || existingJob.dateDebut,
+            missionUrgente: jobData.mission_urgente === 'true' ? true : false,
+            descriptionComplementaire: jobData.description_complementaire || existingJob.descriptionComplementaire,
+            user: { id: user_id || existingJob.user.id },
+        });
+        if (!updatedJob) {
+            throw new common_1.BadRequestException('Job not updated');
+        }
+        if (files.Images_videos?.length > 0) {
+            await this.mediaService.deleteManyJob({ JobId: updatedJob.id.toString(), typeMedia: 'image-video-presentation' });
+            const Images_videos = files.Images_videos;
+            Images_videos.forEach(async (file) => {
+                await this.mediaService.create({
+                    originalName: file.originalname,
+                    filename: file.filename,
+                    path: file.path,
+                    originalUrl: `${database_providers_1.HOST}/uploads/${file.filename}`,
+                    JobId: updatedJob.id.toString(),
+                    typeMedia: 'image-video-presentation',
+                });
+            });
+        }
+        const preferenceKeys = this.preferenceKeys;
+        for (const key of preferenceKeys) {
+            const value = JSON.parse(updateJobDto[key]);
+            if (value != undefined && Array.isArray(value)) {
+                await this.preferenceRepository.delete({ jobs: updatedJob });
+                const preferenceEntities = value.map((el) => ({
+                    jobs: updatedJob,
+                    [key]: el.id,
+                }));
+                await this.preferenceRepository.save(preferenceEntities);
+            }
+        }
+        const job = await this.findJobById(updatedJob.id);
+        if (!job) {
+            throw new common_1.NotFoundException(`Job with ID ${updatedJob.id} not found`);
+        }
+        return job;
     }
     async deleteJob(id) {
         const job = await this.findJobById(id);
         console.log(job);
         return this.jobRepository.softDelete({ id: job.id });
+    }
+    async getJobApplyByUserId(userId) {
+        const jobUser = await this.jobRepository.find({
+            where: { jobApplications: { user: { id: userId } } },
+            relations: this.RelationShip,
+        });
+        if (!jobUser) {
+            throw new common_1.NotFoundException(`Job with ID ${jobUser} not found`);
+        }
+        console.log(jobUser);
+        const DataJob = await this.ReturnN(jobUser, this.preferenceKeys);
+        return DataJob;
     }
     async ReturnN(datas, preferenceKey) {
         return datas.map((data) => {

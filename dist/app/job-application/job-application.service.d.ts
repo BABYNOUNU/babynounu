@@ -11,9 +11,13 @@ export declare class JobApplicationsService {
     private readonly jobRepository;
     private readonly notificationService;
     constructor(jobApplicationRepository: Repository<JobApplication>, userRepository: Repository<User>, jobRepository: Repository<Job>, notificationService: NotificationService);
+    private RelationShip;
     findAll(): Promise<JobApplication[]>;
     findOne(id: number): Promise<JobApplication>;
-    create(createJobApplicationDto: CreateJobApplicationDto, userId: any): Promise<JobApplication>;
+    create(createJobApplicationDto: CreateJobApplicationDto, userId: string): Promise<JobApplication>;
+    private sendJobApplicationNotification;
     update(id: number, updateJobApplicationDto: UpdateJobApplicationDto): Promise<JobApplication>;
     remove(id: number): Promise<void>;
+    getJobApplyByUser(userId: string): Promise<any[]>;
+    GetJobApplyByUserId(userId: string): Promise<any[]>;
 }

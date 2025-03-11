@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UpdateParentDto = exports.CreateParentDto = void 0;
+exports.CreateParentDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 class CreateParentDto {
@@ -28,6 +28,7 @@ class CreateParentDto {
     zone_geographique_prestataire;
     competance_specifique;
     langue_parler;
+    mode_de_paiement;
     informations_complementaires;
     userId;
 }
@@ -64,31 +65,26 @@ __decorate([
 ], CreateParentDto.prototype, "disponibility_du_prestataire", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ type: [] }),
-    (0, class_validator_1.IsArray)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Object)
 ], CreateParentDto.prototype, "besions_specifiques", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ type: [] }),
-    (0, class_validator_1.IsArray)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Object)
 ], CreateParentDto.prototype, "garde_enfants", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ type: [] }),
-    (0, class_validator_1.IsArray)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Object)
 ], CreateParentDto.prototype, "aide_menagere", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ type: [] }),
-    (0, class_validator_1.IsArray)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Object)
 ], CreateParentDto.prototype, "frequence_des_services", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ type: [] }),
-    (0, class_validator_1.IsArray)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Object)
 ], CreateParentDto.prototype, "horaire_souhaites", void 0);
@@ -99,22 +95,24 @@ __decorate([
 ], CreateParentDto.prototype, "adress", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ type: [] }),
-    (0, class_validator_1.IsArray)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Object)
 ], CreateParentDto.prototype, "zone_geographique_prestataire", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ type: [] }),
-    (0, class_validator_1.IsArray)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Object)
 ], CreateParentDto.prototype, "competance_specifique", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ type: [] }),
-    (0, class_validator_1.IsArray)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Object)
 ], CreateParentDto.prototype, "langue_parler", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: [] }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Object)
+], CreateParentDto.prototype, "mode_de_paiement", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)(),
     (0, class_validator_1.IsOptional)(),
@@ -126,6 +124,3 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateParentDto.prototype, "userId", void 0);
-class UpdateParentDto extends CreateParentDto {
-}
-exports.UpdateParentDto = UpdateParentDto;

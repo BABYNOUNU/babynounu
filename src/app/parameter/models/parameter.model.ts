@@ -58,6 +58,9 @@ export class Parameter {
   @OneToMany(() => Preference, (preference) => preference.besions_specifiques, { cascade: true })
   besions_specifiques: Preference;
 
+  @OneToMany(() => Preference, (preference) => preference.mode_de_paiement, { cascade: true })
+  mode_de_paiement: Preference;
+
   @CreateDateColumn()
   created_at: Date;
 

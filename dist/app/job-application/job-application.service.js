@@ -27,6 +27,30 @@ let JobApplicationsService = class JobApplicationsService {
         this.jobRepository = jobRepository;
         this.notificationService = notificationService;
     }
+    RelationShip = [
+        'user', 'user.nounu', 'user.medias', 'user.medias.type_media',
+        'medias',
+        'jobs',
+        'user.medias.type_media',
+        'preferences',
+        'preferences.besions_specifiques',
+        'preferences.garde_enfants',
+        'preferences.aide_menagere',
+        'preferences.frequence_des_services',
+        'preferences.horaire_souhaites',
+        'preferences.adress',
+        'preferences.zone_geographique_prestataire',
+        'preferences.competance_specifique',
+        'preferences.langue_parler',
+        'preferences.disponibility_du_prestataire',
+        'preferences.equipement_menager',
+        'preferences.criteres_specifiques',
+        'preferences.criteres_selections',
+        'preferences.certifications_criteres',
+        'preferences.zone_de_travail',
+        'preferences.type_services',
+        'jobApplications',
+    ];
     async findAll() {
         return this.jobApplicationRepository.find({ relations: ['user', 'job'] });
     }
@@ -41,39 +65,40 @@ let JobApplicationsService = class JobApplicationsService {
         return jobApplication;
     }
     async create(createJobApplicationDto, userId) {
-        const isApplyExist = await this.jobApplicationRepository.findOne({
+        const { userId: applicantUserId, jobId } = createJobApplicationDto;
+        const existingApplication = await this.jobApplicationRepository.findOne({
             where: {
-                user: { id: createJobApplicationDto.userId.toString() },
-                jobs: { id: createJobApplicationDto.jobId },
+                user: { id: applicantUserId.toString() },
+                jobs: { id: jobId },
             },
+            select: ['id', 'is_apply'],
         });
-        if (isApplyExist) {
-            const isApply = isApplyExist.is_apply ? false : true;
-            const updateJobApply = await this.jobApplicationRepository.update({ id: isApplyExist.id }, {
-                is_apply: isApply,
-                user: { id: createJobApplicationDto.userId.toString() },
-                jobs: { id: createJobApplicationDto.jobId },
-            });
-            isApplyExist.is_apply = isApply;
-            return isApplyExist;
+        if (existingApplication) {
+            const newApplyStatus = !existingApplication.is_apply;
+            await this.jobApplicationRepository.update({ id: existingApplication.id }, { is_apply: newApplyStatus });
+            existingApplication.is_apply = newApplyStatus;
+            return existingApplication;
         }
-        const jobApplication = this.jobApplicationRepository.create({
+        const newJobApplication = this.jobApplicationRepository.create({
             is_apply: true,
-            user: { id: createJobApplicationDto.userId.toString() },
-            jobs: { id: createJobApplicationDto.jobId },
+            user: { id: applicantUserId.toString() },
+            jobs: { id: jobId },
         });
-        const jobApplicationSave = await this.jobApplicationRepository.save(jobApplication);
-        if (!jobApplicationSave) {
-            throw new common_1.NotFoundException(`Job with ID ${createJobApplicationDto.jobId} not found`);
+        const savedJobApplication = await this.jobApplicationRepository.save(newJobApplication);
+        if (!savedJobApplication) {
+            throw new common_1.NotFoundException(`Job with ID ${jobId} not found or could not be applied to.`);
         }
-        this.notificationService.createNotification({
+        await this.sendJobApplicationNotification(applicantUserId.toString(), jobId.toString(), userId);
+        return savedJobApplication;
+    }
+    async sendJobApplicationNotification(applicantUserId, jobId, senderUserId) {
+        await this.notificationService.createNotification({
             type: 'JOBS',
-            userId: createJobApplicationDto.userId.toString(),
-            message: `You have applied to job ${createJobApplicationDto.jobId}`,
+            userId: applicantUserId,
+            message: `You have applied to job ${jobId}`,
             is_read: false,
-            senderUserId: userId
+            senderUserId: senderUserId,
         });
-        return jobApplicationSave;
     }
     async update(id, updateJobApplicationDto) {
         const jobApplication = await this.jobApplicationRepository.preload({
@@ -107,6 +132,51 @@ let JobApplicationsService = class JobApplicationsService {
         if (result.affected === 0) {
             throw new common_1.NotFoundException(`JobApplication with ID ${id} not found`);
         }
+    }
+    async getJobApplyByUser(userId) {
+        try {
+            const jobApplicationUser = await this.jobApplicationRepository.find({
+                where: { jobs: { user: { id: userId } } },
+                relations: ['jobs', 'user', 'user.nounu', 'user.medias', 'user.medias.type_media'],
+            });
+            if (!jobApplicationUser) {
+                throw new common_1.NotFoundException(`JobApplication with ID ${jobApplicationUser} not found`);
+            }
+            const _jobApplicationUser = jobApplicationUser.map((data) => {
+                return {
+                    ...data,
+                    image: data.user.medias?.find((media) => media.type_media.slug === 'image-profil'),
+                };
+            });
+            return _jobApplicationUser;
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }
+    async GetJobApplyByUserId(userId) {
+        const jobApplicationUser = await this.jobApplicationRepository.find({
+            where: { user: { id: userId } },
+            relations: this.RelationShip,
+        });
+        if (!jobApplicationUser) {
+            throw new common_1.NotFoundException(`JobApplication with ID ${jobApplicationUser} not found`);
+        }
+        const _jobApplicationUser = jobApplicationUser.map((data) => {
+            return {
+                ...data,
+                image: data.user.medias?.find((media) => media.type_media.slug === 'image-profil'),
+            };
+        });
+        return _jobApplicationUser.map((data) => {
+            return {
+                ...data,
+                job: {
+                    ...data.jobs,
+                    image: data.jobs.user.medias?.find((media) => media.type_media.slug === 'image-profil'),
+                }
+            };
+        });
     }
 };
 exports.JobApplicationsService = JobApplicationsService;

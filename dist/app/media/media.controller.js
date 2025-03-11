@@ -35,11 +35,11 @@ let MediaController = class MediaController {
     findOne(id) {
         return this.mediaService.findOne(+id);
     }
-    update(id, updateMediaDto) {
-        return this.mediaService.update(+id, updateMediaDto);
+    update(id, typeMedia, updateMediaDto) {
+        return this.mediaService.update({ id, typeMedia }, updateMediaDto);
     }
     remove(id) {
-        return this.mediaService.remove(+id);
+        return this.mediaService.remove(id);
     }
 };
 exports.MediaController = MediaController;
@@ -82,11 +82,11 @@ __decorate([
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, update_media_dto_1.UpdateMediaDto]),
+    __metadata("design:paramtypes", [String, String, update_media_dto_1.UpdateMediaDto]),
     __metadata("design:returntype", void 0)
 ], MediaController.prototype, "update", null);
 __decorate([
-    (0, common_1.Delete)(':id'),
+    (0, common_1.Post)(':id'),
     (0, swagger_1.ApiOkResponse)({ description: 'Media deleted' }),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),

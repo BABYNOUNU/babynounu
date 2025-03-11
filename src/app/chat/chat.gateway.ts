@@ -41,8 +41,8 @@ import { HOST } from 'src/database/database.providers';
       @ConnectedSocket() client: Socket,
     ) {
       const { sender, content, room } = data;
-      const message = await this.chatService.saveMessage(sender, content, room);
-      this.server.to(room).emit('newMessage', message);
+      // const message = await this.chatService.saveMessage();
+      // this.server.to(room).emit('newMessage', message);
     }
   }
   

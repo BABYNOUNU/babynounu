@@ -2,7 +2,7 @@ import { MediaService } from './../media/media.service';
 import { Repository } from 'typeorm';
 import { Parents } from './models/parent.model';
 import { CreateParentDto } from './dto/create-parent.dto';
-import { UpdateParentDto } from './dto/create-parent.dto';
+import { UpdateParentDto } from './dto/update-parent.dto';
 import { Preference } from '../Preference/models/preference.model';
 import { NounusService } from '../nounus/nounus.service';
 export declare class ParentsService {
@@ -16,6 +16,9 @@ export declare class ParentsService {
     create(createParentDto: CreateParentDto, files: {
         imageParent: Express.Multer.File[];
     }): Promise<Parents>;
-    update(id: string, updateParentDto: UpdateParentDto): Promise<Parents>;
+    update(id: string, updateParentDto: UpdateParentDto, files: {
+        imageParent: Express.Multer.File[];
+    }): Promise<Parents>;
     remove(id: string): Promise<void>;
+    search(searchCriteria: any): Promise<any[]>;
 }

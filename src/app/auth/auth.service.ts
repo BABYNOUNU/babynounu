@@ -114,12 +114,15 @@ export class AuthService {
       relations: ['type_profil', 'nounu', 'parent'],
     });
 
+    console.log(isUserExist);
+
+
     // RETURN DATA USER CREATE
     return {
       user: {
         ...user,
         access_token: (await this.authentificate(user)).access_token,
-        profil: isUserExist.parent ? isUserExist.nounu : null,
+        profil: isUserExist.parent.length > 0 ? isUserExist.parent : isUserExist.nounu,
       },
     };
   }

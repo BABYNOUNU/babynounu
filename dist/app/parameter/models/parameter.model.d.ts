@@ -18,6 +18,7 @@ export declare class Parameter {
     zone_de_travail: Preference;
     tranche_age_enfants: Preference;
     besions_specifiques: Preference;
+    mode_de_paiement: Preference;
     created_at: Date;
     updated_at: Date;
     deleted_at: Date;

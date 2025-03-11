@@ -21,6 +21,7 @@ const update_nounu_dto_1 = require("./dtos/update-nounu.dto");
 const nounu_model_1 = require("./models/nounu.model");
 const platform_express_1 = require("@nestjs/platform-express");
 const media_config_1 = require("../../config/media.config");
+const search_nounu_criteria_dto_1 = require("./dtos/search-nounu-criteria.dto");
 let NounusController = class NounusController {
     nounuService;
     constructor(nounuService) {
@@ -29,17 +30,20 @@ let NounusController = class NounusController {
     async create(createNounuDto, files) {
         return await this.nounuService.create(createNounuDto, files);
     }
-    async findAll() {
-        return await this.nounuService.findAll();
+    async findAll(userId) {
+        return await this.nounuService.findAll(userId);
     }
     async findOne(id) {
         return await this.nounuService.findOne(id);
     }
-    async update(id, updateNounuDto) {
-        return await this.nounuService.update(id, updateNounuDto);
+    async update(id, updateNounuDto, files) {
+        return await this.nounuService.update(id.toString(), updateNounuDto, files);
     }
     async remove(id) {
         return await this.nounuService.remove(id);
+    }
+    async searchNounu(searchCriteria) {
+        return this.nounuService.search(searchCriteria);
     }
 };
 exports.NounusController = NounusController;
@@ -64,8 +68,9 @@ __decorate([
     (0, common_1.Get)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get all Nounus' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'List of Nounus', type: [nounu_model_1.Nounus] }),
+    __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], NounusController.prototype, "findAll", null);
 __decorate([
@@ -80,15 +85,23 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], NounusController.prototype, "findOne", null);
 __decorate([
-    (0, common_1.Put)(':id'),
+    (0, common_1.Post)('update/:id'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileFieldsInterceptor)([
+        { name: 'imageNounu', maxCount: 1 },
+        { name: 'documents', maxCount: 4 },
+        { name: 'gallery', maxCount: 20 },
+    ], {
+        storage: media_config_1.storageMedia
+    })),
     (0, swagger_1.ApiOperation)({ summary: 'Update a Nounus by ID' }),
     (0, swagger_1.ApiParam)({ name: 'id', description: 'Nounus ID', type: Number }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Nounus updated successfully', type: nounu_model_1.Nounus }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Nounus not found' }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.UploadedFiles)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, update_nounu_dto_1.UpdateNounuDto]),
+    __metadata("design:paramtypes", [Number, update_nounu_dto_1.UpdateNounuDto, Object]),
     __metadata("design:returntype", Promise)
 ], NounusController.prototype, "update", null);
 __decorate([
@@ -102,6 +115,13 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], NounusController.prototype, "remove", null);
+__decorate([
+    (0, common_1.Post)('search'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [search_nounu_criteria_dto_1.SearchNounuCriteriaDto]),
+    __metadata("design:returntype", Promise)
+], NounusController.prototype, "searchNounu", null);
 exports.NounusController = NounusController = __decorate([
     (0, swagger_1.ApiTags)('nounu'),
     (0, common_1.Controller)('nounu'),

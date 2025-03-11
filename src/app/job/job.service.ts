@@ -62,6 +62,7 @@ export class JobsService {
     'equipement_menager',
     'certifications_criteres',
     'criteres_selections',
+    'taches',
   ];
 
   async createJob(createJobDto: CreateJobDto, files: any) {
@@ -157,19 +158,114 @@ export class JobsService {
     if (!jobUser) {
       throw new NotFoundException(`Job with ID ${jobUser} not found`);
     }
-    return jobUser;
+
+    console.log(jobUser);
+    const DataJob = await this.ReturnN(jobUser, this.preferenceKeys);
+    return DataJob;
   }
 
-  async updateJob(id: number, updateJobDto: UpdateJobDto) {
-    const job = await this.findJobById(id)[0];
-    Object.assign(job, updateJobDto);
-    return this.jobRepository.save(job);
+  async updateJob(
+    id: string, // L'ID du job à mettre à jour
+    updateJobDto: UpdateJobDto,
+    files: any,
+  ): Promise<any> {
+    const { user_id, ...jobData } = updateJobDto;
+  
+    // Récupérer le job existant
+    const existingJob = await this.jobRepository.findOne({
+      where: { id: +id },
+      relations: ['user'],
+    });
+  
+    if (!existingJob) {
+      throw new NotFoundException('Job not found');
+    }
+  
+    // Mettre à jour les données du job
+    const updatedJob = await this.jobRepository.save({
+      ...existingJob,
+      titre: jobData.titre || existingJob.titre,
+      description: jobData.description || existingJob.description,
+      moyens_de_contact: jobData.moyens_de_contact || existingJob.moyens_de_contact,
+      inclusWeekend: jobData.inclus_weekend === 'true' ? true : false,
+      nombreEnfants: jobData.nombre_enfants || existingJob.nombreEnfants,
+      experience_minimun: jobData.experience_minimun === 'true' ? true : false,
+      annee_experience: jobData.annee_experience || existingJob.annee_experience,
+      tarifPropose: jobData.tarif || existingJob.tarifPropose,
+      negociable: jobData.negociable === 'true' ? true : false,
+      dateDebut: jobData.date_debut || existingJob.dateDebut,
+      missionUrgente: jobData.mission_urgente === 'true' ? true : false,
+      descriptionComplementaire: jobData.description_complementaire || existingJob.descriptionComplementaire,
+      user: { id: user_id || existingJob.user.id },
+    });
+  
+    if (!updatedJob) {
+      throw new BadRequestException('Job not updated');
+    }
+  
+    // Mettre à jour les fichiers (Images_videos)
+    if (files.Images_videos?.length > 0) {
+      // Supprimer les anciens fichiers associés au job
+      await this.mediaService.deleteManyJob({ JobId: updatedJob.id.toString(), typeMedia: 'image-video-presentation' });
+  
+      // Ajouter les nouveaux fichiers
+      const Images_videos = files.Images_videos;
+      Images_videos.forEach(async (file: any) => {
+        await this.mediaService.create({
+          originalName: file.originalname,
+          filename: file.filename,
+          path: file.path,
+          originalUrl: `${HOST}/uploads/${file.filename}`,
+          JobId: updatedJob.id.toString(),
+          typeMedia: 'image-video-presentation',
+        });
+      });
+    }
+  
+    // Mettre à jour les préférences
+    const preferenceKeys = this.preferenceKeys;
+  
+    for (const key of preferenceKeys) {
+      const value = JSON.parse(updateJobDto[key]);
+      if (value != undefined && Array.isArray(value)) {
+        // Supprimer les anciennes préférences
+        await this.preferenceRepository.delete({ jobs: updatedJob });
+  
+        // Ajouter les nouvelles préférences
+        const preferenceEntities = value.map((el) => ({
+          jobs: updatedJob,
+          [key]: el.id,
+        }));
+        await this.preferenceRepository.save(preferenceEntities);
+      }
+    }
+  
+    // Récupérer le job mis à jour
+    const job = await this.findJobById(updatedJob.id);
+  
+    if (!job) {
+      throw new NotFoundException(`Job with ID ${updatedJob.id} not found`);
+    }
+  
+    return job;
   }
-
   async deleteJob(id: number) {
     const job = await this.findJobById(id)
     console.log(job)
     return this.jobRepository.softDelete({ id: job.id });
+  }
+
+  async getJobApplyByUserId(userId: string) {
+    const jobUser = await this.jobRepository.find({
+      where: { jobApplications: { user: { id: userId } } },
+      relations: this.RelationShip,
+    });
+    if (!jobUser) {
+      throw new NotFoundException(`Job with ID ${jobUser} not found`);
+    }
+    console.log(jobUser);
+    const DataJob = await this.ReturnN(jobUser, this.preferenceKeys);
+    return DataJob;
   }
  
   async ReturnN(datas: any[], preferenceKey: any[]): Promise<Job[]> {

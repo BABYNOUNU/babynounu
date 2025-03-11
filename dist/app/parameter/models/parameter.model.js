@@ -31,6 +31,7 @@ let Parameter = class Parameter {
     zone_de_travail;
     tranche_age_enfants;
     besions_specifiques;
+    mode_de_paiement;
     created_at;
     updated_at;
     deleted_at;
@@ -92,6 +93,10 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => preference_model_1.Preference, (preference) => preference.besions_specifiques, { cascade: true }),
     __metadata("design:type", preference_model_1.Preference)
 ], Parameter.prototype, "besions_specifiques", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => preference_model_1.Preference, (preference) => preference.mode_de_paiement, { cascade: true }),
+    __metadata("design:type", preference_model_1.Preference)
+], Parameter.prototype, "mode_de_paiement", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)(),
     __metadata("design:type", Date)

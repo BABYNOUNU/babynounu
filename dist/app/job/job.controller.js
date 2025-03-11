@@ -38,11 +38,14 @@ let JobsController = class JobsController {
         console.log(userId);
         return this.jobsService.findAllJobByUser(userId);
     }
-    async updateJob(id, updateJobDto) {
-        return this.jobsService.updateJob(id, updateJobDto);
+    async updateJob(id, updateJobDto, files) {
+        return this.jobsService.updateJob(id.toString(), updateJobDto, files);
     }
     async deleteJob(id) {
         return this.jobsService.deleteJob(id);
+    }
+    async getJobApplyByUserId(userId) {
+        return this.jobsService.getJobApplyByUserId(userId);
     }
 };
 exports.JobsController = JobsController;
@@ -95,7 +98,12 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], JobsController.prototype, "findAllJobByUser", null);
 __decorate([
-    (0, common_1.Patch)(':id'),
+    (0, common_1.Post)(':id'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileFieldsInterceptor)([
+        { name: 'Images_videos', maxCount: 10 },
+    ], {
+        storage: media_config_1.storageMedia
+    })),
     (0, swagger_1.ApiOperation)({ summary: 'Update a job posting' }),
     (0, swagger_1.ApiParam)({ name: 'id', type: Number }),
     (0, swagger_1.ApiBody)({ type: update_job_dto_1.UpdateJobDto }),
@@ -104,8 +112,9 @@ __decorate([
     (0, common_1.UsePipes)(new common_1.ValidationPipe()),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.UploadedFiles)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, update_job_dto_1.UpdateJobDto]),
+    __metadata("design:paramtypes", [Number, update_job_dto_1.UpdateJobDto, Object]),
     __metadata("design:returntype", Promise)
 ], JobsController.prototype, "updateJob", null);
 __decorate([
@@ -119,6 +128,17 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], JobsController.prototype, "deleteJob", null);
+__decorate([
+    (0, common_1.Get)('job-applications/user/:userId'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get job applications by user ID' }),
+    (0, swagger_1.ApiParam)({ name: 'userId', type: String }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Job applications retrieved successfully' }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'User not found or no job applications' }),
+    __param(0, (0, common_1.Param)('userId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], JobsController.prototype, "getJobApplyByUserId", null);
 exports.JobsController = JobsController = __decorate([
     (0, swagger_1.ApiTags)('jobs'),
     (0, common_1.Controller)('jobs'),

@@ -16,8 +16,11 @@ exports.ParentController = void 0;
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const parent_service_1 = require("./parent.service");
+const create_parent_dto_1 = require("./dto/create-parent.dto");
+const update_parent_dto_1 = require("./dto/update-parent.dto");
 const platform_express_1 = require("@nestjs/platform-express");
 const media_config_1 = require("../../config/media.config");
+const search_parent_criteria_dto_1 = require("./dto/search-parent-criteria.dto");
 let ParentController = class ParentController {
     parentService;
     constructor(parentService) {
@@ -32,6 +35,15 @@ let ParentController = class ParentController {
     }
     async Create(createParentDto, files) {
         return this.parentService.create(createParentDto, files);
+    }
+    UpdateParent(id, updateParentDto, files) {
+        return this.parentService.update(id.toString(), updateParentDto, files);
+    }
+    DeleteParent(id) {
+        this.parentService.remove(id.toString());
+    }
+    async searchParent(searchCriteria) {
+        return this.parentService.search(searchCriteria);
     }
 };
 exports.ParentController = ParentController;
@@ -50,17 +62,41 @@ __decorate([
 ], ParentController.prototype, "GetParent", null);
 __decorate([
     (0, common_1.Post)('create'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileFieldsInterceptor)([
-        { name: 'imageParent', maxCount: 4 }
-    ], {
-        storage: media_config_1.storageMedia
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileFieldsInterceptor)([{ name: 'imageParent', maxCount: 4 }], {
+        storage: media_config_1.storageMedia,
     })),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.UploadedFiles)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:paramtypes", [create_parent_dto_1.CreateParentDto, Object]),
     __metadata("design:returntype", Promise)
 ], ParentController.prototype, "Create", null);
+__decorate([
+    (0, common_1.Post)('update/:id'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileFieldsInterceptor)([{ name: 'imageParent', maxCount: 4 }], {
+        storage: media_config_1.storageMedia,
+    })),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.UploadedFiles)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, update_parent_dto_1.UpdateParentDto, Object]),
+    __metadata("design:returntype", void 0)
+], ParentController.prototype, "UpdateParent", null);
+__decorate([
+    (0, common_1.Delete)('/delete/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", void 0)
+], ParentController.prototype, "DeleteParent", null);
+__decorate([
+    (0, common_1.Post)('search/parent'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [search_parent_criteria_dto_1.SearchParentCriteriaDto]),
+    __metadata("design:returntype", Promise)
+], ParentController.prototype, "searchParent", null);
 exports.ParentController = ParentController = __decorate([
     (0, swagger_1.ApiTags)('Parents'),
     (0, common_1.Controller)('parent'),

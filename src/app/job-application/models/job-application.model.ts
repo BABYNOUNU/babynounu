@@ -25,7 +25,7 @@ export class JobApplication {
   @Column({ default: 0 })
   limit: number;
 
-  @Column()
+  @Column({ type: 'boolean', default: false })
   is_apply: boolean;
 
   @CreateDateColumn()

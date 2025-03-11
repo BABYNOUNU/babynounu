@@ -8,6 +8,7 @@ export declare class JobsController {
     findAllJobs(): Promise<import("./models/job.model").Job[]>;
     findJobById(id: number): Promise<import("./models/job.model").Job>;
     findAllJobByUser(userId: any): Promise<import("./models/job.model").Job[]>;
-    updateJob(id: number, updateJobDto: UpdateJobDto): Promise<any>;
+    updateJob(id: number, updateJobDto: UpdateJobDto, files: any): Promise<any>;
     deleteJob(id: number): Promise<import("typeorm").UpdateResult>;
+    getJobApplyByUserId(userId: string): Promise<import("./models/job.model").Job[]>;
 }

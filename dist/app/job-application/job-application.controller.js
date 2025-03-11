@@ -40,6 +40,9 @@ let JobApplicationController = class JobApplicationController {
     remove(id) {
         return this.jobApplicationService.remove(+id);
     }
+    getJobApplyByUser(userId) {
+        return this.jobApplicationService.getJobApplyByUser(userId);
+    }
 };
 exports.JobApplicationController = JobApplicationController;
 __decorate([
@@ -95,6 +98,17 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], JobApplicationController.prototype, "remove", null);
+__decorate([
+    (0, common_1.Get)('user/:userId'),
+    (0, swagger_1.ApiOperation)({ summary: 'Récupérer les candidatures d\'un utilisateur par ID' }),
+    (0, swagger_1.ApiParam)({ name: 'userId', description: 'ID de l\'utilisateur', example: '1' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Liste des candidatures de l\'utilisateur.', type: [job_application_model_1.JobApplication] }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Utilisateur non trouvé ou aucune candidature.' }),
+    __param(0, (0, common_1.Param)('userId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], JobApplicationController.prototype, "getJobApplyByUser", null);
 exports.JobApplicationController = JobApplicationController = __decorate([
     (0, swagger_1.ApiTags)('Job Applications'),
     (0, common_1.Controller)('job-applications'),

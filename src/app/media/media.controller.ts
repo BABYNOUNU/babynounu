@@ -82,13 +82,13 @@ export class MediaController {
 
   @Patch(':id')
   @ApiOkResponse({ description: 'Media updated', type: Medias })
-  update(@Param('id') id: string, @Body() updateMediaDto: UpdateMediaDto) {
-    return this.mediaService.update(+id, updateMediaDto);
+  update(@Param('id') id: string, @Body() typeMedia: string, updateMediaDto: UpdateMediaDto) {
+    return this.mediaService.update({id, typeMedia}, updateMediaDto);
   }
 
-  @Delete(':id')
+  @Post(':id')
   @ApiOkResponse({ description: 'Media deleted' })
   remove(@Param('id') id: string) {
-    return this.mediaService.remove(+id);
+    return this.mediaService.remove(id);
   }
 }

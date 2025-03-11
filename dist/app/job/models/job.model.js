@@ -21,6 +21,7 @@ let Job = class Job {
     titre;
     description;
     moyens_de_contact;
+    combinaison_service;
     inclusWeekend;
     nombreEnfants;
     experience_minimun;
@@ -56,6 +57,10 @@ __decorate([
     (0, typeorm_1.Column)({ type: 'text' }),
     __metadata("design:type", String)
 ], Job.prototype, "moyens_de_contact", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'boolean', default: false }),
+    __metadata("design:type", Boolean)
+], Job.prototype, "combinaison_service", void 0);
 __decorate([
     (0, typeorm_1.Column)({ name: 'inclus_weekend', type: 'boolean', default: false }),
     __metadata("design:type", Boolean)

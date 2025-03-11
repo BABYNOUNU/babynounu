@@ -21,8 +21,8 @@ export declare class AuthService {
             email: string;
             password: string;
             type_profil: Parameter;
-            nounu: import("../nounus/models/nounu.model").Nounus;
-            parent: import("../parent/models/parent.model").Parents;
+            nounu: import("../nounus/models/nounu.model").Nounus[];
+            parent: import("../parent/models/parent.model").Parents[];
             abonnement: import("../abonnement/models/abonnement.model").Abonnements;
             medias: import("../media/models/media.model").Medias[];
             notifications: import("../notification/models/notification.model").Notification[];
@@ -39,14 +39,14 @@ export declare class AuthService {
     }): Promise<{
         user: {
             access_token: string;
-            profil: import("../nounus/models/nounu.model").Nounus;
+            profil: import("../nounus/models/nounu.model").Nounus[] | import("../parent/models/parent.model").Parents[];
             id: string;
             slug: string;
             email: string;
             password: string;
             type_profil: Parameter;
-            nounu: import("../nounus/models/nounu.model").Nounus;
-            parent: import("../parent/models/parent.model").Parents;
+            nounu: import("../nounus/models/nounu.model").Nounus[];
+            parent: import("../parent/models/parent.model").Parents[];
             abonnement: import("../abonnement/models/abonnement.model").Abonnements;
             medias: import("../media/models/media.model").Medias[];
             notifications: import("../notification/models/notification.model").Notification[];

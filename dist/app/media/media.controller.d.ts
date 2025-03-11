@@ -10,6 +10,6 @@ export declare class MediaController {
     }): void;
     findAll(): Promise<Medias[]>;
     findOne(id: string): Promise<Medias>;
-    update(id: string, updateMediaDto: UpdateMediaDto): Promise<Medias>;
-    remove(id: string): Promise<void>;
+    update(id: string, typeMedia: string, updateMediaDto: UpdateMediaDto): Promise<Medias>;
+    remove(id: string): Promise<Medias>;
 }

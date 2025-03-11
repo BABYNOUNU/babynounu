@@ -88,11 +88,12 @@ let AuthService = class AuthService {
             where: { id: user?.id },
             relations: ['type_profil', 'nounu', 'parent'],
         });
+        console.log(isUserExist);
         return {
             user: {
                 ...user,
                 access_token: (await this.authentificate(user)).access_token,
-                profil: isUserExist.parent ? isUserExist.nounu : null,
+                profil: isUserExist.parent.length > 0 ? isUserExist.parent : isUserExist.nounu,
             },
         };
     }

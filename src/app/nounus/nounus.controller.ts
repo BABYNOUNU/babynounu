@@ -9,6 +9,7 @@ import {
     NotFoundException,
     UseInterceptors,
     UploadedFiles,
+    Query,
   } from '@nestjs/common';
   import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
   import { NounusService } from './nounus.service';
@@ -17,6 +18,7 @@ import {
   import { Nounus } from './models/nounu.model';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { storageMedia } from 'src/config/media.config';
+import { SearchNounuCriteriaDto } from './dtos/search-nounu-criteria.dto';
   
   @ApiTags('nounu') // Tag pour Swagger
   @Controller('nounu')
@@ -45,8 +47,8 @@ import { storageMedia } from 'src/config/media.config';
     @Get()
     @ApiOperation({ summary: 'Get all Nounus' })
     @ApiResponse({ status: 200, description: 'List of Nounus', type: [Nounus] })
-    async findAll(): Promise<Nounus[]> {
-      return await this.nounuService.findAll();
+    async findAll(@Query() userId: string): Promise<Nounus[]> {
+      return await this.nounuService.findAll(userId);
     }
   
     @Get(':id')
@@ -58,16 +60,28 @@ import { storageMedia } from 'src/config/media.config';
       return await this.nounuService.findOne(id);
     }
   
-    @Put(':id')
+    @Post('update/:id')
+    @UseInterceptors(
+      FileFieldsInterceptor(
+        [
+          { name: 'imageNounu', maxCount: 1 },
+          { name: 'documents', maxCount: 4 },
+          { name: 'gallery', maxCount: 20 },
+        ],
+        {
+          storage: storageMedia
+        }
+      )
+    )
     @ApiOperation({ summary: 'Update a Nounus by ID' })
     @ApiParam({ name: 'id', description: 'Nounus ID', type: Number })
     @ApiResponse({ status: 200, description: 'Nounus updated successfully', type: Nounus })
     @ApiResponse({ status: 404, description: 'Nounus not found' })
     async update(
       @Param('id') id: number,
-      @Body() updateNounuDto: UpdateNounuDto,
+      @Body() updateNounuDto: UpdateNounuDto, @UploadedFiles() files
     ): Promise<Nounus> {
-      return await this.nounuService.update(id, updateNounuDto);
+      return await this.nounuService.update(id.toString(), updateNounuDto, files);
     }
   
     @Delete(':id')
@@ -78,4 +92,9 @@ import { storageMedia } from 'src/config/media.config';
     async remove(@Param('id') id: number): Promise<void> {
       return await this.nounuService.remove(id);
     }
+
+    @Post('search')
+async searchNounu(@Body() searchCriteria: SearchNounuCriteriaDto) {
+  return this.nounuService.search(searchCriteria);
+}
   }

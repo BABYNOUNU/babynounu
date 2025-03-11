@@ -64,6 +64,9 @@ export class Preference {
   @ManyToOne(() => Parameter, { onDelete: 'CASCADE' })
   competance_specifique: Parameter[];
 
+  @ManyToOne(() => Parameter, { onDelete: 'CASCADE' })
+  mode_de_paiement: Parameter[];
+
 
   @ManyToOne(() => Parameter, { onDelete: 'CASCADE' })
   langue_parler: Parameter[];

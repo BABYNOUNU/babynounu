@@ -15,8 +15,8 @@ export declare class User {
     password: string;
     access_token: string;
     type_profil: Parameter;
-    nounu: Nounus;
-    parent: Parents;
+    nounu: Nounus[];
+    parent: Parents[];
     abonnement: Abonnements;
     medias: Medias[];
     notifications: Notification[];

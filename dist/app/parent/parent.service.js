@@ -50,6 +50,7 @@ let ParentsService = class ParentsService {
                 'preferences.competance_specifique',
                 'preferences.langue_parler',
                 'preferences.disponibility_du_prestataire',
+                'preferences.mode_de_paiement',
             ],
         });
         if (!parent) {
@@ -66,6 +67,7 @@ let ParentsService = class ParentsService {
             'competance_specifique',
             'langue_parler',
             'disponibility_du_prestataire',
+            'mode_de_paiement',
         ]);
         return ParentGet[0];
     }
@@ -100,6 +102,7 @@ let ParentsService = class ParentsService {
             'competance_specifique',
             'langue_parler',
             'disponibility_du_prestataire',
+            'mode_de_paiement',
         ];
         for (const key of preferenceKeys) {
             const value = JSON.parse(createParentDto[key]);
@@ -113,17 +116,109 @@ let ParentsService = class ParentsService {
         }
         return savedParent;
     }
-    async update(id, updateParentDto) {
-        const { ...parentData } = updateParentDto;
-        const parent = await this.findOne(id);
-        const updatedParent = Object.assign(parent, { ...parentData });
-        return await this.parentsRepository.save(updatedParent);
+    async update(id, updateParentDto, files) {
+        try {
+            const { userId, ...parentData } = updateParentDto;
+            const existingParent = await this.parentsRepository.findOne({
+                where: { id },
+                relations: ['user'],
+            });
+            if (!existingParent) {
+                throw new common_1.NotFoundException('Parent not found');
+            }
+            const updatedParent = await this.parentsRepository.save({
+                ...existingParent,
+                ...parentData,
+                user: { id: userId },
+            });
+            if (!updatedParent) {
+                throw new common_1.BadRequestException('Parent not updated');
+            }
+            if (files.imageParent?.length > 0) {
+                const imageParent = files.imageParent[0];
+                await this.mediaService.update({ id: existingParent.user.id, typeMedia: 'image-profil' }, {
+                    originalName: imageParent.originalname,
+                    filename: imageParent.filename,
+                    path: imageParent.path,
+                    originalUrl: `${database_providers_1.HOST}/uploads/${imageParent.filename}`,
+                });
+            }
+            const preferenceKeys = [
+                'besions_specifiques',
+                'garde_enfants',
+                'aide_menagere',
+                'frequence_des_services',
+                'horaire_souhaites',
+                'adress',
+                'zone_geographique_prestataire',
+                'competance_specifique',
+                'langue_parler',
+                'disponibility_du_prestataire',
+                'mode_de_paiement',
+            ];
+            for (const key of preferenceKeys) {
+                const value = JSON.parse(updateParentDto[key]);
+                if (Array.isArray(value)) {
+                    await this.preferenceRepository.delete({
+                        parents: { id }
+                    });
+                }
+            }
+            for (const key of preferenceKeys) {
+                const value = JSON.parse(updateParentDto[key]);
+                if (Array.isArray(value)) {
+                    const preferenceEntities = value.map((el) => ({
+                        parents: updatedParent,
+                        [key]: el.id,
+                    }));
+                    await this.preferenceRepository.save(preferenceEntities);
+                }
+            }
+            return await this.findOne(id);
+        }
+        catch (error) {
+            console.log(error);
+        }
     }
     async remove(id) {
         const result = await this.parentsRepository.delete(id);
         if (result.affected === 0) {
             throw new common_1.NotFoundException(`Parent with id ${id} not found`);
         }
+    }
+    async search(searchCriteria) {
+        const { besions_specifiques, garde_enfants, aide_menagere, frequence_des_services, horaire_souhaites, zone_geographique_prestataire, disponibility_du_prestataire, } = searchCriteria;
+        const parentQuery = this.parentsRepository
+            .createQueryBuilder('parent')
+            .leftJoinAndSelect('parent.preferences', 'preferences')
+            .leftJoinAndSelect('parent.user', 'user');
+        if (besions_specifiques) {
+            parentQuery.andWhere('preferences.besions_specifiques = :besions_specifiques', { besions_specifiques });
+        }
+        if (garde_enfants) {
+            parentQuery.andWhere('preferences.garde_enfants = :garde_enfants', {
+                garde_enfants,
+            });
+        }
+        if (aide_menagere) {
+            parentQuery.andWhere('preferences.aide_menagere = :aide_menagere', {
+                aide_menagere,
+            });
+        }
+        if (frequence_des_services) {
+            parentQuery.andWhere('preferences.frequence_des_services = :frequence_des_services', { frequence_des_services });
+        }
+        if (horaire_souhaites) {
+            parentQuery.andWhere('preferences.horaire_souhaites = :horaire_souhaites', { horaire_souhaites });
+        }
+        if (zone_geographique_prestataire) {
+            parentQuery.andWhere('preferences.zone_geographique_prestataire = :zone_geographique_prestataire', { zone_geographique_prestataire });
+        }
+        if (disponibility_du_prestataire) {
+            parentQuery.andWhere('preferences.disponibility_du_prestataire = :disponibility_du_prestataire', { disponibility_du_prestataire });
+        }
+        const parents = await parentQuery.getMany();
+        return parents;
     }
 };
 exports.ParentsService = ParentsService;

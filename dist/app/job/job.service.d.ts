@@ -15,7 +15,8 @@ export declare class JobsService {
     findAllJobs(): Promise<Job[]>;
     findJobById(id: number): Promise<Job>;
     findAllJobByUser(userId: string): Promise<Job[]>;
-    updateJob(id: number, updateJobDto: UpdateJobDto): Promise<any>;
+    updateJob(id: string, updateJobDto: UpdateJobDto, files: any): Promise<any>;
     deleteJob(id: number): Promise<import("typeorm").UpdateResult>;
+    getJobApplyByUserId(userId: string): Promise<Job[]>;
     ReturnN(datas: any[], preferenceKey: any[]): Promise<Job[]>;
 }
