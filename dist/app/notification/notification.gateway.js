@@ -18,10 +18,8 @@ const socket_io_1 = require("socket.io");
 let NotificationGateway = class NotificationGateway {
     server;
     handleConnection(client) {
-        console.log(`Client connecté: ${client.id}`);
     }
     handleDisconnect(client) {
-        console.log(`Client déconnecté: ${client.id}`);
     }
     handleMessage(data, client) {
         console.log(`Message reçu: ${data}`);

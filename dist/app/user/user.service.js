@@ -52,11 +52,11 @@ let UserService = class UserService {
     }
     async loggedUser(ID) {
         const User = await this.userRepository.findOne({ where: { id: ID }, relations: ['role', 'medias.type_media', 'type_profil', 'parent', 'nounu', 'nounu.preferences.adress', 'parent.preferences.adress', 'abonnement'] });
-        console.log(User);
         if (!User) {
             throw new common_1.BadRequestException({ message: 'user not exist in database' });
         }
-        const dataUser = await this.ReturnN([User], ['adress'], User.type_profil?.slug);
+        console.log();
+        const dataUser = User.role.slug == 'admin' ? [User] : await this.ReturnN([User], ['adress'], User.type_profil?.slug);
         return dataUser[0];
     }
     async ReturnN(datas, preferenceKey, type_profil) {

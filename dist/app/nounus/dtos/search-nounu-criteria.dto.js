@@ -21,32 +21,32 @@ class SearchNounuCriteriaDto {
 }
 exports.SearchNounuCriteriaDto = SearchNounuCriteriaDto;
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsArray)(),
     (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", String)
+    __metadata("design:type", Array)
 ], SearchNounuCriteriaDto.prototype, "zone_de_travail", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsArray)(),
     (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", String)
+    __metadata("design:type", Array)
 ], SearchNounuCriteriaDto.prototype, "horaire_disponible", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsArray)(),
     (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", String)
+    __metadata("design:type", Array)
 ], SearchNounuCriteriaDto.prototype, "adress", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsArray)(),
     (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", String)
+    __metadata("design:type", Array)
 ], SearchNounuCriteriaDto.prototype, "tranche_age_enfants", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsArray)(),
     (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", String)
+    __metadata("design:type", Array)
 ], SearchNounuCriteriaDto.prototype, "competance_specifique", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsArray)(),
     (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", String)
+    __metadata("design:type", Array)
 ], SearchNounuCriteriaDto.prototype, "langue_parler", void 0);

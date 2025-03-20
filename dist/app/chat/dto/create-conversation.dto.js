@@ -2,6 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateConversationDto = void 0;
 class CreateConversationDto {
-    title;
+    id;
+    sender;
+    receiver;
+    room;
 }
 exports.CreateConversationDto = CreateConversationDto;

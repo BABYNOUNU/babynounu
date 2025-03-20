@@ -9,28 +9,48 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Conversation = void 0;
+exports.Rooms = void 0;
 const typeorm_1 = require("typeorm");
 const user_model_1 = require("../../user/user.model");
 const message_model_1 = require("./message.model");
-let Conversation = class Conversation {
+let Rooms = class Rooms {
     id;
-    user;
+    sender;
+    receiver;
     messages;
+    createdAt;
+    updatedAt;
+    deletedAt;
 };
-exports.Conversation = Conversation;
+exports.Rooms = Rooms;
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
-], Conversation.prototype, "id", void 0);
+], Rooms.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => user_model_1.User, (user) => user.conversations),
+    (0, typeorm_1.ManyToOne)(() => user_model_1.User, (user) => user.conversations_sender),
     __metadata("design:type", user_model_1.User)
-], Conversation.prototype, "user", void 0);
+], Rooms.prototype, "sender", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => message_model_1.Message, (message) => message.conversation),
+    (0, typeorm_1.ManyToOne)(() => user_model_1.User, (user) => user.conversations_receiver),
+    __metadata("design:type", user_model_1.User)
+], Rooms.prototype, "receiver", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => message_model_1.Message, (message) => message.room),
     __metadata("design:type", Array)
-], Conversation.prototype, "messages", void 0);
-exports.Conversation = Conversation = __decorate([
+], Rooms.prototype, "messages", void 0);
+__decorate([
+    (0, typeorm_1.CreateDateColumn)(),
+    __metadata("design:type", Date)
+], Rooms.prototype, "createdAt", void 0);
+__decorate([
+    (0, typeorm_1.UpdateDateColumn)({ type: 'timestamp' }),
+    __metadata("design:type", Date)
+], Rooms.prototype, "updatedAt", void 0);
+__decorate([
+    (0, typeorm_1.DeleteDateColumn)({ type: 'timestamp', nullable: true }),
+    __metadata("design:type", Date)
+], Rooms.prototype, "deletedAt", void 0);
+exports.Rooms = Rooms = __decorate([
     (0, typeorm_1.Entity)()
-], Conversation);
+], Rooms);

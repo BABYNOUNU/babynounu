@@ -7,10 +7,28 @@ export declare class ChatGateway implements OnGatewayConnection, OnGatewayDiscon
     constructor(chatService: ChatService);
     handleConnection(client: Socket): Promise<void>;
     handleDisconnect(client: Socket): void;
-    handleJoinRoom(room: string, client: Socket): Promise<void>;
+    handleJoinRoom(roomId: string, client: Socket): Promise<void>;
     handleMessage(data: {
-        sender: string;
+        senderId: string;
         content: string;
-        room: string;
+        roomId: string;
+        receiverId?: string;
+    }, client: Socket): Promise<void>;
+    handleTyping(data: {
+        sender: string;
+        roomId: string;
+    }, client: Socket): Promise<void>;
+    getAllConversationByUser(userId: string, client: Socket): Promise<void>;
+    getConversation(data: {
+        roomId: number;
+        openChatSenderId: string;
+    }, client: Socket): Promise<void>;
+    updateViewMessage(data: {
+        roomId: string;
+        receiverId: string;
+    }, client: Socket): Promise<void>;
+    getCountMessageByReceiverId(data: {
+        roomId: string;
+        receiverId: string;
     }, client: Socket): Promise<void>;
 }

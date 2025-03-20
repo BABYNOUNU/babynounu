@@ -16,7 +16,7 @@ const abonnement_model_1 = require("../abonnement/models/abonnement.model");
 const notification_model_1 = require("../notification/models/notification.model");
 const job_model_1 = require("../job/models/job.model");
 const paiement_model_1 = require("../paiement/models/paiement.model");
-const conversation_model_1 = require("../chat/models/conversation.model");
+const rooms_model_1 = require("../chat/models/rooms.model");
 const job_application_model_1 = require("../job-application/models/job-application.model");
 const parameter_model_1 = require("../parameter/models/parameter.model");
 const nounu_model_1 = require("../nounus/models/nounu.model");
@@ -34,7 +34,9 @@ let User = class User {
     medias;
     notifications;
     sentNotifications;
-    conversations;
+    conversations_sender;
+    conversations_receiver;
+    messages;
     job_to_apply;
     jobs;
     paiements;
@@ -99,11 +101,19 @@ __decorate([
     __metadata("design:type", Array)
 ], User.prototype, "sentNotifications", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => conversation_model_1.Conversation, (conversation) => conversation.user, {
+    (0, typeorm_1.OneToMany)(() => rooms_model_1.Rooms, (room) => room.sender),
+    __metadata("design:type", Array)
+], User.prototype, "conversations_sender", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => rooms_model_1.Rooms, (room) => room.receiver),
+    __metadata("design:type", Array)
+], User.prototype, "conversations_receiver", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => rooms_model_1.Rooms, (room) => room.sender, {
         cascade: true,
     }),
     __metadata("design:type", Array)
-], User.prototype, "conversations", void 0);
+], User.prototype, "messages", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => job_application_model_1.JobApplication, (job_to_apply) => job_to_apply.user, {
         cascade: true,

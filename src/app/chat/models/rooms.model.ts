@@ -1,31 +1,29 @@
 import {
   Entity,
   PrimaryGeneratedColumn,
-  Column,
   ManyToOne,
+  OneToMany,
+  Column,
   CreateDateColumn,
-  UpdateDateColumn,
   DeleteDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
-import { Rooms } from './rooms.model';
 import { User } from 'src/app/user/user.model';
+import { Message } from './message.model';
 
 @Entity()
-export class Message {
+export class Rooms {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, (user) => user.messages, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, (user) => user.conversations_sender)
   sender: User;
 
-  @Column({ type: 'text' })
-  content: string;
+  @ManyToOne(() => User, (user) => user.conversations_receiver)
+  receiver: User;
 
-  @ManyToOne(() => Rooms, (room) => room.messages, { onDelete: 'CASCADE' })
-  room: Rooms;
-
-  @Column({ default: false })
-  viewed: boolean;
+  @OneToMany(() => Message, (message) => message.room)
+  messages: Message[];
 
   @CreateDateColumn()
   createdAt: Date;

@@ -1,31 +1,36 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsArray, IsOptional, IsString } from 'class-validator';
 
 export class SearchParentCriteriaDto {
+
   @IsString()
+  @IsOptional()
+  fullname?: string;
+  
+  @IsArray()
   @IsOptional()
   besions_specifiques?: string;
 
-  @IsString()
+  @IsArray()
   @IsOptional()
   garde_enfants?: string;
 
-  @IsString()
+  @IsArray()
   @IsOptional()
   aide_menagere?: string;
 
-  @IsString()
+  @IsArray()
   @IsOptional()
   frequence_des_services?: string;
 
-  @IsString()
+  @IsArray()
   @IsOptional()
   horaire_souhaites?: string;
 
-  @IsString()
+  @IsArray()
   @IsOptional()
   zone_geographique_prestataire?: string;
 
-  @IsString()
+  @IsArray()
   @IsOptional()
   disponibility_du_prestataire?: string;
 }

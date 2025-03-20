@@ -241,14 +241,7 @@ let NounusService = class NounusService {
     }
     async search(searchCriteria) {
         const { fullname, description, zone_de_travail, horaire_disponible, adress, tranche_age_enfants, competance_specifique, langue_parler, } = searchCriteria;
-        const whereConditions = {};
-        if (fullname) {
-            whereConditions.fullname = (0, typeorm_1.Like)(`%${fullname}%`);
-        }
-        const nounus = await this.nounuRepository.find({
-            where: {
-                ...whereConditions,
-            },
+        const _nounus = await this.nounuRepository.find({
             relations: [
                 'user',
                 'user.medias',
@@ -263,7 +256,7 @@ let NounusService = class NounusService {
                 'preferences.certifications_criteres',
             ],
         });
-        const nounuOne = await this.ReturnN(nounus, [
+        const nounus = await this.ReturnN(_nounus, [
             'zone_de_travail',
             'horaire_disponible',
             'adress',
@@ -272,7 +265,46 @@ let NounusService = class NounusService {
             'langue_parler',
             'certifications_criteres'
         ]);
-        return nounuOne;
+        const filteredNounus = nounus.filter((nounu) => {
+            if (fullname && !nounu.fullname?.toLowerCase().includes(fullname?.toLowerCase())) {
+                return false;
+            }
+            if (description && !nounu.description?.toLowerCase().includes(description?.toLowerCase())) {
+                return false;
+            }
+            if (zone_de_travail && zone_de_travail.length > 0) {
+                const hasMatchingZone = nounu.preferences.zone_de_travail.some((zone) => zone_de_travail.includes(zone.id));
+                if (!hasMatchingZone)
+                    return false;
+            }
+            if (horaire_disponible && horaire_disponible.length > 0) {
+                const hasMatchingHoraire = nounu.preferences.horaire_disponible.some((horaire) => horaire_disponible.includes(horaire.id));
+                if (!hasMatchingHoraire)
+                    return false;
+            }
+            if (adress && adress.length > 0) {
+                const hasMatchingAdress = nounu.preferences.adress.some((addr) => adress.includes(addr.id));
+                if (!hasMatchingAdress)
+                    return false;
+            }
+            if (tranche_age_enfants && tranche_age_enfants.length > 0) {
+                const hasMatchingAge = nounu.preferences.tranche_age_enfants.some((age) => tranche_age_enfants.includes(age.id));
+                if (!hasMatchingAge)
+                    return false;
+            }
+            if (competance_specifique && competance_specifique.length > 0) {
+                const hasMatchingCompetence = nounu.preferences.competance_specifique.some((competence) => competance_specifique.includes(competence.id));
+                if (!hasMatchingCompetence)
+                    return false;
+            }
+            if (langue_parler && langue_parler.length > 0) {
+                const hasMatchingLangue = nounu.preferences.langue_parler.some((langue) => langue_parler.includes(langue.id));
+                if (!hasMatchingLangue)
+                    return false;
+            }
+            return true;
+        });
+        return filteredNounus;
     }
     async ReturnN(datas, preferenceKey) {
         return datas.map((data) => {
@@ -285,6 +317,24 @@ let NounusService = class NounusService {
                     if (pref[key])
                         aggregatedPreferences[key].push(pref[key]);
                 });
+            });
+            return {
+                ...data,
+                image: data.user.medias.find((media) => media.type_media.slug === 'image-profil'),
+                gallery: data.user.medias.filter((media) => media.type_media.slug === 'gallery-image'),
+                imageDocuments: data.user.medias.filter((media) => media.type_media.slug === 'document-verification'),
+                preferences: aggregatedPreferences,
+            };
+        });
+    }
+    async ReturnSearchN(datas, preferenceKey) {
+        return datas.map((data) => {
+            const aggregatedPreferences = {};
+            preferenceKey.forEach((key) => {
+                aggregatedPreferences[key] = data.preferences
+                    .map((pref) => pref[key])
+                    .filter((value) => value !== undefined && value !== null)
+                    .flat();
             });
             return {
                 ...data,

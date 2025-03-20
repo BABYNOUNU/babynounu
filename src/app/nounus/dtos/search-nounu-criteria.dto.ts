@@ -1,27 +1,27 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsArray, IsOptional, IsString } from 'class-validator';
 
 export class SearchNounuCriteriaDto {
-  @IsString()
+  @IsArray()
   @IsOptional()
-  zone_de_travail?: string;
+  zone_de_travail?: any[];
 
-  @IsString()
+  @IsArray()
   @IsOptional()
-  horaire_disponible?: string;
+  horaire_disponible?: any[];
 
-  @IsString()
+  @IsArray()
   @IsOptional()
-  adress?: string;
+  adress?: any[];
 
-  @IsString()
+  @IsArray()
   @IsOptional()
-  tranche_age_enfants?: string;
+  tranche_age_enfants?: any[];
 
-  @IsString()
+  @IsArray()
   @IsOptional()
-  competance_specifique?: string;
+  competance_specifique?: any[];
 
-  @IsString()
+  @IsArray()
   @IsOptional()
-  langue_parler?: string;
+  langue_parler?: any[];
 }

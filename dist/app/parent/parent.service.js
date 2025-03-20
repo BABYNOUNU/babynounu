@@ -30,7 +30,42 @@ let ParentsService = class ParentsService {
         this.nounuService = nounuService;
     }
     async findAll() {
-        return await this.parentsRepository.find({ relations: ['preferences'] });
+        const parents = await this.parentsRepository.find({
+            relations: [
+                'user',
+                'user.medias',
+                'user.medias.type_media',
+                'preferences',
+                'preferences.besions_specifiques',
+                'preferences.garde_enfants',
+                'preferences.aide_menagere',
+                'preferences.frequence_des_services',
+                'preferences.horaire_souhaites',
+                'preferences.adress',
+                'preferences.zone_geographique_prestataire',
+                'preferences.competance_specifique',
+                'preferences.langue_parler',
+                'preferences.disponibility_du_prestataire',
+                'preferences.mode_de_paiement',
+            ],
+        });
+        if (!parents) {
+            throw new common_1.NotFoundException(`Parent with not found`);
+        }
+        const Parents = await this.nounuService.ReturnN(parents, [
+            'besions_specifiques',
+            'garde_enfants',
+            'aide_menagere',
+            'frequence_des_services',
+            'horaire_souhaites',
+            'adress',
+            'zone_geographique_prestataire',
+            'competance_specifique',
+            'langue_parler',
+            'disponibility_du_prestataire',
+            'mode_de_paiement',
+        ]);
+        return Parents;
     }
     async findOne(id) {
         const parent = await this.parentsRepository.findOne({
@@ -160,7 +195,7 @@ let ParentsService = class ParentsService {
                 const value = JSON.parse(updateParentDto[key]);
                 if (Array.isArray(value)) {
                     await this.preferenceRepository.delete({
-                        parents: { id }
+                        parents: { id },
                     });
                 }
             }
@@ -187,38 +222,83 @@ let ParentsService = class ParentsService {
         }
     }
     async search(searchCriteria) {
-        const { besions_specifiques, garde_enfants, aide_menagere, frequence_des_services, horaire_souhaites, zone_geographique_prestataire, disponibility_du_prestataire, } = searchCriteria;
-        const parentQuery = this.parentsRepository
-            .createQueryBuilder('parent')
-            .leftJoinAndSelect('parent.preferences', 'preferences')
-            .leftJoinAndSelect('parent.user', 'user');
-        if (besions_specifiques) {
-            parentQuery.andWhere('preferences.besions_specifiques = :besions_specifiques', { besions_specifiques });
-        }
-        if (garde_enfants) {
-            parentQuery.andWhere('preferences.garde_enfants = :garde_enfants', {
-                garde_enfants,
-            });
-        }
-        if (aide_menagere) {
-            parentQuery.andWhere('preferences.aide_menagere = :aide_menagere', {
-                aide_menagere,
-            });
-        }
-        if (frequence_des_services) {
-            parentQuery.andWhere('preferences.frequence_des_services = :frequence_des_services', { frequence_des_services });
-        }
-        if (horaire_souhaites) {
-            parentQuery.andWhere('preferences.horaire_souhaites = :horaire_souhaites', { horaire_souhaites });
-        }
-        if (zone_geographique_prestataire) {
-            parentQuery.andWhere('preferences.zone_geographique_prestataire = :zone_geographique_prestataire', { zone_geographique_prestataire });
-        }
-        if (disponibility_du_prestataire) {
-            parentQuery.andWhere('preferences.disponibility_du_prestataire = :disponibility_du_prestataire', { disponibility_du_prestataire });
-        }
-        const parents = await parentQuery.getMany();
-        return parents;
+        const { besions_specifiques, garde_enfants, aide_menagere, frequence_des_services, horaire_souhaites, zone_geographique_prestataire, disponibility_du_prestataire, fullname } = searchCriteria;
+        const _parents = await this.parentsRepository.find({
+            relations: [
+                'user',
+                'user.medias',
+                'user.medias.type_media',
+                'preferences',
+                'preferences.besions_specifiques',
+                'preferences.garde_enfants',
+                'preferences.aide_menagere',
+                'preferences.frequence_des_services',
+                'preferences.horaire_souhaites',
+                'preferences.adress',
+                'preferences.zone_geographique_prestataire',
+                'preferences.competance_specifique',
+                'preferences.langue_parler',
+                'preferences.disponibility_du_prestataire',
+                'preferences.mode_de_paiement',
+            ],
+        });
+        const parents = await this.nounuService.ReturnN(_parents, [
+            'besions_specifiques',
+            'garde_enfants',
+            'aide_menagere',
+            'frequence_des_services',
+            'horaire_souhaites',
+            'adress',
+            'zone_geographique_prestataire',
+            'competance_specifique',
+            'langue_parler',
+            'disponibility_du_prestataire',
+            'mode_de_paiement',
+        ]);
+        const filteredParents = parents.filter((parent) => {
+            if (fullname) {
+                const hasMatchingFullname = parent.fullname.toLowerCase().includes(fullname.toLowerCase());
+                if (!hasMatchingFullname)
+                    return false;
+            }
+            if (besions_specifiques && besions_specifiques.length > 0) {
+                const hasMatchingBesoin = parent.preferences.besions_specifiques.some((besoin) => besions_specifiques.includes(besoin.id));
+                if (!hasMatchingBesoin)
+                    return false;
+            }
+            if (garde_enfants && garde_enfants.length > 0) {
+                const hasMatchingGarde = parent.preferences.garde_enfants.some((garde) => garde_enfants.includes(garde.id));
+                if (!hasMatchingGarde)
+                    return false;
+            }
+            if (aide_menagere && aide_menagere.length > 0) {
+                const hasMatchingAide = parent.preferences.aide_menagere.some((aide) => aide_menagere.includes(aide.id));
+                if (!hasMatchingAide)
+                    return false;
+            }
+            if (frequence_des_services && frequence_des_services.length > 0) {
+                const hasMatchingFrequence = parent.preferences.frequence_des_services.some((frequence) => frequence_des_services.includes(frequence.id));
+                if (!hasMatchingFrequence)
+                    return false;
+            }
+            if (horaire_souhaites && horaire_souhaites.length > 0) {
+                const hasMatchingHoraire = parent.preferences.horaire_souhaites.some((horaire) => horaire_souhaites.includes(horaire.id));
+                if (!hasMatchingHoraire)
+                    return false;
+            }
+            if (zone_geographique_prestataire && zone_geographique_prestataire.length > 0) {
+                const hasMatchingZone = parent.preferences.zone_geographique_prestataire.some((zone) => zone_geographique_prestataire.includes(zone.id));
+                if (!hasMatchingZone)
+                    return false;
+            }
+            if (disponibility_du_prestataire && disponibility_du_prestataire.length > 0) {
+                const hasMatchingDisponibility = parent.preferences.disponibility_du_prestataire.some((disponibility) => disponibility_du_prestataire.includes(disponibility.id));
+                if (!hasMatchingDisponibility)
+                    return false;
+            }
+            return true;
+        });
+        return filteredParents;
     }
 };
 exports.ParentsService = ParentsService;

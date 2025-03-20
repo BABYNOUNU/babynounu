@@ -1,11 +1,10 @@
-import { Rooms } from './rooms.model';
 import { User } from 'src/app/user/user.model';
-export declare class Message {
+import { Message } from './message.model';
+export declare class Rooms {
     id: number;
     sender: User;
-    content: string;
-    room: Rooms;
-    viewed: boolean;
+    receiver: User;
+    messages: Message[];
     createdAt: Date;
     updatedAt: Date;
     deletedAt: Date | null;

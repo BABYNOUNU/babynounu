@@ -27,8 +27,7 @@ let ParentController = class ParentController {
         this.parentService = parentService;
     }
     GetParents() {
-        console.log('All');
-        this.parentService.findAll();
+        return this.parentService.findAll();
     }
     GetParent(id) {
         return this.parentService.findOne(id);
@@ -91,7 +90,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ParentController.prototype, "DeleteParent", null);
 __decorate([
-    (0, common_1.Post)('search/parent'),
+    (0, common_1.Post)('search_parent'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [search_parent_criteria_dto_1.SearchParentCriteriaDto]),

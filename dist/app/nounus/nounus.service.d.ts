@@ -23,5 +23,6 @@ export declare class NounusService {
     }): Promise<Nounus>;
     remove(id: number): Promise<void>;
     search(searchCriteria: any): Promise<any[]>;
-    ReturnN(datas: any[], preferenceKey: any[]): Promise<Nounus[]>;
+    ReturnN(datas: any[], preferenceKey: any[]): Promise<any[]>;
+    ReturnSearchN(datas: any[], preferenceKey: any[]): Promise<Nounus[]>;
 }

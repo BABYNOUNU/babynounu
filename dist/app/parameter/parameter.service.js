@@ -21,17 +21,30 @@ let ParameterService = class ParameterService {
         this.parameterRepository = parameterRepository;
     }
     async findAll() {
-        return this.parameterRepository.find({
-            relations: { type_parameter: true, },
+        const parameters = await this.parameterRepository.find({
+            relations: { type_parameter: true },
         });
+        const parametersGroupedByType = parameters.reduce((acc, parameter) => {
+            const type = parameter.type_parameter.slug;
+            if (!acc[type]) {
+                acc[type] = [];
+            }
+            acc[type].push(parameter);
+            return acc;
+        }, {});
+        return parametersGroupedByType;
     }
     async findAllBySlug(typeParmaSlug) {
-        return this.parameterRepository.find({ where: { type_parameter: { slug: typeParmaSlug } },
+        return this.parameterRepository.find({
+            where: { type_parameter: { slug: typeParmaSlug } },
             relations: { type_parameter: true },
         });
     }
     async findOneBySlug(slug) {
-        const parameter = await this.parameterRepository.findOne({ where: { slug }, relations: ['type_parameter'] });
+        const parameter = await this.parameterRepository.findOne({
+            where: { slug },
+            relations: ['type_parameter'],
+        });
         if (!parameter) {
             throw new common_1.NotFoundException(`Parameter with slug ${slug} not found`);
         }

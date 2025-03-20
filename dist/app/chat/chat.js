@@ -1,11 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatProviders = void 0;
-const chat_model_1 = require("./models/chat.model");
+const rooms_model_1 = require("./models/rooms.model");
+const message_model_1 = require("./models/message.model");
 exports.ChatProviders = [
     {
-        provide: 'CHAT_REPOSITORY',
-        useFactory: (dataSource) => dataSource.getRepository(chat_model_1.ChatMessages),
+        provide: 'MESSAGE_REPOSITORY',
+        useFactory: (dataSource) => dataSource.getRepository(message_model_1.Message),
         inject: ['DATA_SOURCE'],
     },
+    {
+        provide: 'ROOMS_REPOSITORY',
+        useFactory: (dataSource) => dataSource.getRepository(rooms_model_1.Rooms),
+        inject: ['DATA_SOURCE'],
+    }
 ];

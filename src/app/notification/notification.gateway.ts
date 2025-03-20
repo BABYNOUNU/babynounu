@@ -19,12 +19,12 @@ import { HOST } from 'src/database/database.providers';
   
     // Écouter les connexions des clients
     handleConnection(client: Socket) {
-      console.log(`Client connecté: ${client.id}`);
+      // console.log(`Client connecté: ${client.id}`);
     }
   
     // Écouter les déconnexions des clients
     handleDisconnect(client: Socket) {
-      console.log(`Client déconnecté: ${client.id}`);
+      // console.log(`Client déconnecté: ${client.id}`);
     }
   
     // Écouter un événement personnalisé (optionnel)

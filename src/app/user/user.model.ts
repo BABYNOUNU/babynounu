@@ -14,7 +14,7 @@ import { Abonnements } from '../abonnement/models/abonnement.model';
 import { Notification } from '../notification/models/notification.model';
 import { Job } from '../job/models/job.model';
 import { Paiements } from '../paiement/models/paiement.model';
-import { Conversation } from '../chat/models/conversation.model';
+import { Rooms } from '../chat/models/rooms.model';
 import { JobApplication } from '../job-application/models/job-application.model';
 import { Preference } from '../Preference/models/preference.model';
 import { Parameter } from '../parameter/models/parameter.model';
@@ -70,10 +70,18 @@ export class User {
   })
   sentNotifications: Notification[];
 
-  @OneToMany(() => Conversation, (conversation) => conversation.user, {
+  @OneToMany(() => Rooms, (room) => room.sender)
+  conversations_sender: Rooms[];
+
+  @OneToMany(() => Rooms, (room) => room.receiver)
+  conversations_receiver: Rooms[];
+
+  @OneToMany(() => Rooms, (room) => room.sender, {
     cascade: true,
   })
-  conversations: Conversation[];
+  messages: Rooms[];
+
+  
 
   @OneToMany(() => JobApplication, (job_to_apply) => job_to_apply.user, {
     cascade: true,
@@ -90,6 +98,8 @@ export class User {
     cascade: true,
   })
   paiements: Paiements[];
+
+ 
 
   
 

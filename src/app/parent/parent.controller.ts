@@ -29,8 +29,7 @@ export class ParentController {
   // Get All Parents
   @Get('')
   GetParents() {
-    console.log('All');
-    this.parentService.findAll();
+    return this.parentService.findAll();
   }
 
   // Get Signle Parent
@@ -73,7 +72,7 @@ export class ParentController {
   }
 
 
-  @Post('search/parent')
+  @Post('search_parent')
 async searchParent(@Body() searchCriteria: SearchParentCriteriaDto) {
   return this.parentService.search(searchCriteria);
 }

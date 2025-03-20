@@ -11,11 +11,17 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Message = void 0;
 const typeorm_1 = require("typeorm");
-const conversation_model_1 = require("./conversation.model");
+const rooms_model_1 = require("./rooms.model");
+const user_model_1 = require("../../user/user.model");
 let Message = class Message {
     id;
+    sender;
     content;
-    conversation;
+    room;
+    viewed;
+    createdAt;
+    updatedAt;
+    deletedAt;
 };
 exports.Message = Message;
 __decorate([
@@ -23,13 +29,33 @@ __decorate([
     __metadata("design:type", Number)
 ], Message.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.ManyToOne)(() => user_model_1.User, (user) => user.messages, { onDelete: 'CASCADE' }),
+    __metadata("design:type", user_model_1.User)
+], Message.prototype, "sender", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'text' }),
     __metadata("design:type", String)
 ], Message.prototype, "content", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => conversation_model_1.Conversation, (conversation) => conversation.messages),
-    __metadata("design:type", conversation_model_1.Conversation)
-], Message.prototype, "conversation", void 0);
+    (0, typeorm_1.ManyToOne)(() => rooms_model_1.Rooms, (room) => room.messages, { onDelete: 'CASCADE' }),
+    __metadata("design:type", rooms_model_1.Rooms)
+], Message.prototype, "room", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: false }),
+    __metadata("design:type", Boolean)
+], Message.prototype, "viewed", void 0);
+__decorate([
+    (0, typeorm_1.CreateDateColumn)(),
+    __metadata("design:type", Date)
+], Message.prototype, "createdAt", void 0);
+__decorate([
+    (0, typeorm_1.UpdateDateColumn)({ type: 'timestamp' }),
+    __metadata("design:type", Date)
+], Message.prototype, "updatedAt", void 0);
+__decorate([
+    (0, typeorm_1.DeleteDateColumn)({ type: 'timestamp', nullable: true }),
+    __metadata("design:type", Date)
+], Message.prototype, "deletedAt", void 0);
 exports.Message = Message = __decorate([
     (0, typeorm_1.Entity)()
 ], Message);

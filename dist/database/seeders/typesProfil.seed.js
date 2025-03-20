@@ -19,5 +19,11 @@ exports.TypeProfilSeeders = [
         description: "open-modal-auth-profil-menager",
         type_parameter: "2",
         slug: "menager"
-    }
+    },
+    {
+        name: "Administrateur",
+        description: "open-modal-auth-profil-administrateur",
+        type_parameter: "2",
+        slug: "administrateur"
+    },
 ];

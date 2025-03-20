@@ -1,3 +1,6 @@
 export declare class CreateConversationDto {
-    title: string;
+    readonly id: number;
+    readonly sender: string;
+    readonly receiver: string;
+    readonly room: string;
 }

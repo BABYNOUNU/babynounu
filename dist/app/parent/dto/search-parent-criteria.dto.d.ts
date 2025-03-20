@@ -1,4 +1,5 @@
 export declare class SearchParentCriteriaDto {
+    fullname?: string;
     besions_specifiques?: string;
     garde_enfants?: string;
     aide_menagere?: string;

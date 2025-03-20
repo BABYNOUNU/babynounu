@@ -51,13 +51,14 @@ export class UserService {
 
   async loggedUser(ID: any): Promise<User | null> {
     const User = await this.userRepository.findOne({ where: { id: ID }, relations: ['role', 'medias.type_media', 'type_profil', 'parent', 'nounu', 'nounu.preferences.adress', 'parent.preferences.adress', 'abonnement'] });
-    console.log(User)
+  
     if (!User) {
       throw new BadRequestException({ message: 'user not exist in database' });
     }
-
-    const dataUser = await this.ReturnN([User], ['adress'], User.type_profil?.slug);
-    return dataUser[0];
+    console.log()
+    const dataUser = User.role.slug == 'admin'  ? [User] : await this.ReturnN([User], ['adress'], User.type_profil?.slug);
+    
+    return  dataUser[0];
   }
 
 

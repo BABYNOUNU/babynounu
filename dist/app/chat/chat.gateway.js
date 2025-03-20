@@ -28,13 +28,43 @@ let ChatGateway = class ChatGateway {
     handleDisconnect(client) {
         console.log(`Client disconnected: ${client.id}`);
     }
-    async handleJoinRoom(room, client) {
-        client.join(room);
-        const messages = await this.chatService.getMessages(room);
-        client.emit('loadMessages', messages);
+    async handleJoinRoom(roomId, client) {
+        client.join(roomId);
+        const messages = await this.chatService.getMessages(+roomId);
+        this.server.to(roomId).emit('loadMessages', messages);
     }
     async handleMessage(data, client) {
-        const { sender, content, room } = data;
+        const { senderId, content, roomId, receiverId } = data;
+        console.log(roomId);
+        const message = await this.chatService.saveMessage({
+            senderId,
+            content,
+            roomId,
+        });
+        console.log(this.server);
+        this.server.emit('newMessage', message);
+    }
+    async handleTyping(data, client) {
+        this.server.emit('typing', { user: data.sender, roomId: data.roomId });
+    }
+    async getAllConversationByUser(userId, client) {
+        const conversations = await this.chatService.getAllConversationsByUser(userId);
+        client.emit('allConversations', conversations);
+    }
+    async getConversation(data, client) {
+        const { roomId, openChatSenderId } = data;
+        const conversation = await this.chatService.getConversation(roomId, openChatSenderId);
+        client.emit('conversation', conversation);
+    }
+    async updateViewMessage(data, client) {
+        const { roomId, receiverId } = data;
+        await this.chatService.updateViewMessage(receiverId, +roomId);
+        this.server.to(roomId).emit('updateViewMessage', { roomIdMessage: roomId });
+    }
+    async getCountMessageByReceiverId(data, client) {
+        const { roomId, receiverId } = data;
+        const count = await this.chatService.getCountMessageByReceiverId(receiverId, +roomId);
+        client.emit('countMessageByReceiverId', count);
     }
 };
 exports.ChatGateway = ChatGateway;
@@ -58,9 +88,49 @@ __decorate([
     __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
     __metadata("design:returntype", Promise)
 ], ChatGateway.prototype, "handleMessage", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('typing'),
+    __param(0, (0, websockets_1.MessageBody)()),
+    __param(1, (0, websockets_1.ConnectedSocket)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
+    __metadata("design:returntype", Promise)
+], ChatGateway.prototype, "handleTyping", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('getAllConversationByUser'),
+    __param(0, (0, websockets_1.MessageBody)()),
+    __param(1, (0, websockets_1.ConnectedSocket)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, socket_io_1.Socket]),
+    __metadata("design:returntype", Promise)
+], ChatGateway.prototype, "getAllConversationByUser", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('getConversation'),
+    __param(0, (0, websockets_1.MessageBody)()),
+    __param(1, (0, websockets_1.ConnectedSocket)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
+    __metadata("design:returntype", Promise)
+], ChatGateway.prototype, "getConversation", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('updateViewMessage'),
+    __param(0, (0, websockets_1.MessageBody)()),
+    __param(1, (0, websockets_1.ConnectedSocket)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
+    __metadata("design:returntype", Promise)
+], ChatGateway.prototype, "updateViewMessage", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('getCountMessageByReceiverId'),
+    __param(0, (0, websockets_1.MessageBody)()),
+    __param(1, (0, websockets_1.ConnectedSocket)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
+    __metadata("design:returntype", Promise)
+], ChatGateway.prototype, "getCountMessageByReceiverId", null);
 exports.ChatGateway = ChatGateway = __decorate([
     (0, websockets_1.WebSocketGateway)({
-        cors: true,
+        cors: { origin: '*' },
     }),
     __metadata("design:paramtypes", [chat_service_1.ChatService])
 ], ChatGateway);

@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SearchParentCriteriaDto = void 0;
 const class_validator_1 = require("class-validator");
 class SearchParentCriteriaDto {
+    fullname;
     besions_specifiques;
     garde_enfants;
     aide_menagere;
@@ -25,34 +26,39 @@ __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
+], SearchParentCriteriaDto.prototype, "fullname", void 0);
+__decorate([
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
 ], SearchParentCriteriaDto.prototype, "besions_specifiques", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsArray)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], SearchParentCriteriaDto.prototype, "garde_enfants", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsArray)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], SearchParentCriteriaDto.prototype, "aide_menagere", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsArray)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], SearchParentCriteriaDto.prototype, "frequence_des_services", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsArray)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], SearchParentCriteriaDto.prototype, "horaire_souhaites", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsArray)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], SearchParentCriteriaDto.prototype, "zone_geographique_prestataire", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsArray)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], SearchParentCriteriaDto.prototype, "disponibility_du_prestataire", void 0);
