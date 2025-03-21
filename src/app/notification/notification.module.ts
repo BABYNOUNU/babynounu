@@ -4,10 +4,12 @@ import { NotificationService } from './notification.service';
 import { NotificationProviders } from './notification';
 import { DatabaseModule } from 'src/database/database.module';
 import { NotificationGateway } from './notification.gateway';
+import { AbonnementService } from '../abonnement/abonnement.service';
+import { AbonnementProviders } from '../abonnement/abonnement';
 
 @Module({
   imports: [DatabaseModule],
   controllers: [NotificationController],
-  providers: [NotificationService, NotificationGateway, ...NotificationProviders]
+  providers: [NotificationService, ...NotificationProviders], 
 })
 export class NotificationModule {}

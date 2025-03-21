@@ -56,5 +56,6 @@ exports.AppModule = AppModule = __decorate([
         ],
         controllers: [],
         providers: [],
+        exports: []
     })
 ], AppModule);

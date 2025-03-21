@@ -14,7 +14,6 @@ export class NotificationService {
   constructor(
     @Inject('NOTIFICATION_REPOSITORY')
     private readonly notificationRepository: Repository<Notification>,
-    private readonly notificationGateway: NotificationGateway,
   ) {}
 
   /**
@@ -29,6 +28,7 @@ export class NotificationService {
       user: { id: createNotificationDto.userId },
       isRead: createNotificationDto.is_read,
       sender: { id: createNotificationDto.senderUserId },
+      job: { id: createNotificationDto.jobId },
     });
 
     const saveNotification =
@@ -38,9 +38,6 @@ export class NotificationService {
       throw new NotFoundException('Notification not saved');
     }
 
-    this.notificationGateway.server
-      .emit('notification', saveNotification);
-
     return saveNotification;
   }
 
@@ -49,12 +46,32 @@ export class NotificationService {
    * @param userId - ID of the user.
    * @returns A list of notifications.
    */
-  async getNotifications(userId: number) {
-    console.log(userId);
-    return await this.notificationRepository.find({
-      where: { user: { id: userId.toString() } },
-      order: { createdAt: 'DESC' },
+  async getNotifications(userId: string) {
+    let notifications = await this.notificationRepository.find({
+      where: { sender: { id: userId } },
+      relations: {
+        user: {
+          nounu: true,
+          parent: true,
+        },
+        job: true,
+      },
     });
+
+    notifications = notifications.map((notify) => {
+      return {
+        ...notify,
+        profil:
+          notify.user.nounu.length > 0
+            ? notify.user.nounu[0]
+            : notify.user.parent[0],
+      };
+    });
+
+    const count = await this.notificationRepository.count({
+      where: { sender: { id: userId }, isRead: false },
+    });
+    return { notifications, count };
   }
 
   /**
@@ -64,5 +81,22 @@ export class NotificationService {
    */
   async markAsRead(notificationId: number) {
     await this.notificationRepository.update(notificationId, { isRead: true });
+  }
+
+  /**
+   * Update view by user id.
+   * @param userId - ID of the user.
+   * @returns void
+   */
+  async updateViewByUserId(senderUserId: string) {
+    await this.notificationRepository
+      .createQueryBuilder('notification')
+      .innerJoin('notification.sender', 'sender')
+      .update(Notification)
+      .set({ isRead: true })
+      .where('sender.id = :senderUserId', { senderUserId })
+      .execute();
+
+    return this.getNotifications(senderUserId);
   }
 }

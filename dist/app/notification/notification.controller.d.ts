@@ -4,6 +4,9 @@ export declare class NotificationController {
     private readonly notificationsService;
     constructor(notificationsService: NotificationService);
     createNotification(createNotificationDto: CreateNotificationDto): Promise<import("./models/notification.model").Notification>;
-    getNotifications(userId: number): Promise<import("./models/notification.model").Notification[]>;
+    getNotifications(userId: string): Promise<{
+        notifications: import("./models/notification.model").Notification[];
+        count: number;
+    }>;
     markAsRead(id: number): Promise<void>;
 }

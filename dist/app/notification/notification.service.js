@@ -13,15 +13,13 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NotificationService = void 0;
-const notification_gateway_1 = require("./notification.gateway");
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("typeorm");
+const notification_model_1 = require("./models/notification.model");
 let NotificationService = class NotificationService {
     notificationRepository;
-    notificationGateway;
-    constructor(notificationRepository, notificationGateway) {
+    constructor(notificationRepository) {
         this.notificationRepository = notificationRepository;
-        this.notificationGateway = notificationGateway;
     }
     async createNotification(createNotificationDto) {
         const notification = this.notificationRepository.create({
@@ -30,30 +28,55 @@ let NotificationService = class NotificationService {
             user: { id: createNotificationDto.userId },
             isRead: createNotificationDto.is_read,
             sender: { id: createNotificationDto.senderUserId },
+            job: { id: createNotificationDto.jobId },
         });
         const saveNotification = await this.notificationRepository.save(notification);
         if (!saveNotification) {
             throw new common_1.NotFoundException('Notification not saved');
         }
-        this.notificationGateway.server
-            .emit('notification', saveNotification);
         return saveNotification;
     }
     async getNotifications(userId) {
-        console.log(userId);
-        return await this.notificationRepository.find({
-            where: { user: { id: userId.toString() } },
-            order: { createdAt: 'DESC' },
+        let notifications = await this.notificationRepository.find({
+            where: { sender: { id: userId } },
+            relations: {
+                user: {
+                    nounu: true,
+                    parent: true,
+                },
+                job: true,
+            },
         });
+        notifications = notifications.map((notify) => {
+            return {
+                ...notify,
+                profil: notify.user.nounu.length > 0
+                    ? notify.user.nounu[0]
+                    : notify.user.parent[0],
+            };
+        });
+        const count = await this.notificationRepository.count({
+            where: { sender: { id: userId }, isRead: false },
+        });
+        return { notifications, count };
     }
     async markAsRead(notificationId) {
         await this.notificationRepository.update(notificationId, { isRead: true });
+    }
+    async updateViewByUserId(senderUserId) {
+        await this.notificationRepository
+            .createQueryBuilder('notification')
+            .innerJoin('notification.sender', 'sender')
+            .update(notification_model_1.Notification)
+            .set({ isRead: true })
+            .where('sender.id = :senderUserId', { senderUserId })
+            .execute();
+        return this.getNotifications(senderUserId);
     }
 };
 exports.NotificationService = NotificationService;
 exports.NotificationService = NotificationService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)('NOTIFICATION_REPOSITORY')),
-    __metadata("design:paramtypes", [typeorm_1.Repository,
-        notification_gateway_1.NotificationGateway])
+    __metadata("design:paramtypes", [typeorm_1.Repository])
 ], NotificationService);

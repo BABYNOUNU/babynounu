@@ -14,6 +14,11 @@ const job_application_1 = require("./job-application");
 const database_module_1 = require("../../database/database.module");
 const notification_service_1 = require("../notification/notification.service");
 const notification_gateway_1 = require("../notification/notification.gateway");
+const notification_1 = require("../notification/notification");
+const abonnement_service_1 = require("../abonnement/abonnement.service");
+const abonnement_1 = require("../abonnement/abonnement");
+const paiement_service_1 = require("../paiement/paiement.service");
+const paiement_1 = require("../paiement/paiement");
 let JobApplicationModule = class JobApplicationModule {
 };
 exports.JobApplicationModule = JobApplicationModule;
@@ -21,6 +26,16 @@ exports.JobApplicationModule = JobApplicationModule = __decorate([
     (0, common_1.Module)({
         imports: [database_module_1.DatabaseModule],
         controllers: [job_application_controller_1.JobApplicationController],
-        providers: [job_application_service_1.JobApplicationsService, notification_service_1.NotificationService, notification_gateway_1.NotificationGateway, ...job_application_1.JobApplicationProviders]
+        providers: [
+            job_application_service_1.JobApplicationsService,
+            notification_service_1.NotificationService,
+            notification_gateway_1.NotificationGateway,
+            abonnement_service_1.AbonnementService,
+            paiement_service_1.PaymentService,
+            ...paiement_1.PaiementProviders,
+            ...abonnement_1.AbonnementProviders,
+            ...notification_1.NotificationProviders,
+            ...job_application_1.JobApplicationProviders,
+        ],
     })
 ], JobApplicationModule);

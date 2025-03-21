@@ -225,7 +225,6 @@ let JobsService = class JobsService {
         if (!jobUser) {
             throw new common_1.NotFoundException(`Job with ID ${jobUser} not found`);
         }
-        console.log(jobUser);
         const DataJob = await this.ReturnN(jobUser, this.preferenceKeys);
         return DataJob;
     }

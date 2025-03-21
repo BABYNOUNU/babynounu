@@ -1,4 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+} from 'typeorm';
 import { User } from 'src/app/user/user.model';
 import { Job } from 'src/app/job/models/job.model';
 
@@ -21,7 +29,7 @@ export class Notification {
 
   @ManyToOne(() => User, (user) => user.notifications, { onDelete: 'CASCADE' })
   user: User; // Utilisateur qui reçoit la notification
-  
+
   @ManyToOne(() => User, (user) => user.sentNotifications, { onDelete: 'CASCADE' })
   sender: User; // Utilisateur qui envoie la notification
 

@@ -63,4 +63,14 @@ export class JobApplicationController {
     return this.jobApplicationService.getJobApplyByUser(userId);
   }
 
+
+  
+  @Get('job/user/:userId')
+  @ApiOperation({ summary: 'Récupérer les jobs ou l\'utilisateur peut postuler' })
+  @ApiParam({ name: 'userId', description: 'ID de l\'utilisateur', example: '1' })
+  @ApiResponse({ status: 200, description: 'Liste des jobs où l\'utilisateur peut postuler.', type: [JobApplication] })
+  @ApiResponse({ status: 404, description: 'Utilisateur non trouvé ou aucun job.' })
+  getJobToApplyByUser(@Param('userId') userId: string) {
+    return this.jobApplicationService.getJobToApplyByUser(userId);
+  }
 }

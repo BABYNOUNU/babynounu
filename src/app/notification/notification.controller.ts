@@ -44,7 +44,7 @@ export class NotificationController {
     description: 'Notifications retrieved successfully',
   })
   @ApiResponse({ status: 404, description: 'User not found' })
-  async getNotifications(@Param('userId') userId: number) {
+  async getNotifications(@Param('userId') userId: string) {
     return this.notificationsService.getNotifications(userId);
   }
 

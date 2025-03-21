@@ -16,7 +16,6 @@ exports.AbonnementService = void 0;
 const notification_service_1 = require("./../notification/notification.service");
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("typeorm");
-const notification_gateway_1 = require("../notification/notification.gateway");
 const paiement_service_1 = require("../paiement/paiement.service");
 const axios_1 = require("axios");
 let AbonnementService = class AbonnementService {
@@ -24,13 +23,11 @@ let AbonnementService = class AbonnementService {
     payRepository;
     paymentService;
     NotificationService;
-    notificationGateway;
-    constructor(abonnementRepository, payRepository, paymentService, NotificationService, notificationGateway) {
+    constructor(abonnementRepository, payRepository, paymentService, NotificationService) {
         this.abonnementRepository = abonnementRepository;
         this.payRepository = payRepository;
         this.paymentService = paymentService;
         this.NotificationService = NotificationService;
-        this.notificationGateway = notificationGateway;
     }
     async createAbonnement(createAbonnementDto) {
         const paiement = await this.payRepository.findOne({
@@ -40,15 +37,18 @@ let AbonnementService = class AbonnementService {
             },
         });
         if (!paiement) {
-            throw new common_1.NotFoundException(`Auccun paiement avec l'ID de transaction ${createAbonnementDto.transactionId} n'a pas été trouvé`);
+            throw new common_1.NotFoundException(`Aucun paiement avec l'ID de transaction ${createAbonnementDto.transactionId} n'a été trouvé.`);
         }
-        const IsAbonnementExist = await this.abonnementRepository.findOne({
-            where: { user: { id: createAbonnementDto.userId }, paiement: { id: paiement.id } },
+        const isAbonnementExist = await this.abonnementRepository.findOne({
+            where: {
+                user: { id: createAbonnementDto.userId },
+                paiement: { id: paiement.id },
+            },
         });
-        if (IsAbonnementExist) {
-            return IsAbonnementExist;
+        if (isAbonnementExist) {
+            return isAbonnementExist;
         }
-        var config = {
+        const config = {
             method: 'post',
             url: 'https://api-checkout.cinetpay.com/v2/payment/check',
             headers: {
@@ -61,53 +61,57 @@ let AbonnementService = class AbonnementService {
             },
         };
         let abonnementChecked;
-        await (0, axios_1.default)(config)
-            .then((response) => {
+        try {
+            const response = await (0, axios_1.default)(config);
             abonnementChecked = response.data;
-        })
-            .catch((error) => {
-            throw new common_1.NotFoundException(`Le paiement avec l'ID de transaction ${createAbonnementDto.transactionId} n'a pas été trouvé`);
-        });
+            if (!abonnementChecked || !abonnementChecked.data) {
+                throw new common_1.NotFoundException(`La réponse de l'API CinetPay est invalide pour la transaction ${createAbonnementDto.transactionId}.`);
+            }
+        }
+        catch (error) {
+            throw new common_1.NotFoundException(`Le paiement avec l'ID de transaction ${createAbonnementDto.transactionId} n'a pas pu être vérifié.`);
+        }
         const abonnement = this.abonnementRepository.create({
             paiement: { id: paiement.id },
             user: { id: createAbonnementDto.userId },
         });
         const abonnementSave = await this.abonnementRepository.save(abonnement);
         if (!abonnementSave) {
-            throw new common_1.NotFoundException(`Abonnement with transaction ID ${createAbonnementDto.transactionId} not found`);
+            throw new common_1.NotFoundException(`L'abonnement avec l'ID de transaction ${createAbonnementDto.transactionId} n'a pas pu être créé.`);
         }
-        this.paymentService.updatePayment(paiement.id, {
+        await this.paymentService.updatePayment(paiement.id, {
             status: abonnementChecked.data.status,
             paymentMethod: abonnementChecked.data.payment_method,
             currency: abonnementChecked.data.currency,
             operator_id: abonnementChecked.data.operator_id,
         });
-        const GetAbonnement = await this.getAbonnementById(abonnementSave.id);
-        this.notificationGateway.server.emit('abonnementValide', {
-            message: GetAbonnement,
-        });
-        if (!GetAbonnement) {
-            throw new common_1.NotFoundException(`Abonnement with transaction ID ${createAbonnementDto.transactionId} not found`);
-        }
-        this.NotificationService.createNotification({
+        await this.NotificationService.createNotification({
             type: 'ABONNEMENT',
             userId: createAbonnementDto.userId.toString(),
-            message: `Votre abonnement a bien été validé`,
+            message: `Votre abonnement a bien été validé.`,
             is_read: false,
             senderUserId: createAbonnementDto.userId.toString(),
         });
-        return abonnementSave;
+        const Abonnement = await this.getAbonnementById(abonnementSave.id);
+        return Abonnement;
     }
     async getAbonnementsByUser(userId) {
         return this.abonnementRepository.find({
             where: { user: { id: userId } },
-            relations: ['paiement', 'type'],
+            relations: {
+                paiement: true,
+                user: true,
+            },
         });
     }
     async getAbonnementById(abonnementId) {
         const abonnement = await this.abonnementRepository.findOne({
             where: { id: abonnementId },
-            relations: ['paiement', 'type', 'user'],
+            relations: {
+                paiement: true,
+                type: true,
+                user: true,
+            },
         });
         if (!abonnement) {
             throw new common_1.NotFoundException(`Abonnement with ID ${abonnementId} not found`);
@@ -137,6 +141,5 @@ exports.AbonnementService = AbonnementService = __decorate([
     __metadata("design:paramtypes", [typeorm_1.Repository,
         typeorm_1.Repository,
         paiement_service_1.PaymentService,
-        notification_service_1.NotificationService,
-        notification_gateway_1.NotificationGateway])
+        notification_service_1.NotificationService])
 ], AbonnementService);

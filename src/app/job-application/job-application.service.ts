@@ -9,6 +9,7 @@ import { UpdateJobApplicationDto } from './dto/update-job-application.dto';
 import { User } from '../user/user.model';
 import { Job } from '../job/models/job.model';
 import { NotificationService } from '../notification/notification.service';
+import { NotificationGateway } from '../notification/notification.gateway';
 
 @Injectable()
 export class JobApplicationsService {
@@ -23,7 +24,10 @@ export class JobApplicationsService {
   ) {}
 
   private RelationShip = [
-    'user', 'user.nounu', 'user.medias', 'user.medias.type_media',
+    'user',
+    'user.nounu',
+    'user.medias',
+    'user.medias.type_media',
     'medias',
     'jobs',
     'user.medias.type_media',
@@ -69,16 +73,16 @@ export class JobApplicationsService {
     userId: string,
   ): Promise<JobApplication> {
     const { userId: applicantUserId, jobId } = createJobApplicationDto;
-  
+
     // Vérifier si l'utilisateur a déjà postulé à ce job
     const existingApplication = await this.jobApplicationRepository.findOne({
       where: {
-        user: { id: applicantUserId.toString() },
+        user: { id: userId },
         jobs: { id: jobId },
       },
       select: ['id', 'is_apply'], // Récupérer uniquement les champs nécessaires
     });
-  
+
     // Si une candidature existe déjà, basculer l'état de is_apply
     if (existingApplication) {
       const newApplyStatus = !existingApplication.is_apply; // Inverser l'état actuel
@@ -86,36 +90,39 @@ export class JobApplicationsService {
         { id: existingApplication.id },
         { is_apply: newApplyStatus },
       );
-  
+
       // Mettre à jour l'objet existant pour le retourner
       existingApplication.is_apply = newApplyStatus;
       return existingApplication;
     }
-  
+
     // Créer une nouvelle candidature
     const newJobApplication = this.jobApplicationRepository.create({
       is_apply: true,
-      user: { id: applicantUserId.toString() },
+      user: { id: userId },
       jobs: { id: jobId },
     });
-  
+
     // Sauvegarder la nouvelle candidature
-    const savedJobApplication = await this.jobApplicationRepository.save(
-      newJobApplication,
-    );
-  
+    const savedJobApplication =
+      await this.jobApplicationRepository.save(newJobApplication);
+
     if (!savedJobApplication) {
       throw new NotFoundException(
         `Job with ID ${jobId} not found or could not be applied to.`,
       );
     }
-  
+
     // Envoyer une notification à l'utilisateur
-    await this.sendJobApplicationNotification(applicantUserId.toString(), jobId.toString(), userId);
-  
+    await this.sendJobApplicationNotification(
+      userId,
+      jobId.toString(),
+      applicantUserId.toString(),
+    );
+
     return savedJobApplication;
   }
-  
+
   /**
    * Envoie une notification à l'utilisateur après une candidature à un job.
    * @param applicantUserId - L'ID de l'utilisateur qui postule.
@@ -123,16 +130,17 @@ export class JobApplicationsService {
    * @param senderUserId - L'ID de l'utilisateur qui envoie la notification.
    */
   private async sendJobApplicationNotification(
-    applicantUserId: string,
+    userId: string,
     jobId: string,
     senderUserId: string,
   ): Promise<void> {
     await this.notificationService.createNotification({
       type: 'JOBS',
-      userId: applicantUserId,
-      message: `You have applied to job ${jobId}`,
+      userId: userId,
+      message: `Semble être interessé par votre offre d'emploi`,
       is_read: false,
       senderUserId: senderUserId,
+      jobId: +jobId,
     });
   }
 
@@ -189,54 +197,100 @@ export class JobApplicationsService {
   async getJobApplyByUser(userId: string): Promise<any[]> {
     try {
       const jobApplicationUser = await this.jobApplicationRepository.find({
-        where: { jobs: { user: {id: userId} } },
-        relations: ['jobs', 'user', 'user.nounu', 'user.medias', 'user.medias.type_media'],
+        where: { jobs: { user: { id: userId } }, is_apply: true },
+        relations: [
+          'jobs',
+          'user',
+          'user.nounu',
+          'user.medias',
+          'user.medias.type_media',
+        ],
       });
       if (!jobApplicationUser) {
-        throw new NotFoundException(`JobApplication with ID ${jobApplicationUser} not found`);
+        throw new NotFoundException(
+          `JobApplication with ID ${jobApplicationUser} not found`,
+        );
       }
 
       const _jobApplicationUser = jobApplicationUser.map((data) => {
-        
         return {
           ...data,
-          image: data.user.medias?.find((media) => media.type_media.slug === 'image-profil'),
-        }
-      })
+          image: data.user.medias?.find(
+            (media) => media.type_media.slug === 'image-profil',
+          ),
+        };
+      });
 
       return _jobApplicationUser;
     } catch (error) {
-      console.log(error)
+      console.log(error);
+    }
+  }
+
+
+  async getJobToApplyByUser(userId: string): Promise<any[]> {
+    try {
+      const jobApplicationUser = await this.jobApplicationRepository.find({
+        where: { jobs: { jobApplications: { user: { id: userId } } }, is_apply: true },
+        relations: [
+          'jobs',
+          'user',
+          'user.nounu',
+          'user.medias',
+          'user.medias.type_media',
+        ],
+      });
+      if (!jobApplicationUser) {
+        throw new NotFoundException(
+          `JobApplication with ID ${jobApplicationUser} not found`,
+        );
+      }
+
+      const _jobApplicationUser = jobApplicationUser.map((data) => {
+        return {
+          ...data,
+          image: data.user.medias?.find(
+            (media) => media.type_media.slug === 'image-profil',
+          ),
+        };
+      });
+
+      return _jobApplicationUser;
+    } catch (error) {
+      console.log(error);
     }
   }
 
   async GetJobApplyByUserId(userId: string): Promise<any[]> {
     const jobApplicationUser = await this.jobApplicationRepository.find({
-      where: { user: {id: userId } },
+      where: { user: { id: userId } },
       relations: this.RelationShip,
     });
     if (!jobApplicationUser) {
-      throw new NotFoundException(`JobApplication with ID ${jobApplicationUser} not found`);
+      throw new NotFoundException(
+        `JobApplication with ID ${jobApplicationUser} not found`,
+      );
     }
 
     const _jobApplicationUser = jobApplicationUser.map((data) => {
-      
       return {
         ...data,
-        image: data.user.medias?.find((media) => media.type_media.slug === 'image-profil'),
-      }
-    })
+        image: data.user.medias?.find(
+          (media) => media.type_media.slug === 'image-profil',
+        ),
+      };
+    });
 
     return _jobApplicationUser.map((data) => {
       return {
         ...data,
         job: {
           ...data.jobs,
-          image: data.jobs.user.medias?.find((media) => media.type_media.slug === 'image-profil'),
-        }
-      }
-    })
-
+          image: data.jobs.user.medias?.find(
+            (media) => media.type_media.slug === 'image-profil',
+          ),
+        },
+      };
+    });
   }
-
 }

@@ -19,5 +19,6 @@ export declare class JobApplicationsService {
     update(id: number, updateJobApplicationDto: UpdateJobApplicationDto): Promise<JobApplication>;
     remove(id: number): Promise<void>;
     getJobApplyByUser(userId: string): Promise<any[]>;
+    getJobToApplyByUser(userId: string): Promise<any[]>;
     GetJobApplyByUserId(userId: string): Promise<any[]>;
 }

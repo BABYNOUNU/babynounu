@@ -4,4 +4,5 @@ export declare class CreateNotificationDto {
     userId: string;
     is_read: boolean;
     senderUserId: string;
+    jobId?: number;
 }

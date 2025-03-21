@@ -18,7 +18,7 @@ export class AbonnementService {
     private readonly payRepository: Repository<Paiements>,
     private readonly paymentService: PaymentService,
     private readonly NotificationService: NotificationService,
-    private readonly notificationGateway: NotificationGateway,
+    // private readonly notificationGateway: NotificationGateway,
   ) {}
 
   /**
@@ -27,6 +27,7 @@ export class AbonnementService {
    * @returns L'abonnement créé.
    */
   async createAbonnement(createAbonnementDto: CreateAbonnementDto) {
+    // Vérifie si le paiement existe
     const paiement = await this.payRepository.findOne({
       where: {
         user: { id: createAbonnementDto.userId },
@@ -36,25 +37,24 @@ export class AbonnementService {
 
     if (!paiement) {
       throw new NotFoundException(
-        `Auccun paiement avec l'ID de transaction ${createAbonnementDto.transactionId} n'a pas été trouvé`,
+        `Aucun paiement avec l'ID de transaction ${createAbonnementDto.transactionId} n'a été trouvé.`,
       );
     }
 
-    const IsAbonnementExist = await this.abonnementRepository.findOne({
-      where: { user: { id: createAbonnementDto.userId }, paiement: { id: paiement.id } },
+    // Vérifie si l'abonnement existe déjà
+    const isAbonnementExist = await this.abonnementRepository.findOne({
+      where: {
+        user: { id: createAbonnementDto.userId },
+        paiement: { id: paiement.id },
+      },
     });
 
-    // if (!IsAbonnementExist) {
-    //   throw new NotFoundException(
-    //     `Auccun abonnement avec l'ID de transaction ${createAbonnementDto.transactionId} n'a pas été rencontré`,
-    //   );
-    // }
-
-    if (IsAbonnementExist) {
-      return IsAbonnementExist
+    if (isAbonnementExist) {
+      return isAbonnementExist; // Retourne l'abonnement existant
     }
 
-    var config = {
+    // Vérifie le statut du paiement via l'API CinetPay
+    const config = {
       method: 'post',
       url: 'https://api-checkout.cinetpay.com/v2/payment/check',
       headers: {
@@ -69,60 +69,57 @@ export class AbonnementService {
 
     let abonnementChecked: any;
 
-    await axios(config)
-      .then((response) => {
-        abonnementChecked = response.data;
-      })
-      .catch((error) => {
-        throw new NotFoundException(
-          `Le paiement avec l'ID de transaction ${createAbonnementDto.transactionId} n'a pas été trouvé`,
-        );
-      });
+    try {
+      const response = await axios(config);
+      abonnementChecked = response.data;
 
+      // Vérifie que la réponse contient les données attendues
+      if (!abonnementChecked || !abonnementChecked.data) {
+        throw new NotFoundException(
+          `La réponse de l'API CinetPay est invalide pour la transaction ${createAbonnementDto.transactionId}.`,
+        );
+      }
+    } catch (error) {
+      throw new NotFoundException(
+        `Le paiement avec l'ID de transaction ${createAbonnementDto.transactionId} n'a pas pu être vérifié.`,
+      );
+    }
+
+    // Crée un nouvel abonnement
     const abonnement = this.abonnementRepository.create({
       paiement: { id: paiement.id },
       user: { id: createAbonnementDto.userId },
     });
+
     const abonnementSave = await this.abonnementRepository.save(abonnement);
 
     if (!abonnementSave) {
       throw new NotFoundException(
-        `Abonnement with transaction ID ${createAbonnementDto.transactionId} not found`,
+        `L'abonnement avec l'ID de transaction ${createAbonnementDto.transactionId} n'a pas pu être créé.`,
       );
     }
 
-    // Mettre à jour le paiement
-
-    this.paymentService.updatePayment(paiement.id, {
+    // Met à jour le paiement
+    await this.paymentService.updatePayment(paiement.id, {
       status: abonnementChecked.data.status,
       paymentMethod: abonnementChecked.data.payment_method,
       currency: abonnementChecked.data.currency,
       operator_id: abonnementChecked.data.operator_id,
     });
 
-    // Émettre un événement Socket.IO
-    const GetAbonnement = await this.getAbonnementById(abonnementSave.id);
-    this.notificationGateway.server.emit('abonnementValide', {
-      message: GetAbonnement,
-    });
-
-    if (!GetAbonnement) {
-      throw new NotFoundException(
-        `Abonnement with transaction ID ${createAbonnementDto.transactionId} not found`,
-      );
-    }
-
-    this.NotificationService.createNotification({
+    // Émet une notification
+    await this.NotificationService.createNotification({
       type: 'ABONNEMENT',
       userId: createAbonnementDto.userId.toString(),
-      message: `Votre abonnement a bien été validé`,
+      message: `Votre abonnement a bien été validé.`,
       is_read: false,
       senderUserId: createAbonnementDto.userId.toString(),
     });
 
-    return abonnementSave;
-  }
+    const Abonnement = await this.getAbonnementById(abonnementSave.id);
 
+    return Abonnement;
+  }
   /**
    * Récupère tous les abonnements d'un utilisateur.
    * @param userId - ID de l'utilisateur.
@@ -131,7 +128,10 @@ export class AbonnementService {
   async getAbonnementsByUser(userId: string) {
     return this.abonnementRepository.find({
       where: { user: { id: userId } },
-      relations: ['paiement', 'type'], // Charge les relations
+      relations: {
+        paiement: true,
+        user: true,
+      },
     });
   }
 
@@ -143,7 +143,11 @@ export class AbonnementService {
   async getAbonnementById(abonnementId: string) {
     const abonnement = await this.abonnementRepository.findOne({
       where: { id: abonnementId },
-      relations: ['paiement', 'type', 'user'], // Charge les relations
+      relations: {
+        paiement: true,
+        type: true,
+        user: true,
+      }, // Charge les relations
     });
 
     if (!abonnement) {

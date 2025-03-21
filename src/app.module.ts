@@ -18,6 +18,7 @@ import { JobModule } from './app/job/job.module';
 import { JobApplicationModule } from './app/job-application/job-application.module';
 import { ParameterModule } from './app/parameter/parameter.module';
 import { NounusModule } from './app/nounus/nounus.module';
+import { NotificationGateway } from './app/notification/notification.gateway';
 
 
 
@@ -48,6 +49,7 @@ import { NounusModule } from './app/nounus/nounus.module';
   ],
   controllers: [],
   providers: [],
+  exports: []
 })
 
 
