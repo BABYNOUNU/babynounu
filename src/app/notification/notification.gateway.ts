@@ -6,6 +6,8 @@ import {
   SubscribeMessage,
   MessageBody,
   ConnectedSocket,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { NotificationService } from './notification.service';
@@ -14,9 +16,9 @@ import { CreateAbonnementDto } from '../abonnement/dtos/create-abonnement.dto';
 import { JobApplicationsService } from '../job-application/job-application.service';
 
 @WebSocketGateway({
-  cors: true,
+  cors: { origin: '*' },
 })
-export class NotificationGateway {
+export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
