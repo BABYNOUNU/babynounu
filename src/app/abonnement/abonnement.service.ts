@@ -3,7 +3,6 @@ import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Abonnements } from './models/abonnement.model';
 import { CreateAbonnementDto } from './dtos/create-abonnement.dto';
-import { NotificationGateway } from '../notification/notification.gateway';
 import { PaymentService } from '../paiement/paiement.service';
 import axios from 'axios';
 import { Paiements } from '../paiement/models/paiement.model';

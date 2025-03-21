@@ -1,4 +1,4 @@
-import { NotificationGateway } from './../notification/notification.gateway';
+
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AbonnementController } from './abonnement.controller';

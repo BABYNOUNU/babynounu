@@ -4,7 +4,6 @@ import { JobApplicationsService } from './job-application.service';
 import { JobApplicationProviders } from './job-application';
 import { DatabaseModule } from 'src/database/database.module';
 import { NotificationService } from '../notification/notification.service';
-import { NotificationGateway } from '../notification/notification.gateway';
 import { NotificationProviders } from '../notification/notification';
 import { AbonnementService } from '../abonnement/abonnement.service';
 import { AbonnementProviders } from '../abonnement/abonnement';
@@ -17,7 +16,6 @@ import { PaiementProviders } from '../paiement/paiement';
   providers: [
     JobApplicationsService,
     NotificationService,
-    NotificationGateway,
     AbonnementService,
     PaymentService,
     ...PaiementProviders,

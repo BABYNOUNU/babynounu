@@ -12,14 +12,14 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.NotificationGateway = void 0;
+exports.ChatGateway = void 0;
 const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
 const notification_service_1 = require("./notification.service");
 const abonnement_service_1 = require("../abonnement/abonnement.service");
 const create_abonnement_dto_1 = require("../abonnement/dtos/create-abonnement.dto");
 const job_application_service_1 = require("../job-application/job-application.service");
-let NotificationGateway = class NotificationGateway {
+let ChatGateway = class ChatGateway {
     abonnementService;
     notificationService;
     jobApplicationService;
@@ -57,11 +57,11 @@ let NotificationGateway = class NotificationGateway {
         });
     }
 };
-exports.NotificationGateway = NotificationGateway;
+exports.ChatGateway = ChatGateway;
 __decorate([
     (0, websockets_1.WebSocketServer)(),
     __metadata("design:type", socket_io_1.Server)
-], NotificationGateway.prototype, "server", void 0);
+], ChatGateway.prototype, "server", void 0);
 __decorate([
     (0, websockets_1.SubscribeMessage)('message'),
     __param(0, (0, websockets_1.MessageBody)()),
@@ -69,7 +69,7 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, socket_io_1.Socket]),
     __metadata("design:returntype", void 0)
-], NotificationGateway.prototype, "handleMessage", null);
+], ChatGateway.prototype, "handleMessage", null);
 __decorate([
     (0, websockets_1.SubscribeMessage)('checkIsAbonnement'),
     __param(0, (0, websockets_1.MessageBody)()),
@@ -78,7 +78,7 @@ __decorate([
     __metadata("design:paramtypes", [create_abonnement_dto_1.CreateAbonnementDto,
         socket_io_1.Socket]),
     __metadata("design:returntype", Promise)
-], NotificationGateway.prototype, "CheckIsAbonnement", null);
+], ChatGateway.prototype, "CheckIsAbonnement", null);
 __decorate([
     (0, websockets_1.SubscribeMessage)('getNotifications'),
     __param(0, (0, websockets_1.MessageBody)()),
@@ -86,7 +86,7 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
     __metadata("design:returntype", Promise)
-], NotificationGateway.prototype, "GetNotifications", null);
+], ChatGateway.prototype, "GetNotifications", null);
 __decorate([
     (0, websockets_1.SubscribeMessage)('updateViewByUserId'),
     __param(0, (0, websockets_1.MessageBody)()),
@@ -94,12 +94,12 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
     __metadata("design:returntype", Promise)
-], NotificationGateway.prototype, "UpdateViewByUserId", null);
-exports.NotificationGateway = NotificationGateway = __decorate([
+], ChatGateway.prototype, "UpdateViewByUserId", null);
+exports.ChatGateway = ChatGateway = __decorate([
     (0, websockets_1.WebSocketGateway)({
-        cors: true,
+        cors: { origin: '*' },
     }),
     __metadata("design:paramtypes", [abonnement_service_1.AbonnementService,
         notification_service_1.NotificationService,
         job_application_service_1.JobApplicationsService])
-], NotificationGateway);
+], ChatGateway);

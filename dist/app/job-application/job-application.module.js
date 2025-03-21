@@ -13,7 +13,6 @@ const job_application_service_1 = require("./job-application.service");
 const job_application_1 = require("./job-application");
 const database_module_1 = require("../../database/database.module");
 const notification_service_1 = require("../notification/notification.service");
-const notification_gateway_1 = require("../notification/notification.gateway");
 const notification_1 = require("../notification/notification");
 const abonnement_service_1 = require("../abonnement/abonnement.service");
 const abonnement_1 = require("../abonnement/abonnement");
@@ -29,7 +28,6 @@ exports.JobApplicationModule = JobApplicationModule = __decorate([
         providers: [
             job_application_service_1.JobApplicationsService,
             notification_service_1.NotificationService,
-            notification_gateway_1.NotificationGateway,
             abonnement_service_1.AbonnementService,
             paiement_service_1.PaymentService,
             ...paiement_1.PaiementProviders,

@@ -9,7 +9,6 @@ import { UpdateJobApplicationDto } from './dto/update-job-application.dto';
 import { User } from '../user/user.model';
 import { Job } from '../job/models/job.model';
 import { NotificationService } from '../notification/notification.service';
-import { NotificationGateway } from '../notification/notification.gateway';
 
 @Injectable()
 export class JobApplicationsService {

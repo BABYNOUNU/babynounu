@@ -1,4 +1,3 @@
-import { NotificationGateway } from './notification.gateway';
 import {
   Injectable,
   Inject,
