@@ -7,6 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AbonnementModule = void 0;
+const paiement_1 = require("./../paiement/paiement");
 const common_1 = require("@nestjs/common");
 const abonnement_controller_1 = require("./abonnement.controller");
 const abonnement_service_1 = require("./abonnement.service");
@@ -15,6 +16,7 @@ const abonnement_1 = require("./abonnement");
 const paiement_service_1 = require("../paiement/paiement.service");
 const notification_service_1 = require("../notification/notification.service");
 const notification_1 = require("../notification/notification");
+const notification_gateway_1 = require("../notification/notification.gateway");
 let AbonnementModule = class AbonnementModule {
 };
 exports.AbonnementModule = AbonnementModule;
@@ -22,6 +24,14 @@ exports.AbonnementModule = AbonnementModule = __decorate([
     (0, common_1.Module)({
         imports: [database_module_1.DatabaseModule],
         controllers: [abonnement_controller_1.AbonnementController],
-        providers: [abonnement_service_1.AbonnementService, paiement_service_1.PaymentService, notification_service_1.NotificationService, ...abonnement_1.AbonnementProviders, ...notification_1.NotificationProviders],
+        providers: [
+            abonnement_service_1.AbonnementService,
+            paiement_service_1.PaymentService,
+            notification_gateway_1.NotificationGateway,
+            notification_service_1.NotificationService,
+            ...notification_1.NotificationProviders,
+            ...paiement_1.PaiementProviders,
+            ...abonnement_1.AbonnementProviders,
+        ],
     })
 ], AbonnementModule);

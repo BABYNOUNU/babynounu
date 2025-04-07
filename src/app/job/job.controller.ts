@@ -70,7 +70,6 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
     @ApiResponse({ status: 200, description: 'Job retrieved successfully' })
     @ApiResponse({ status: 404, description: 'Job not found' })
     async findAllJobByUser(@Param('userId') userId: any) {
-      console.log(userId)
       return this.jobsService.findAllJobByUser(userId);
     }
   

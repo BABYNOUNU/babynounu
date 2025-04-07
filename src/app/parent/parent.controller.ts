@@ -34,7 +34,7 @@ export class ParentController {
 
   // Get Signle Parent
   @Get('/:id')
-  GetParent(@Param('id') id: string) {
+  GetParent(@Param('id') id: number) {
     return this.parentService.findOne(id);
   }
 
@@ -62,7 +62,7 @@ export class ParentController {
     @Body() updateParentDto: UpdateParentDto,
     @UploadedFiles() files,
   ) {
-   return this.parentService.update(id.toString(), updateParentDto, files);
+   return this.parentService.update(id, updateParentDto, files);
   }
 
   // // Delete parent existing

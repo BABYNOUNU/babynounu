@@ -1,13 +1,13 @@
-mkdir ./src/app/nounus &&
-npx nest generate module app/nounus --no-spec &&
-npx nest generate controller app/nounus --no-spec &&
-npx nest generate service app/nounus --no-spec &&
-npx nest generate provider app/nounus --no-spec &&
-mkdir ./src/app/nounus/models &&
-mkdir ./src/app/nounus/dtos &&
-touch ./src/app/nounus/dtos/create-nounu.dto.ts &&
-touch ./src/app/nounus/dtos/update-nounu.dto.ts &&
-touch ./src/app/nounus/models/nounu.model.ts
+mkdir ./src/app/contracts &&
+npx nest generate module app/contracts --no-spec &&
+npx nest generate controller app/contracts --no-spec &&
+npx nest generate service app/contracts --no-spec &&
+npx nest generate provider app/contracts --no-spec &&
+mkdir ./src/app/contracts/models &&
+mkdir ./src/app/contracts/dtos &&
+touch ./src/app/contracts/dtos/create-message.dto.ts &&
+touch ./src/app/contracts/dtos/update-message.dto.ts &&
+touch ./src/app/contracts/models/message.model.ts
 
 git init
 git add ./

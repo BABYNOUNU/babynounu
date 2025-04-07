@@ -12,6 +12,11 @@ const notification_controller_1 = require("./notification.controller");
 const notification_service_1 = require("./notification.service");
 const notification_1 = require("./notification");
 const database_module_1 = require("../../database/database.module");
+const abonnement_service_1 = require("../abonnement/abonnement.service");
+const abonnement_1 = require("../abonnement/abonnement");
+const notification_gateway_1 = require("./notification.gateway");
+const paiement_1 = require("../paiement/paiement");
+const paiement_service_1 = require("../paiement/paiement.service");
 let NotificationModule = class NotificationModule {
 };
 exports.NotificationModule = NotificationModule;
@@ -19,6 +24,14 @@ exports.NotificationModule = NotificationModule = __decorate([
     (0, common_1.Module)({
         imports: [database_module_1.DatabaseModule],
         controllers: [notification_controller_1.NotificationController],
-        providers: [notification_service_1.NotificationService, ...notification_1.NotificationProviders],
+        providers: [
+            notification_service_1.NotificationService,
+            paiement_service_1.PaymentService,
+            notification_gateway_1.NotificationGateway,
+            abonnement_service_1.AbonnementService,
+            ...abonnement_1.AbonnementProviders,
+            ...paiement_1.PaiementProviders,
+            ...notification_1.NotificationProviders,
+        ],
     })
 ], NotificationModule);

@@ -14,7 +14,8 @@ export declare class NounusService {
         documents: Express.Multer.File[];
         gallery: Express.Multer.File[];
     }): Promise<Nounus>;
-    findAll(userId: any): Promise<any>;
+    findAllNotCurrentUser(userId: any): Promise<any>;
+    findAll(): Promise<any>;
     findOne(id: number): Promise<any>;
     update(id: string, updateNounuDto: UpdateNounuDto, files: {
         imageNounu: Express.Multer.File[];
@@ -23,6 +24,13 @@ export declare class NounusService {
     }): Promise<Nounus>;
     remove(id: number): Promise<void>;
     search(searchCriteria: any): Promise<any[]>;
+    getNonCertifiedNounus(): Promise<any[]>;
+    approveCertification(nounuId: number): Promise<{
+        certif: boolean;
+    }>;
+    updateStatus(nounuId: number, status: string): Promise<{
+        status: string;
+    }>;
     ReturnN(datas: any[], preferenceKey: any[]): Promise<any[]>;
     ReturnSearchN(datas: any[], preferenceKey: any[]): Promise<Nounus[]>;
 }

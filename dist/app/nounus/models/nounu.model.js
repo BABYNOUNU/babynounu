@@ -10,7 +10,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Nounus = void 0;
+const contracts_model_1 = require("../../contracts/models/contracts.model");
 const preference_model_1 = require("../../Preference/models/preference.model");
+const room_model_1 = require("../../rooms/models/room.model");
 const user_model_1 = require("../../user/user.model");
 const typeorm_1 = require("typeorm");
 let Nounus = class Nounus {
@@ -20,14 +22,18 @@ let Nounus = class Nounus {
     phone;
     annees_experience;
     tarif_horaire;
+    status;
     tarif_mensuel;
     flexibilite_tarifaire;
     urgences;
+    certif;
     evaluation_precedentes;
     references;
     courte_biographie;
     preferences;
     user;
+    nounouRooms;
+    contracts;
     createdAt;
     updatedAt;
     deletedAt;
@@ -60,6 +66,10 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
+], Nounus.prototype, "status", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
 ], Nounus.prototype, "tarif_mensuel", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: 'boolean', default: false }),
@@ -69,6 +79,10 @@ __decorate([
     (0, typeorm_1.Column)({ type: 'boolean', default: false }),
     __metadata("design:type", Boolean)
 ], Nounus.prototype, "urgences", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'boolean', default: false }),
+    __metadata("design:type", Boolean)
+], Nounus.prototype, "certif", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: 'text' }),
     __metadata("design:type", String)
@@ -93,6 +107,17 @@ __decorate([
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", user_model_1.User)
 ], Nounus.prototype, "user", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => room_model_1.Room, (room) => room.nounou),
+    __metadata("design:type", Array)
+], Nounus.prototype, "nounouRooms", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => contracts_model_1.Contracts, (contract) => contract.nounu, {
+        cascade: true,
+        onDelete: 'CASCADE',
+    }),
+    __metadata("design:type", Array)
+], Nounus.prototype, "contracts", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)({ name: 'created_at', type: 'timestamp' }),
     __metadata("design:type", Date)

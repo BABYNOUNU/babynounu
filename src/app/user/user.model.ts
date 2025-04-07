@@ -14,12 +14,13 @@ import { Abonnements } from '../abonnement/models/abonnement.model';
 import { Notification } from '../notification/models/notification.model';
 import { Job } from '../job/models/job.model';
 import { Paiements } from '../paiement/models/paiement.model';
-import { Rooms } from '../chat/models/rooms.model';
 import { JobApplication } from '../job-application/models/job-application.model';
 import { Preference } from '../Preference/models/preference.model';
 import { Parameter } from '../parameter/models/parameter.model';
 import { Nounus } from '../nounus/models/nounu.model';
 import { Medias } from '../media/models/media.model';
+import { Room } from '../rooms/models/room.model';
+import { Message } from '../messages/models/message.model';
 
 @Entity()
 export class User {
@@ -40,9 +41,8 @@ export class User {
 
   @ManyToOne(() => Parameter, (SN) => SN.type_profil, { onDelete: 'CASCADE' })
   type_profil: Parameter;
-  
 
-  @OneToMany(() => Nounus,  (nounu) => nounu.user, { cascade: true})
+  @OneToMany(() => Nounus, (nounu) => nounu.user, { cascade: true })
   nounu: Nounus[];
 
   @OneToMany(() => Parents, (parent) => parent.user, { cascade: true })
@@ -59,7 +59,6 @@ export class User {
   })
   medias: Medias[];
 
-
   @OneToMany(() => Notification, (notification) => notification.user, {
     cascade: true,
   })
@@ -70,24 +69,11 @@ export class User {
   })
   sentNotifications: Notification[];
 
-  @OneToMany(() => Rooms, (room) => room.sender)
-  conversations_sender: Rooms[];
-
-  @OneToMany(() => Rooms, (room) => room.receiver)
-  conversations_receiver: Rooms[];
-
-  @OneToMany(() => Rooms, (room) => room.sender, {
-    cascade: true,
-  })
-  messages: Rooms[];
-
-  
 
   @OneToMany(() => JobApplication, (job_to_apply) => job_to_apply.user, {
     cascade: true,
   })
   job_to_apply: JobApplication[];
-
 
   @OneToMany(() => Job, (job) => job.user, {
     cascade: true,
@@ -99,10 +85,14 @@ export class User {
   })
   paiements: Paiements[];
 
- 
+  @ManyToOne(() => Parameter, (parameter) => parameter.role, {
+    onDelete: 'CASCADE',
+  })
+  role: Parameter;
 
+  @OneToMany(() => Message, message => message.sender)
+  messages: Message[];
   
 
-  @ManyToOne(() => Parameter, (parameter) => parameter.role, {  onDelete: 'CASCADE' })
-  role: Parameter;
+  
 }

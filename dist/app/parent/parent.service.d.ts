@@ -12,11 +12,11 @@ export declare class ParentsService {
     private readonly nounuService;
     constructor(parentsRepository: Repository<Parents>, preferenceRepository: Repository<Preference>, mediaService: MediaService, nounuService: NounusService);
     findAll(): Promise<Parents[]>;
-    findOne(id: string): Promise<any>;
+    findOne(id: number): Promise<any>;
     create(createParentDto: CreateParentDto, files: {
         imageParent: Express.Multer.File[];
     }): Promise<Parents>;
-    update(id: string, updateParentDto: UpdateParentDto, files: {
+    update(id: number, updateParentDto: UpdateParentDto, files: {
         imageParent: Express.Multer.File[];
     }): Promise<Parents>;
     remove(id: string): Promise<void>;

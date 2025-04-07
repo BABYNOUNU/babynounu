@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("typeorm");
 let UserService = class UserService {
     userRepository;
+    userSockets = new Map();
     constructor(userRepository) {
         this.userRepository = userRepository;
     }
@@ -28,7 +29,7 @@ let UserService = class UserService {
             throw new common_1.BadRequestException({ message: 'user not exist in database' });
         }
         return {
-            ...IsUserExist
+            ...IsUserExist,
         };
     }
     async users() {
@@ -51,13 +52,62 @@ let UserService = class UserService {
         return { message: 'User deleted' };
     }
     async loggedUser(ID) {
-        const User = await this.userRepository.findOne({ where: { id: ID }, relations: ['role', 'medias.type_media', 'type_profil', 'parent', 'nounu', 'nounu.preferences.adress', 'parent.preferences.adress', 'abonnement'] });
+        const User = await this.userRepository.findOne({
+            where: { id: ID },
+            relations: [
+                'role',
+                'medias.type_media',
+                'type_profil',
+                'parent',
+                'nounu',
+                'nounu.preferences.adress',
+                'parent.preferences.adress',
+                'abonnement',
+            ],
+        });
         if (!User) {
             throw new common_1.BadRequestException({ message: 'user not exist in database' });
         }
-        console.log();
-        const dataUser = User.role.slug == 'admin' ? [User] : await this.ReturnN([User], ['adress'], User.type_profil?.slug);
+        const dataUser = User.role.slug == 'admin'
+            ? [User]
+            : await this.ReturnN([User], ['adress'], User.type_profil?.slug);
         return dataUser[0];
+    }
+    registerSocket(userId, socketId) {
+        this.userSockets.set(userId, socketId);
+    }
+    removeSocket(userId) {
+        this.userSockets.delete(userId);
+    }
+    findSocket(userId) {
+        return this.userSockets.get(userId);
+    }
+    findAdminSockets() {
+        const adminSockets = [];
+        this.userSockets.forEach((socketId, userId) => {
+            if (this.isAdmin(userId)) {
+                adminSockets.push(socketId);
+            }
+        });
+        return adminSockets;
+    }
+    async isAdmin(userId) {
+        const user = await this.userRepository.findOne({
+            where: { id: userId.toString() },
+            select: ['role'],
+        });
+        return user?.role.slug === 'admin';
+    }
+    async findOne(id) {
+        return await this.userRepository.findOne({
+            where: { id: id },
+            relations: {
+                nounu: true,
+                parent: true,
+                role: true,
+                type_profil: true
+            },
+        });
     }
     async ReturnN(datas, preferenceKey, type_profil) {
         return datas.map((data) => {
@@ -77,7 +127,7 @@ let UserService = class UserService {
             return {
                 ...data,
                 profil,
-                image: data.medias.find((media) => media.type_media?.slug === 'image-profil')
+                image: data.medias.find((media) => media.type_media?.slug === 'image-profil'),
             };
         });
     }

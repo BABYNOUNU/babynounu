@@ -15,56 +15,128 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatGateway = void 0;
 const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
-const chat_service_1 = require("./chat.service");
+const rooms_service_1 = require("../rooms/rooms.service");
+const messages_service_1 = require("../messages/messages.service");
+const user_service_1 = require("../user/user.service");
 let ChatGateway = class ChatGateway {
-    chatService;
+    roomService;
+    messageService;
+    userService;
     server;
-    constructor(chatService) {
-        this.chatService = chatService;
+    constructor(roomService, messageService, userService) {
+        this.roomService = roomService;
+        this.messageService = messageService;
+        this.userService = userService;
     }
-    async handleConnection(client) {
-        console.log(`Client connected: ${client.id}`);
-    }
-    handleDisconnect(client) {
-        console.log(`Client disconnected: ${client.id}`);
-    }
-    async handleJoinRoom(roomId, client) {
-        client.join(roomId);
-        const messages = await this.chatService.getMessages(+roomId);
-        this.server.to(roomId).emit('loadMessages', messages);
+    async handleJoinRoom(data, client) {
+        client.join(`room_${data.roomId}`);
     }
     async handleMessage(data, client) {
-        const { senderId, content, roomId, receiverId } = data;
-        console.log(roomId);
-        const message = await this.chatService.saveMessage({
-            senderId,
-            content,
-            roomId,
+        const userClient = client.handshake.auth.user;
+        const room = await this.roomService.findOne(data.roomId);
+        const message = await this.messageService.create({
+            content: data.content,
+            roomId: data.roomId,
+            senderId: userClient.id,
         });
-        console.log(this.server);
-        this.server.emit('newMessage', message);
+        await this.updateUnreadCounters(userClient, room.id);
+        this.server.to(`room_${data.roomId}`).emit('newMessage', message);
+        this.server.emit('updateConversationList');
+        this.server.emit('requestRefreshUnreadCounts');
+        await this.handleUserNotifications(userClient, data, room);
+    }
+    async updateUnreadCounters(user, roomId) {
+        if (user.type_profil.slug === 'parent') {
+            await this.roomService.incrementUnreadCount(roomId, 'nounu');
+            await this.roomService.incrementUnreadCount(roomId, 'administrateur');
+        }
+        else if (user.type_profil.slug === 'nounu') {
+            await this.roomService.incrementUnreadCount(roomId, 'parent');
+        }
+        else if (user.type_profil.slug === 'administrateur') {
+            const room = await this.roomService.findOne(roomId);
+            if (room.parent.user.id == user.id) {
+                await this.roomService.incrementUnreadCount(roomId, 'nounu');
+            }
+            else {
+                await this.roomService.incrementUnreadCount(roomId, 'parent');
+            }
+        }
+    }
+    async handleUserNotifications(userClient, messageData, room) {
+        if (userClient.type_profil.slug === 'parent') {
+            this.userService.registerSocket(messageData.toSender, userClient.id);
+            const nounuSocket = await this.userService.findSocket(messageData.toSender);
+            if (nounuSocket) {
+                this.server.emit('updateConversationList');
+                this.userService.removeSocket(messageData.toSender);
+            }
+            this.userService.removeSocket(messageData.toSender);
+        }
+        else if (userClient.type_profil.slug === 'administrateur') {
+            this.userService.registerSocket(room.parent.user.id, userClient.id);
+            const parentSocket = await this.userService.findSocket(room.parent.user.id);
+            if (parentSocket) {
+                this.server.to(parentSocket).emit('updateConversationList');
+                this.userService.removeSocket(room.parent.user.id);
+            }
+            this.userService.removeSocket(room.parent.user.id);
+        }
+    }
+    async getConversationsForUser(client) {
+        const userClient = client.handshake.auth.user;
+        const AllConversations = await this.roomService.getConversationsForUser(userClient.id);
+        this.server.emit('updateConversationList', AllConversations);
+    }
+    async handleGetGlobalUnreadCounts(data, client) {
+        const userClient = client.handshake.auth.user;
+        const counts = await this.roomService.getGlobalUnreadCounts(data.roomId, userClient.id);
+        this.server.emit('globalUnreadCounts', counts);
+        return counts;
+    }
+    async handleMarkAsRead(data, client) {
+        const userClient = client.handshake.auth.user;
+        const room = await this.roomService.findOne(data.roomId);
+        await this.messageService.markMessagesAsRead(room.id, userClient.id);
+        await this.resetUnreadCounter(userClient, room.id);
+        this.server.to(`room_${data.roomId}`).emit('messagesRead', {
+            roomId: room.id,
+            readerId: userClient.id,
+        });
+        this.server.emit('requestRefreshUnreadCounts');
+    }
+    async handleRequestRefreshUnreadCounts(data, client) {
+        const userClient = client.handshake.auth.user;
+        const counts = await this.roomService.getGlobalUnreadCounts(data.roomId, userClient.id);
+        this.server.emit('globalUnreadCounts', counts);
+    }
+    async resetUnreadCounter(user, roomId) {
+        if (user.type_profil.slug === 'parent') {
+            await this.roomService.resetUnreadCount(roomId, 'parent');
+        }
+        else if (user.type_profil.slug === 'nounu') {
+            await this.roomService.resetUnreadCount(roomId, 'nounu');
+        }
+        else if (user.type_profil.slug === 'administrateur') {
+            await this.roomService.resetUnreadCount(roomId, 'administrateur');
+        }
     }
     async handleTyping(data, client) {
-        this.server.emit('typing', { user: data.sender, roomId: data.roomId });
+        const userClient = client.handshake.auth.user;
+        const room = await this.roomService.findOne(data.roomId);
+        if (!(await this.hasAccessToRoom(userClient.id, room))) {
+            return;
+        }
+        client.broadcast.to(`room_${data.roomId}`).emit('userTyping', {
+            userId: userClient.id,
+            isTyping: data.isTyping,
+        });
     }
-    async getAllConversationByUser(userId, client) {
-        const conversations = await this.chatService.getAllConversationsByUser(userId);
-        client.emit('allConversations', conversations);
-    }
-    async getConversation(data, client) {
-        const { roomId, openChatSenderId } = data;
-        const conversation = await this.chatService.getConversation(roomId, openChatSenderId);
-        client.emit('conversation', conversation);
-    }
-    async updateViewMessage(data, client) {
-        const { roomId, receiverId } = data;
-        await this.chatService.updateViewMessage(receiverId, +roomId);
-        this.server.to(roomId).emit('updateViewMessage', { roomIdMessage: roomId });
-    }
-    async getCountMessageByReceiverId(data, client) {
-        const { roomId, receiverId } = data;
-        const count = await this.chatService.getCountMessageByReceiverId(receiverId, +roomId);
-        client.emit('countMessageByReceiverId', count);
+    async hasAccessToRoom(userId, room) {
+        const user = await this.userService.findOne(userId);
+        return (user.type_profil.slug === 'administrateur' ||
+            (user.type_profil.slug === 'parent' && room.parent.user.id === user.id) ||
+            (user.type_profil.slug === 'nounu' && room.nounou.user.id === user.id));
     }
 };
 exports.ChatGateway = ChatGateway;
@@ -77,7 +149,7 @@ __decorate([
     __param(0, (0, websockets_1.MessageBody)()),
     __param(1, (0, websockets_1.ConnectedSocket)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, socket_io_1.Socket]),
+    __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
     __metadata("design:returntype", Promise)
 ], ChatGateway.prototype, "handleJoinRoom", null);
 __decorate([
@@ -85,52 +157,55 @@ __decorate([
     __param(0, (0, websockets_1.MessageBody)()),
     __param(1, (0, websockets_1.ConnectedSocket)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], ChatGateway.prototype, "handleMessage", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('AllConversations'),
+    __param(0, (0, websockets_1.ConnectedSocket)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], ChatGateway.prototype, "getConversationsForUser", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('getGlobalUnreadCounts'),
+    __param(0, (0, websockets_1.MessageBody)()),
+    __param(1, (0, websockets_1.ConnectedSocket)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], ChatGateway.prototype, "handleGetGlobalUnreadCounts", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('markAsRead'),
+    __param(0, (0, websockets_1.MessageBody)()),
+    __param(1, (0, websockets_1.ConnectedSocket)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], ChatGateway.prototype, "handleMarkAsRead", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('requestRefreshUnreadCounts'),
+    __param(0, (0, websockets_1.MessageBody)()),
+    __param(1, (0, websockets_1.ConnectedSocket)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], ChatGateway.prototype, "handleRequestRefreshUnreadCounts", null);
 __decorate([
     (0, websockets_1.SubscribeMessage)('typing'),
     __param(0, (0, websockets_1.MessageBody)()),
     __param(1, (0, websockets_1.ConnectedSocket)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], ChatGateway.prototype, "handleTyping", null);
-__decorate([
-    (0, websockets_1.SubscribeMessage)('getAllConversationByUser'),
-    __param(0, (0, websockets_1.MessageBody)()),
-    __param(1, (0, websockets_1.ConnectedSocket)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, socket_io_1.Socket]),
-    __metadata("design:returntype", Promise)
-], ChatGateway.prototype, "getAllConversationByUser", null);
-__decorate([
-    (0, websockets_1.SubscribeMessage)('getConversation'),
-    __param(0, (0, websockets_1.MessageBody)()),
-    __param(1, (0, websockets_1.ConnectedSocket)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
-    __metadata("design:returntype", Promise)
-], ChatGateway.prototype, "getConversation", null);
-__decorate([
-    (0, websockets_1.SubscribeMessage)('updateViewMessage'),
-    __param(0, (0, websockets_1.MessageBody)()),
-    __param(1, (0, websockets_1.ConnectedSocket)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
-    __metadata("design:returntype", Promise)
-], ChatGateway.prototype, "updateViewMessage", null);
-__decorate([
-    (0, websockets_1.SubscribeMessage)('getCountMessageByReceiverId'),
-    __param(0, (0, websockets_1.MessageBody)()),
-    __param(1, (0, websockets_1.ConnectedSocket)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
-    __metadata("design:returntype", Promise)
-], ChatGateway.prototype, "getCountMessageByReceiverId", null);
 exports.ChatGateway = ChatGateway = __decorate([
     (0, websockets_1.WebSocketGateway)({
-        cors: { origin: '*' },
+        cors: {
+            origin: '*',
+        },
     }),
-    __metadata("design:paramtypes", [chat_service_1.ChatService])
+    __metadata("design:paramtypes", [rooms_service_1.RoomsService,
+        messages_service_1.MessageService,
+        user_service_1.UserService])
 ], ChatGateway);

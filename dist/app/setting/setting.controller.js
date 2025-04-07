@@ -62,7 +62,6 @@ let SettingController = class SettingController {
                 !IsExistDb.find((db) => db.slug === element.slug))
                 ToAdd.push(element);
         }
-        console.log(ToAdd);
         return ToAdd;
     }
     async addAllTypeParametres(Repository, AllParametre) {

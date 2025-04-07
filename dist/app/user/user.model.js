@@ -16,11 +16,11 @@ const abonnement_model_1 = require("../abonnement/models/abonnement.model");
 const notification_model_1 = require("../notification/models/notification.model");
 const job_model_1 = require("../job/models/job.model");
 const paiement_model_1 = require("../paiement/models/paiement.model");
-const rooms_model_1 = require("../chat/models/rooms.model");
 const job_application_model_1 = require("../job-application/models/job-application.model");
 const parameter_model_1 = require("../parameter/models/parameter.model");
 const nounu_model_1 = require("../nounus/models/nounu.model");
 const media_model_1 = require("../media/models/media.model");
+const message_model_1 = require("../messages/models/message.model");
 let User = class User {
     id;
     slug;
@@ -34,13 +34,11 @@ let User = class User {
     medias;
     notifications;
     sentNotifications;
-    conversations_sender;
-    conversations_receiver;
-    messages;
     job_to_apply;
     jobs;
     paiements;
     role;
+    messages;
 };
 exports.User = User;
 __decorate([
@@ -101,20 +99,6 @@ __decorate([
     __metadata("design:type", Array)
 ], User.prototype, "sentNotifications", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => rooms_model_1.Rooms, (room) => room.sender),
-    __metadata("design:type", Array)
-], User.prototype, "conversations_sender", void 0);
-__decorate([
-    (0, typeorm_1.OneToMany)(() => rooms_model_1.Rooms, (room) => room.receiver),
-    __metadata("design:type", Array)
-], User.prototype, "conversations_receiver", void 0);
-__decorate([
-    (0, typeorm_1.OneToMany)(() => rooms_model_1.Rooms, (room) => room.sender, {
-        cascade: true,
-    }),
-    __metadata("design:type", Array)
-], User.prototype, "messages", void 0);
-__decorate([
     (0, typeorm_1.OneToMany)(() => job_application_model_1.JobApplication, (job_to_apply) => job_to_apply.user, {
         cascade: true,
     }),
@@ -133,9 +117,15 @@ __decorate([
     __metadata("design:type", Array)
 ], User.prototype, "paiements", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => parameter_model_1.Parameter, (parameter) => parameter.role, { onDelete: 'CASCADE' }),
+    (0, typeorm_1.ManyToOne)(() => parameter_model_1.Parameter, (parameter) => parameter.role, {
+        onDelete: 'CASCADE',
+    }),
     __metadata("design:type", parameter_model_1.Parameter)
 ], User.prototype, "role", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => message_model_1.Message, message => message.sender),
+    __metadata("design:type", Array)
+], User.prototype, "messages", void 0);
 exports.User = User = __decorate([
     (0, typeorm_1.Entity)()
 ], User);

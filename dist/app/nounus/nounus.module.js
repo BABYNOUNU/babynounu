@@ -26,6 +26,16 @@ exports.NounusModule = NounusModule = __decorate([
     (0, common_1.Module)({
         imports: [database_module_1.DatabaseModule],
         controllers: [nounus_controller_1.NounusController],
-        providers: [nounus_service_1.NounusService, parent_service_1.ParentsService, parameter_service_1.ParameterService, media_service_1.MediaService, ...parent_provider_1.ParentProviders, ...parameter_1.ParameterProviders, ...preference_1.PreferenceProvider, ...media_1.MediaProviders, ...nounus_1.NounusProviders]
+        providers: [
+            nounus_service_1.NounusService,
+            parent_service_1.ParentsService,
+            parameter_service_1.ParameterService,
+            media_service_1.MediaService,
+            ...parent_provider_1.ParentProviders,
+            ...parameter_1.ParameterProviders,
+            ...preference_1.PreferenceProvider,
+            ...media_1.MediaProviders,
+            ...nounus_1.NounusProviders,
+        ],
     })
 ], NounusModule);

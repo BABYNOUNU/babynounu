@@ -37,7 +37,6 @@ let NounusService = class NounusService {
         if (!savedNounu) {
             throw new common_1.BadRequestException('Nounu not created');
         }
-        console.log(files);
         if (files.imageNounu?.length > 0) {
             const imageNounu = files.imageNounu[0];
             await this.mediaService.create({
@@ -80,7 +79,7 @@ let NounusService = class NounusService {
             'tranche_age_enfants',
             'competance_specifique',
             'langue_parler',
-            'certifications_criteres'
+            'certifications_criteres',
         ];
         for (const key of preferenceKeys) {
             const value = JSON.parse(createNounuDto[key]);
@@ -94,8 +93,7 @@ let NounusService = class NounusService {
         }
         return savedNounu;
     }
-    async findAll(userId) {
-        console.log(userId);
+    async findAllNotCurrentUser(userId) {
         const nounus = await this.nounuRepository.find({
             relations: [
                 'user',
@@ -115,6 +113,31 @@ let NounusService = class NounusService {
                     id: (0, typeorm_1.Not)(userId.userId),
                 },
             },
+        });
+        return await this.ReturnN(nounus, [
+            'zone_de_travail',
+            'horaire_disponible',
+            'adress',
+            'tranche_age_enfants',
+            'competance_specifique',
+            'langue_parler',
+        ]);
+    }
+    async findAll() {
+        const nounus = await this.nounuRepository.find({
+            relations: [
+                'user',
+                'user.medias',
+                'user.medias.type_media',
+                'preferences',
+                'preferences.zone_de_travail',
+                'preferences.horaire_disponible',
+                'preferences.adress',
+                'preferences.tranche_age_enfants',
+                'preferences.competance_specifique',
+                'preferences.langue_parler',
+                'preferences.certifications_criteres',
+            ],
         });
         return await this.ReturnN(nounus, [
             'zone_de_travail',
@@ -152,7 +175,7 @@ let NounusService = class NounusService {
             'tranche_age_enfants',
             'competance_specifique',
             'langue_parler',
-            'certifications_criteres'
+            'certifications_criteres',
         ]);
         return nounuOne[0];
     }
@@ -215,7 +238,7 @@ let NounusService = class NounusService {
             'tranche_age_enfants',
             'competance_specifique',
             'langue_parler',
-            'certifications_criteres'
+            'certifications_criteres',
         ];
         for (const key of preferenceKeys) {
             const value = JSON.parse(updateNounuDto[key]);
@@ -263,13 +286,15 @@ let NounusService = class NounusService {
             'tranche_age_enfants',
             'competance_specifique',
             'langue_parler',
-            'certifications_criteres'
+            'certifications_criteres',
         ]);
         const filteredNounus = nounus.filter((nounu) => {
-            if (fullname && !nounu.fullname?.toLowerCase().includes(fullname?.toLowerCase())) {
+            if (fullname &&
+                !nounu.fullname?.toLowerCase().includes(fullname?.toLowerCase())) {
                 return false;
             }
-            if (description && !nounu.description?.toLowerCase().includes(description?.toLowerCase())) {
+            if (description &&
+                !nounu.description?.toLowerCase().includes(description?.toLowerCase())) {
                 return false;
             }
             if (zone_de_travail && zone_de_travail.length > 0) {
@@ -305,6 +330,52 @@ let NounusService = class NounusService {
             return true;
         });
         return filteredNounus;
+    }
+    async getNonCertifiedNounus() {
+        const _nounus = await this.nounuRepository.find({
+            where: { certif: false },
+            relations: [
+                'user',
+                'user.medias',
+                'user.medias.type_media',
+                'preferences',
+            ],
+        });
+        return _nounus.map((nounu) => {
+            const images = nounu.user.medias.filter((media) => media.type_media.slug === 'image-profil');
+            const documents = nounu.user.medias.filter((media) => media.type_media.slug === 'document-verification');
+            return {
+                ...nounu,
+                images,
+                documents,
+            };
+        });
+    }
+    async approveCertification(nounuId) {
+        const nounu = await this.nounuRepository.findOne({
+            where: { id: nounuId },
+        });
+        if (!nounu) {
+            throw new common_1.NotFoundException(`Nounu with id ${nounuId} not found`);
+        }
+        nounu.certif = true;
+        await this.nounuRepository.save(nounu);
+        return {
+            certif: nounu.certif
+        };
+    }
+    async updateStatus(nounuId, status) {
+        const nounu = await this.nounuRepository.findOne({
+            where: { id: nounuId },
+        });
+        if (!nounu) {
+            throw new common_1.NotFoundException(`Nounu with id ${nounuId} not found`);
+        }
+        nounu.status = status;
+        await this.nounuRepository.save(nounu);
+        return {
+            status: nounu.status
+        };
     }
     async ReturnN(datas, preferenceKey) {
         return datas.map((data) => {

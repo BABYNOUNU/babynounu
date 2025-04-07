@@ -1,3 +1,4 @@
+import { Not } from 'typeorm';
 import { Notification } from './models/notification.model';
 // src/events/events.gateway.ts
 import {
@@ -18,14 +19,13 @@ import { JobApplicationsService } from '../job-application/job-application.servi
 @WebSocketGateway({
   cors: { origin: '*' },
 })
-export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class NotificationGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
   constructor(
-    private readonly abonnementService: AbonnementService,
     private readonly notificationService: NotificationService,
-    private readonly jobApplicationService: JobApplicationsService,
+    private readonly abonnementService: AbonnementService,
   ) {}
 
   // Écouter les connexions des clients
@@ -44,7 +44,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: string,
     @ConnectedSocket() client: Socket,
   ): void {
-    console.log(`Message reçu: ${data}`);
     this.server.emit('message', `Réponse du serveur: ${data}`); // Diffuser à tous les clients
   }
 
@@ -56,8 +55,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ): Promise<any> {
     const isAbonnement =
       await this.abonnementService.createAbonnement(createAbonnementDto);
-    console.log(isAbonnement);
-    this.server.emit('isAbonnement', isAbonnement); // Diffuser à tous les clients
+      this.server.emit('isAbonnement', isAbonnement); // Diffuser à tous les clients
   }
 
   // Envoie une notification à l'utilisateur qui a souscrit une offre d'emploi
@@ -76,8 +74,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
   }
 
-
-  
   // Mettre à jour la vue des notifications pour un utilisateur
   @SubscribeMessage('updateViewByUserId')
   async UpdateViewByUserId(
@@ -87,9 +83,26 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const notification = await this.notificationService.updateViewByUserId(
       data.userId,
     );
+    const count = await this.notificationService.getAllCountByReceiverId(
+      data.userId,
+    );
     this.server.emit('notifications', {
       userId: data.userId,
       notifications: notification,
+      count
     });
+  }
+
+  // Renvoie le nombre de notifications non lues pour un utilisateur
+  @SubscribeMessage('getAllCountNotificationsByReceiverId')
+  async GetAllCountByReceiverId(
+    @MessageBody() data: { receiverId: string },
+    @ConnectedSocket() client: Socket,
+  ): Promise<any> {
+    
+    const count = await this.notificationService.getAllCountByReceiverId(
+      data.receiverId,
+    );
+    this.server.emit('allCountNotificationsByReceiverId', count);
   }
 }

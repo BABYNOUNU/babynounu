@@ -27,7 +27,6 @@ let MediaController = class MediaController {
         this.mediaService = mediaService;
     }
     create(createMediaDto, files) {
-        console.log(createMediaDto, files);
     }
     findAll() {
         return this.mediaService.findAll();

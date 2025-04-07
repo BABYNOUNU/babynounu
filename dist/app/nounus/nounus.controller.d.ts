@@ -7,9 +7,19 @@ export declare class NounusController {
     private readonly nounuService;
     constructor(nounuService: NounusService);
     create(createNounuDto: CreateNounuDto, files: any): Promise<Nounus>;
-    findAll(userId: string): Promise<Nounus[]>;
+    findAllNotCurrentUser(userId: string): Promise<Nounus[]>;
+    findAll(): Promise<Nounus[]>;
+    getNonCertifiedNounus(): Promise<Nounus[]>;
     findOne(id: number): Promise<Nounus>;
+    updateStatus(id: number, { status }: {
+        status: string;
+    }): Promise<{
+        status: string;
+    }>;
     update(id: string, updateNounuDto: UpdateNounuDto, files: any): Promise<Nounus>;
+    approveCertification(id: number): Promise<{
+        certif: boolean;
+    }>;
     remove(id: number): Promise<void>;
     searchNounu(searchCriteria: SearchNounuCriteriaDto): Promise<any[]>;
 }

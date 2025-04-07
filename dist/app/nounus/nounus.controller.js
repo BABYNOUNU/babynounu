@@ -30,14 +30,27 @@ let NounusController = class NounusController {
     async create(createNounuDto, files) {
         return await this.nounuService.create(createNounuDto, files);
     }
-    async findAll(userId) {
-        return await this.nounuService.findAll(userId);
+    async findAllNotCurrentUser(userId) {
+        return await this.nounuService.findAllNotCurrentUser(userId);
+    }
+    async findAll() {
+        return await this.nounuService.findAll();
+    }
+    async getNonCertifiedNounus() {
+        console.log('test');
+        return await this.nounuService.getNonCertifiedNounus();
     }
     async findOne(id) {
         return await this.nounuService.findOne(id);
     }
+    async updateStatus(id, { status }) {
+        return await this.nounuService.updateStatus(id, status);
+    }
     async update(id, updateNounuDto, files) {
         return await this.nounuService.update(id, updateNounuDto, files);
+    }
+    async approveCertification(id) {
+        return await this.nounuService.approveCertification(id);
     }
     async remove(id) {
         return await this.nounuService.remove(id);
@@ -54,10 +67,14 @@ __decorate([
         { name: 'documents', maxCount: 4 },
         { name: 'gallery', maxCount: 20 },
     ], {
-        storage: media_config_1.storageMedia
+        storage: media_config_1.storageMedia,
     })),
     (0, swagger_1.ApiOperation)({ summary: 'Create a new Nounus' }),
-    (0, swagger_1.ApiResponse)({ status: 201, description: 'Nounus created successfully', type: nounu_model_1.Nounus }),
+    (0, swagger_1.ApiResponse)({
+        status: 201,
+        description: 'Nounus created successfully',
+        type: nounu_model_1.Nounus,
+    }),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.UploadedFiles)()),
     __metadata("design:type", Function),
@@ -72,7 +89,27 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
+], NounusController.prototype, "findAllNotCurrentUser", null);
+__decorate([
+    (0, common_1.Get)('all'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all Nounus' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'List of Nounus', type: [nounu_model_1.Nounus] }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
 ], NounusController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Get)('non-certified'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all Nounus which are not certified' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'List of Nounus which are not certified',
+        type: [nounu_model_1.Nounus],
+    }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], NounusController.prototype, "getNonCertifiedNounus", null);
 __decorate([
     (0, common_1.Get)(':id'),
     (0, swagger_1.ApiOperation)({ summary: 'Get a Nounus by ID' }),
@@ -85,17 +122,36 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], NounusController.prototype, "findOne", null);
 __decorate([
+    (0, common_1.Post)('update-status/:id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Update status of a Nounus by ID' }),
+    (0, swagger_1.ApiParam)({ name: 'id', description: 'Nounus ID', type: Number }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Nounus updated successfully',
+    }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Nounus not found' }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", Promise)
+], NounusController.prototype, "updateStatus", null);
+__decorate([
     (0, common_1.Post)('update/:id'),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileFieldsInterceptor)([
         { name: 'imageNounu', maxCount: 1 },
         { name: 'documents', maxCount: 4 },
         { name: 'gallery', maxCount: 20 },
     ], {
-        storage: media_config_1.storageMedia
+        storage: media_config_1.storageMedia,
     })),
     (0, swagger_1.ApiOperation)({ summary: 'Update a Nounus by ID' }),
     (0, swagger_1.ApiParam)({ name: 'id', description: 'Nounus ID', type: Number }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Nounus updated successfully', type: nounu_model_1.Nounus }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Nounus updated successfully',
+        type: nounu_model_1.Nounus,
+    }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Nounus not found' }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
@@ -104,6 +160,21 @@ __decorate([
     __metadata("design:paramtypes", [String, update_nounu_dto_1.UpdateNounuDto, Object]),
     __metadata("design:returntype", Promise)
 ], NounusController.prototype, "update", null);
+__decorate([
+    (0, common_1.Post)('approve-certification/:id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Approve a Nounus by ID' }),
+    (0, swagger_1.ApiParam)({ name: 'id', description: 'Nounus ID', type: Number }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Nounus updated successfully',
+        type: nounu_model_1.Nounus,
+    }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Nounus not found' }),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], NounusController.prototype, "approveCertification", null);
 __decorate([
     (0, common_1.Delete)(':id'),
     (0, swagger_1.ApiOperation)({ summary: 'Delete a Nounus by ID' }),

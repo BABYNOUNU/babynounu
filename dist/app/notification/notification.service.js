@@ -54,7 +54,7 @@ let NotificationService = class NotificationService {
                     ? notify.user.nounu[0]
                     : notify.user.parent[0],
             };
-        });
+        })?.reverse();
         const count = await this.notificationRepository.count({
             where: { sender: { id: userId }, isRead: false },
         });
@@ -72,6 +72,15 @@ let NotificationService = class NotificationService {
             .where('sender.id = :senderUserId', { senderUserId })
             .execute();
         return this.getNotifications(senderUserId);
+    }
+    async getAllCountByReceiverId(receiverId) {
+        return await this.notificationRepository.count({
+            where: {
+                sender: { id: receiverId },
+                user: { id: (0, typeorm_1.Not)(receiverId) },
+                isRead: false,
+            },
+        });
     }
 };
 exports.NotificationService = NotificationService;

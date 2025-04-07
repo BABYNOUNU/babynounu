@@ -13,11 +13,13 @@ import {
 } from 'typeorm';
 import { Preference } from 'src/app/Preference/models/preference.model';
 import { Medias } from 'src/app/media/models/media.model';
+import { Room } from 'src/app/rooms/models/room.model';
+import { Contracts } from 'src/app/contracts/models/contracts.model';
 
 @Entity()
 export class Parents {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   // Informations Personnelles
 
@@ -47,7 +49,19 @@ export class Parents {
   @ManyToOne(() => User, (user) => user.parent, { onDelete: 'CASCADE' })
   user: User;
 
-  @Column({ type: 'text', nullable: true }) 
+  @OneToMany(() => Room, (room) => room.parent, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  parentRooms: Room[];
+
+  @OneToMany(() => Contracts, (contract) => contract.parent, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  contracts: Contracts[];
+
+  @Column({ type: 'text', nullable: true })
   informations_complementaires: string;
 
   @CreateDateColumn({ type: 'timestamp' })

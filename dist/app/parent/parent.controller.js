@@ -36,7 +36,7 @@ let ParentController = class ParentController {
         return this.parentService.create(createParentDto, files);
     }
     UpdateParent(id, updateParentDto, files) {
-        return this.parentService.update(id.toString(), updateParentDto, files);
+        return this.parentService.update(id, updateParentDto, files);
     }
     DeleteParent(id) {
         this.parentService.remove(id.toString());
@@ -56,7 +56,7 @@ __decorate([
     (0, common_1.Get)('/:id'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], ParentController.prototype, "GetParent", null);
 __decorate([

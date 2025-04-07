@@ -67,7 +67,7 @@ export class ParentsService {
     return Parents;
   }
 
-  async findOne(id: string): Promise<any> {
+  async findOne(id: number): Promise<any> {
     const parent = await this.parentsRepository.findOne({
       where: { id },
       relations: [
@@ -169,7 +169,7 @@ export class ParentsService {
     return savedParent;
   }
   async update(
-    id: string, // L'ID du parent à mettre à jour
+    id: number, // L'ID du parent à mettre à jour
     updateParentDto: UpdateParentDto,
     files: { imageParent: Express.Multer.File[] },
   ): Promise<Parents> {

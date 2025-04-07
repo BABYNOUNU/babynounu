@@ -15,6 +15,16 @@ import { ParameterProviders } from '../parameter/parameter';
 @Module({
   imports: [DatabaseModule],
   controllers: [NounusController],
-  providers: [NounusService, ParentsService, ParameterService, MediaService, ...ParentProviders, ...ParameterProviders, ...PreferenceProvider, ...MediaProviders,  ...NounusProviders]
+  providers: [
+    NounusService,
+    ParentsService,
+    ParameterService,
+    MediaService,
+    ...ParentProviders,
+    ...ParameterProviders,
+    ...PreferenceProvider,
+    ...MediaProviders,
+    ...NounusProviders,
+  ],
 })
 export class NounusModule {}

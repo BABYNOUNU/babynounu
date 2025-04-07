@@ -75,7 +75,7 @@ let AuthService = class AuthService {
     async signIn({ signInBody }) {
         const user = await this.userRepository.findOne({
             where: { email: signInBody.email },
-            relations: ['type_profil'],
+            relations: ['type_profil', 'role'],
         });
         if (!user) {
             throw new common_1.BadRequestException("L'addresse email ou mot de passe est incorrect");
@@ -86,9 +86,8 @@ let AuthService = class AuthService {
         }
         const isUserExist = await this.userRepository.findOne({
             where: { id: user?.id },
-            relations: ['type_profil', 'nounu', 'parent'],
+            relations: ['type_profil', 'nounu', 'parent', 'role'],
         });
-        console.log(isUserExist);
         return {
             user: {
                 ...user,

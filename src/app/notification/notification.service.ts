@@ -4,15 +4,17 @@ import {
   BadRequestException,
   NotFoundException,
 } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { Notification } from './models/notification.model';
 import { CreateNotificationDto } from './dtos/create-notification.dto';
+import { NotificationGateway } from './notification.gateway';
 
 @Injectable()
 export class NotificationService {
   constructor(
     @Inject('NOTIFICATION_REPOSITORY')
     private readonly notificationRepository: Repository<Notification>,
+    // private readonly notificationGateway: NotificationGateway,
   ) {}
 
   /**
@@ -65,7 +67,7 @@ export class NotificationService {
             ? notify.user.nounu[0]
             : notify.user.parent[0],
       };
-    });
+    })?.reverse()
 
     const count = await this.notificationRepository.count({
       where: { sender: { id: userId }, isRead: false },
@@ -98,4 +100,21 @@ export class NotificationService {
 
     return this.getNotifications(senderUserId);
   }
+
+
+/**
+ * Get the count of all notifications for a specific receiver that are not read.
+ * @param receiverId - ID of the receiver.
+ * @returns The count of unread notifications.
+ */
+async getAllCountByReceiverId(receiverId: string): Promise<number> {
+  return await this.notificationRepository.count({
+    where: {
+      sender: { id: receiverId },
+      user: { id: Not(receiverId) },
+      isRead: false,
+    },
+  });
+}
+
 }

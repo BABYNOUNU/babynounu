@@ -13,108 +13,112 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AbonnementService = void 0;
-const notification_service_1 = require("./../notification/notification.service");
+const notification_service_1 = require("../notification/notification.service");
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("typeorm");
 const paiement_service_1 = require("../paiement/paiement.service");
 const axios_1 = require("axios");
 let AbonnementService = class AbonnementService {
     abonnementRepository;
-    payRepository;
+    paymentRepository;
     paymentService;
-    NotificationService;
-    constructor(abonnementRepository, payRepository, paymentService, NotificationService) {
+    notificationService;
+    SUBSCRIPTION_DURATION_DAYS = 30;
+    constructor(abonnementRepository, paymentRepository, paymentService, notificationService) {
         this.abonnementRepository = abonnementRepository;
-        this.payRepository = payRepository;
+        this.paymentRepository = paymentRepository;
         this.paymentService = paymentService;
-        this.NotificationService = NotificationService;
+        this.notificationService = notificationService;
     }
     async createAbonnement(createAbonnementDto) {
-        const paiement = await this.payRepository.findOne({
-            where: {
-                user: { id: createAbonnementDto.userId },
-                transaction_id: createAbonnementDto.transactionId,
-            },
-        });
-        if (!paiement) {
-            throw new common_1.NotFoundException(`Aucun paiement avec l'ID de transaction ${createAbonnementDto.transactionId} n'a été trouvé.`);
+        const payment = await this.findPayment(createAbonnementDto);
+        if (!payment) {
+            return this.buildResponse(false, false);
         }
-        const isAbonnementExist = await this.abonnementRepository.findOne({
-            where: {
-                user: { id: createAbonnementDto.userId },
-                paiement: { id: paiement.id },
-            },
-        });
-        if (isAbonnementExist) {
-            return isAbonnementExist;
+        const existingAbonnement = await this.findExistingAbonnement(createAbonnementDto.userId, payment.id);
+        if (existingAbonnement) {
+            return this.buildResponse(true, await this.hasActiveAbonnement(createAbonnementDto.userId), existingAbonnement);
         }
-        const config = {
-            method: 'post',
-            url: 'https://api-checkout.cinetpay.com/v2/payment/check',
-            headers: {
-                'Content-Type': 'application/json',
+        const isPaymentValid = await this.validateCinetPayPayment(payment.payment_token, createAbonnementDto.userId, createAbonnementDto.transactionId);
+        if (!isPaymentValid) {
+            return this.buildResponse(true, await this.hasActiveAbonnement(createAbonnementDto.userId));
+        }
+        const newAbonnement = await this.createNewAbonnement(createAbonnementDto.userId, payment.id);
+        await this.sendSubscriptionNotification(createAbonnementDto.userId);
+        return this.buildResponse(true, true, newAbonnement);
+    }
+    async findPayment(createAbonnementDto) {
+        return this.paymentRepository.findOneBy({
+            user: { id: createAbonnementDto.userId },
+            transaction_id: createAbonnementDto.transactionId,
+        });
+    }
+    async findExistingAbonnement(userId, paymentId) {
+        return this.abonnementRepository.findOne({
+            where: {
+                user: { id: userId },
+                paiement: { id: paymentId },
             },
-            data: {
+            relations: ['user', 'paiement'],
+        });
+    }
+    async validateCinetPayPayment(paymentToken, userId, transactionId) {
+        try {
+            const response = await axios_1.default.post('https://api-checkout.cinetpay.com/v2/payment/check', {
                 apikey: process.env.CINETPAY_API_KEY,
                 site_id: process.env.CINETPAY_SITE_ID,
-                token: paiement.payment_token,
-            },
-        };
-        let abonnementChecked;
-        try {
-            const response = await (0, axios_1.default)(config);
-            abonnementChecked = response.data;
-            if (!abonnementChecked || !abonnementChecked.data) {
-                throw new common_1.NotFoundException(`La réponse de l'API CinetPay est invalide pour la transaction ${createAbonnementDto.transactionId}.`);
-            }
+                token: paymentToken,
+                return_url: `${process.env.CINETPAY_RETURN_URL}?userId=${userId}&transactionId=${transactionId}`,
+            }, {
+                headers: { 'Content-Type': 'application/json' },
+            });
+            return !!response.data.data;
         }
         catch (error) {
-            throw new common_1.NotFoundException(`Le paiement avec l'ID de transaction ${createAbonnementDto.transactionId} n'a pas pu être vérifié.`);
+            console.error('CinetPay validation error:', error);
+            return false;
         }
+    }
+    async createNewAbonnement(userId, paymentId) {
         const abonnement = this.abonnementRepository.create({
-            paiement: { id: paiement.id },
-            user: { id: createAbonnementDto.userId },
+            paiement: { id: paymentId },
+            user: { id: userId },
         });
-        const abonnementSave = await this.abonnementRepository.save(abonnement);
-        if (!abonnementSave) {
-            throw new common_1.NotFoundException(`L'abonnement avec l'ID de transaction ${createAbonnementDto.transactionId} n'a pas pu être créé.`);
+        const savedAbonnement = await this.abonnementRepository.save(abonnement);
+        if (!savedAbonnement) {
+            throw new common_1.NotFoundException(`Échec de la création de l'abonnement pour l'utilisateur ${userId}`);
         }
-        await this.paymentService.updatePayment(paiement.id, {
-            status: abonnementChecked.data.status,
-            paymentMethod: abonnementChecked.data.payment_method,
-            currency: abonnementChecked.data.currency,
-            operator_id: abonnementChecked.data.operator_id,
-        });
-        await this.NotificationService.createNotification({
+        return savedAbonnement;
+    }
+    async sendSubscriptionNotification(userId) {
+        await this.notificationService.createNotification({
             type: 'ABONNEMENT',
-            userId: createAbonnementDto.userId.toString(),
-            message: `Votre abonnement a bien été validé.`,
+            userId: userId,
+            message: 'Votre abonnement a bien été validé.',
             is_read: false,
-            senderUserId: createAbonnementDto.userId.toString(),
+            senderUserId: userId,
         });
-        const Abonnement = await this.getAbonnementById(abonnementSave.id);
-        return Abonnement;
+    }
+    buildResponse(isPayment, hasActiveSubscription, abonnement) {
+        return {
+            ...(abonnement || {}),
+            isPayment,
+            hasActiveSubscription,
+        };
     }
     async getAbonnementsByUser(userId) {
         return this.abonnementRepository.find({
             where: { user: { id: userId } },
-            relations: {
-                paiement: true,
-                user: true,
-            },
+            relations: ['paiement', 'user'],
         });
     }
     async getAbonnementById(abonnementId) {
         const abonnement = await this.abonnementRepository.findOne({
             where: { id: abonnementId },
-            relations: {
-                paiement: true,
-                type: true,
-                user: true,
-            },
+            relations: ['paiement', 'type', 'user'],
         });
         if (!abonnement) {
-            throw new common_1.NotFoundException(`Abonnement with ID ${abonnementId} not found`);
+            throw new common_1.NotFoundException(`Abonnement avec l'ID ${abonnementId} introuvable`);
         }
         return abonnement;
     }
@@ -123,14 +127,16 @@ let AbonnementService = class AbonnementService {
             where: { user: { id: userId } },
             order: { createdAt: 'DESC' },
         });
-        if (!abonnement) {
+        if (!abonnement)
             return false;
-        }
-        const abonnementDate = new Date(abonnement.createdAt);
+        return this.isSubscriptionActive(abonnement.createdAt);
+    }
+    isSubscriptionActive(createdAt) {
+        const subscriptionDate = new Date(createdAt);
         const currentDate = new Date();
-        const daysSinceAbonnement = Math.floor((currentDate.getTime() - abonnementDate.getTime()) /
+        const daysSinceSubscription = Math.floor((currentDate.getTime() - subscriptionDate.getTime()) /
             (1000 * 60 * 60 * 24));
-        return daysSinceAbonnement <= 30;
+        return daysSinceSubscription <= this.SUBSCRIPTION_DURATION_DAYS;
     }
 };
 exports.AbonnementService = AbonnementService;

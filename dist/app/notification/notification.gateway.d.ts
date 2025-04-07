@@ -3,13 +3,11 @@ import { Server, Socket } from 'socket.io';
 import { NotificationService } from './notification.service';
 import { AbonnementService } from '../abonnement/abonnement.service';
 import { CreateAbonnementDto } from '../abonnement/dtos/create-abonnement.dto';
-import { JobApplicationsService } from '../job-application/job-application.service';
-export declare class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
-    private readonly abonnementService;
+export declare class NotificationGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly notificationService;
-    private readonly jobApplicationService;
+    private readonly abonnementService;
     server: Server;
-    constructor(abonnementService: AbonnementService, notificationService: NotificationService, jobApplicationService: JobApplicationsService);
+    constructor(notificationService: NotificationService, abonnementService: AbonnementService);
     handleConnection(client: Socket): void;
     handleDisconnect(client: Socket): void;
     handleMessage(data: string, client: Socket): void;
@@ -19,5 +17,8 @@ export declare class ChatGateway implements OnGatewayConnection, OnGatewayDiscon
     }, client: Socket): Promise<any>;
     UpdateViewByUserId(data: {
         userId: string;
+    }, client: Socket): Promise<any>;
+    GetAllCountByReceiverId(data: {
+        receiverId: string;
     }, client: Socket): Promise<any>;
 }

@@ -14,4 +14,5 @@ export declare class NotificationService {
         notifications: Notification[];
         count: number;
     }>;
+    getAllCountByReceiverId(receiverId: string): Promise<number>;
 }

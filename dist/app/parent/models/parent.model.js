@@ -13,6 +13,8 @@ exports.Parents = void 0;
 const user_model_1 = require("../../user/user.model");
 const typeorm_1 = require("typeorm");
 const preference_model_1 = require("../../Preference/models/preference.model");
+const room_model_1 = require("../../rooms/models/room.model");
+const contracts_model_1 = require("../../contracts/models/contracts.model");
 let Parents = class Parents {
     id;
     fullname;
@@ -22,6 +24,8 @@ let Parents = class Parents {
     budget_estimated;
     preferences;
     user;
+    parentRooms;
+    contracts;
     informations_complementaires;
     createdAt;
     updatedAt;
@@ -29,8 +33,8 @@ let Parents = class Parents {
 };
 exports.Parents = Parents;
 __decorate([
-    (0, typeorm_1.PrimaryGeneratedColumn)('uuid'),
-    __metadata("design:type", String)
+    (0, typeorm_1.PrimaryGeneratedColumn)(),
+    __metadata("design:type", Number)
 ], Parents.prototype, "id", void 0);
 __decorate([
     (0, typeorm_1.Column)('varchar', { length: 255, unique: false, nullable: true }),
@@ -63,6 +67,20 @@ __decorate([
     (0, typeorm_1.ManyToOne)(() => user_model_1.User, (user) => user.parent, { onDelete: 'CASCADE' }),
     __metadata("design:type", user_model_1.User)
 ], Parents.prototype, "user", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => room_model_1.Room, (room) => room.parent, {
+        cascade: true,
+        onDelete: 'CASCADE',
+    }),
+    __metadata("design:type", Array)
+], Parents.prototype, "parentRooms", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => contracts_model_1.Contracts, (contract) => contract.parent, {
+        cascade: true,
+        onDelete: 'CASCADE',
+    }),
+    __metadata("design:type", Array)
+], Parents.prototype, "contracts", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: 'text', nullable: true }),
     __metadata("design:type", String)

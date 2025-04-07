@@ -1,11 +1,11 @@
-import { ChatService } from './chat.service';
-import { CreateConversationDto } from './dto/create-conversation.dto';
-import { CreateChatMessageDto } from './dto/create-chat.dto';
+import { RoomsService } from '../rooms/rooms.service';
+import { MessageService } from '../messages/messages.service';
 export declare class ChatController {
-    private readonly chatService;
-    constructor(chatService: ChatService);
-    sendMessage(sendMessageDto: CreateChatMessageDto): Promise<import("./models/message.model").Message>;
-    createConversation(createConversationDto: CreateConversationDto): Promise<import("./models/rooms.model").Rooms>;
-    getConversation(room: number, openChatSenderId: string): Promise<any>;
-    getConversationsByUser(userId: string): Promise<any[]>;
+    private roomService;
+    private messageService;
+    constructor(roomService: RoomsService, messageService: MessageService);
+    getConversations(userId: string): Promise<any[]>;
+    getMessages(roomId: number): Promise<import("../messages/models/message.model").Message[]>;
+    findOrCreateRoom(parentId: number, nounouId: number): Promise<import("../rooms/models/room.model").Room>;
+    findOne(id: number): Promise<import("../rooms/models/room.model").Room>;
 }

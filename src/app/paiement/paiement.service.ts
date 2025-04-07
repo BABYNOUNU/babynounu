@@ -4,12 +4,15 @@ import { Paiements } from './models/paiement.model';
 import { CreatePaymentDto } from './dtos/create-payment.dto';
 import axios from 'axios';
 import { UpdatePaymentDto } from './dtos/update-payment.dto';
+import { NotificationGateway } from '../notification/notification.gateway';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class PaymentService {
   constructor(
     @Inject('PAYMENT_REPOSITORY')
     private readonly paymentRepository: Repository<Paiements>,
+    // private readonly notificationGateway: NotificationGateway,
   ) {}
 
   /**
@@ -56,6 +59,14 @@ export class PaymentService {
       { id: paymentSave.id },
       { payment_token: paymentData.data.payment_token },
     );
+
+    // this.notificationGateway.CheckIsAbonnement(
+    //   {
+    //     userId: createPaymentDto.userId,
+    //     transactionId: paymentSave.transaction_id,
+    //   },
+    //   null,
+    // );
 
     return paymentData;
   }

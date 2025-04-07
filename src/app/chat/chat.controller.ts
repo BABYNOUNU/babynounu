@@ -1,54 +1,42 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { ChatService } from './chat.service';
-import { CreateConversationDto } from './dto/create-conversation.dto';
-import { CreateChatMessageDto } from './dto/create-chat.dto';
+// src/chat/chat.controller.ts
+import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/auh.guard';
+import { User } from '../user/user.model';
+import { RoomsService } from '../rooms/rooms.service';
+import { MessageService } from '../messages/messages.service';
 
-@ApiTags('Chat')
+
 @Controller('chat')
+@UseGuards(JwtAuthGuard)
 export class ChatController {
-  constructor(private readonly chatService: ChatService) {}
+  constructor(
+    private roomService: RoomsService,
+    private messageService: MessageService,
+  ) {}
 
-  @Post('send')
-  @ApiOperation({ summary: 'Envoyer un message' })
-  @ApiResponse({ status: 201, description: 'Message envoyé avec succès' })
-  @ApiResponse({ status: 400, description: 'Données invalides' })
-  async sendMessage(@Body() sendMessageDto: CreateChatMessageDto) {
-    return this.chatService.saveMessage({
-      senderId: sendMessageDto.senderId,
-      roomId: sendMessageDto.roomId,
-      content: sendMessageDto.content,
-    });
+  @Get('conversations')
+  async getConversations(@Query('userId') userId: string) {
+    return this.roomService.getConversationsForUser(userId);
   }
 
-  @Post('conversations/create')
-  @ApiOperation({ summary: 'Créer une conversation' })
-  @ApiResponse({ status: 201, description: 'Conversation créée avec succès' })
-  @ApiResponse({ status: 400, description: 'Données invalides' })
-  async createConversation(
-    @Body() createConversationDto: CreateConversationDto,
-  ) {
-    return this.chatService.createConversation(createConversationDto);
+  @Get('messages')
+  async getMessages(@Query('roomId') roomId: number) {
+    // Vérifier que l'utilisateur a accès à cette conversation
+    // const room = await this.roomService.findOne(roomId);
+   
+      return this.messageService.findByRoom(roomId);
+   
   }
 
-  @Get('conversations/:conversationId')
-  @ApiOperation({ summary: 'Obtenir une conversation' })
-  @ApiResponse({ status: 200, description: 'Conversation retournée' })
-  @ApiResponse({ status: 404, description: 'Conversation non trouvée' })
-  async getConversation(
-    @Param('conversationId') room: number,
-    openChatSenderId: string,
-  ) {
-    return this.chatService.getConversation(room, openChatSenderId);
+  @Get('find-or-create-room')
+  async findOrCreateRoom(@Query('parentId') parentId: number, @Query('nounouId') nounouId: number) {
+    return this.roomService.findOrCreate(parentId, nounouId);
   }
 
-  @Get('conversations/user/:userId')
-  @ApiOperation({ summary: 'Lister les conversations par utilisateur' })
-  @ApiResponse({
-    status: 200,
-    description: 'Liste des conversations par utilisateur retournée',
-  })
-  async getConversationsByUser(@Param('userId') userId: string) {
-    return this.chatService.getAllConversationsByUser(userId);
+
+  @Get('room/:id')
+  async findOne(@Query('id') id: number) {
+    return this.roomService.findOne(id);
   }
+
 }

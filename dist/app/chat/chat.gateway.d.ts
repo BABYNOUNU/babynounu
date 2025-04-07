@@ -1,34 +1,44 @@
-import { OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
-import { ChatService } from './chat.service';
-export declare class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
-    private readonly chatService;
+import { RoomsService } from '../rooms/rooms.service';
+import { MessageService } from '../messages/messages.service';
+import { UserService } from '../user/user.service';
+import { User } from '../user/user.model';
+export declare class ChatGateway {
+    private readonly roomService;
+    private readonly messageService;
+    private readonly userService;
     server: Server;
-    constructor(chatService: ChatService);
-    handleConnection(client: Socket): Promise<void>;
-    handleDisconnect(client: Socket): void;
-    handleJoinRoom(roomId: string, client: Socket): Promise<void>;
-    handleMessage(data: {
-        senderId: string;
-        content: string;
-        roomId: string;
-        receiverId?: string;
-    }, client: Socket): Promise<void>;
-    handleTyping(data: {
-        sender: string;
-        roomId: string;
-    }, client: Socket): Promise<void>;
-    getAllConversationByUser(userId: string, client: Socket): Promise<void>;
-    getConversation(data: {
+    constructor(roomService: RoomsService, messageService: MessageService, userService: UserService);
+    handleJoinRoom(data: {
         roomId: number;
-        openChatSenderId: string;
     }, client: Socket): Promise<void>;
-    updateViewMessage(data: {
-        roomId: string;
-        receiverId: string;
-    }, client: Socket): Promise<void>;
-    getCountMessageByReceiverId(data: {
-        roomId: string;
-        receiverId: string;
-    }, client: Socket): Promise<void>;
+    handleMessage(data: {
+        roomId: number;
+        content: string;
+        toSender?: any;
+    }, client: any): Promise<void>;
+    private updateUnreadCounters;
+    private handleUserNotifications;
+    getConversationsForUser(client: any): Promise<void>;
+    handleGetGlobalUnreadCounts(data: {
+        roomId: number;
+    }, client: any): Promise<{
+        parentUnread: number;
+        nounouUnread: number;
+        adminUnread: number;
+    }>;
+    handleMarkAsRead(data: {
+        roomId: number;
+    }, client: any): Promise<void>;
+    handleRequestRefreshUnreadCounts(data: {
+        roomId: number;
+    }, client: any): Promise<void>;
+    private resetUnreadCounter;
+    handleTyping(data: {
+        roomId: number;
+        isTyping: boolean;
+    }, client: Socket & {
+        user: User;
+    }): Promise<void>;
+    private hasAccessToRoom;
 }

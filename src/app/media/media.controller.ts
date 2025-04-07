@@ -58,7 +58,6 @@ export class MediaController {
       test: Express.Multer.File[];
     },
   ) {
-    console.log(createMediaDto, files);
     // const mediaData: CreateMediaDto = {
     //   ...createMediaDto,
     //   originalName: file.originalname,

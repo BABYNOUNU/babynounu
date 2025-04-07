@@ -12,34 +12,29 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ChatGateway = void 0;
+exports.NotificationGateway = void 0;
 const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
 const notification_service_1 = require("./notification.service");
 const abonnement_service_1 = require("../abonnement/abonnement.service");
 const create_abonnement_dto_1 = require("../abonnement/dtos/create-abonnement.dto");
-const job_application_service_1 = require("../job-application/job-application.service");
-let ChatGateway = class ChatGateway {
-    abonnementService;
+let NotificationGateway = class NotificationGateway {
     notificationService;
-    jobApplicationService;
+    abonnementService;
     server;
-    constructor(abonnementService, notificationService, jobApplicationService) {
-        this.abonnementService = abonnementService;
+    constructor(notificationService, abonnementService) {
         this.notificationService = notificationService;
-        this.jobApplicationService = jobApplicationService;
+        this.abonnementService = abonnementService;
     }
     handleConnection(client) {
     }
     handleDisconnect(client) {
     }
     handleMessage(data, client) {
-        console.log(`Message reçu: ${data}`);
         this.server.emit('message', `Réponse du serveur: ${data}`);
     }
     async CheckIsAbonnement(createAbonnementDto, client) {
         const isAbonnement = await this.abonnementService.createAbonnement(createAbonnementDto);
-        console.log(isAbonnement);
         this.server.emit('isAbonnement', isAbonnement);
     }
     async GetNotifications(data, client) {
@@ -51,17 +46,23 @@ let ChatGateway = class ChatGateway {
     }
     async UpdateViewByUserId(data, client) {
         const notification = await this.notificationService.updateViewByUserId(data.userId);
+        const count = await this.notificationService.getAllCountByReceiverId(data.userId);
         this.server.emit('notifications', {
             userId: data.userId,
             notifications: notification,
+            count
         });
     }
+    async GetAllCountByReceiverId(data, client) {
+        const count = await this.notificationService.getAllCountByReceiverId(data.receiverId);
+        this.server.emit('allCountNotificationsByReceiverId', count);
+    }
 };
-exports.ChatGateway = ChatGateway;
+exports.NotificationGateway = NotificationGateway;
 __decorate([
     (0, websockets_1.WebSocketServer)(),
     __metadata("design:type", socket_io_1.Server)
-], ChatGateway.prototype, "server", void 0);
+], NotificationGateway.prototype, "server", void 0);
 __decorate([
     (0, websockets_1.SubscribeMessage)('message'),
     __param(0, (0, websockets_1.MessageBody)()),
@@ -69,7 +70,7 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, socket_io_1.Socket]),
     __metadata("design:returntype", void 0)
-], ChatGateway.prototype, "handleMessage", null);
+], NotificationGateway.prototype, "handleMessage", null);
 __decorate([
     (0, websockets_1.SubscribeMessage)('checkIsAbonnement'),
     __param(0, (0, websockets_1.MessageBody)()),
@@ -78,7 +79,7 @@ __decorate([
     __metadata("design:paramtypes", [create_abonnement_dto_1.CreateAbonnementDto,
         socket_io_1.Socket]),
     __metadata("design:returntype", Promise)
-], ChatGateway.prototype, "CheckIsAbonnement", null);
+], NotificationGateway.prototype, "CheckIsAbonnement", null);
 __decorate([
     (0, websockets_1.SubscribeMessage)('getNotifications'),
     __param(0, (0, websockets_1.MessageBody)()),
@@ -86,7 +87,7 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
     __metadata("design:returntype", Promise)
-], ChatGateway.prototype, "GetNotifications", null);
+], NotificationGateway.prototype, "GetNotifications", null);
 __decorate([
     (0, websockets_1.SubscribeMessage)('updateViewByUserId'),
     __param(0, (0, websockets_1.MessageBody)()),
@@ -94,12 +95,19 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
     __metadata("design:returntype", Promise)
-], ChatGateway.prototype, "UpdateViewByUserId", null);
-exports.ChatGateway = ChatGateway = __decorate([
+], NotificationGateway.prototype, "UpdateViewByUserId", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('getAllCountNotificationsByReceiverId'),
+    __param(0, (0, websockets_1.MessageBody)()),
+    __param(1, (0, websockets_1.ConnectedSocket)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
+    __metadata("design:returntype", Promise)
+], NotificationGateway.prototype, "GetAllCountByReceiverId", null);
+exports.NotificationGateway = NotificationGateway = __decorate([
     (0, websockets_1.WebSocketGateway)({
         cors: { origin: '*' },
     }),
-    __metadata("design:paramtypes", [abonnement_service_1.AbonnementService,
-        notification_service_1.NotificationService,
-        job_application_service_1.JobApplicationsService])
-], ChatGateway);
+    __metadata("design:paramtypes", [notification_service_1.NotificationService,
+        abonnement_service_1.AbonnementService])
+], NotificationGateway);

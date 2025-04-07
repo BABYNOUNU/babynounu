@@ -6,7 +6,7 @@ export declare class ParentController {
     private readonly parentService;
     constructor(parentService: ParentsService);
     GetParents(): Promise<import("./models/parent.model").Parents[]>;
-    GetParent(id: string): Promise<any>;
+    GetParent(id: number): Promise<any>;
     Create(createParentDto: CreateParentDto, files: any): Promise<import("./models/parent.model").Parents>;
     UpdateParent(id: number, updateParentDto: UpdateParentDto, files: any): Promise<import("./models/parent.model").Parents>;
     DeleteParent(id: number): void;

@@ -89,7 +89,7 @@ export class AuthService {
     // CHECK IF USER ALREADY EXISTS
     const user = await this.userRepository.findOne({
       where: { email: signInBody.email },
-      relations: ['type_profil'],
+      relations: ['type_profil', 'role'],
     });
     if (!user) {
       throw new BadRequestException(
@@ -111,10 +111,8 @@ export class AuthService {
     //Verify if nounu or parent exist
     const isUserExist = await this.userRepository.findOne({
       where: { id: user?.id },
-      relations: ['type_profil', 'nounu', 'parent'],
+      relations: ['type_profil', 'nounu', 'parent', 'role'],
     });
-
-    console.log(isUserExist);
 
 
     // RETURN DATA USER CREATE

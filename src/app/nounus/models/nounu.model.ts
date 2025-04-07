@@ -1,5 +1,7 @@
+import { Contracts } from 'src/app/contracts/models/contracts.model';
 import { Medias } from 'src/app/media/models/media.model';
 import { Preference } from 'src/app/Preference/models/preference.model';
+import { Room } from 'src/app/rooms/models/room.model';
 import { User } from 'src/app/user/user.model';
 import {
   Entity,
@@ -35,6 +37,9 @@ export class Nounus {
   tarif_horaire: string;
 
   @Column()
+  status: string;
+
+  @Column()
   tarif_mensuel: string;
 
   @Column({ type: 'boolean', default: false })
@@ -42,6 +47,9 @@ export class Nounus {
 
   @Column({ type: 'boolean', default: false })
   urgences: boolean;
+
+  @Column({ type: 'boolean', default: false })
+  certif: boolean;
 
   @Column({ type: 'text' })
   evaluation_precedentes: string;
@@ -61,6 +69,15 @@ export class Nounus {
   @ManyToOne(() => User, (user) => user.nounu, { onDelete: 'CASCADE' })
   @JoinColumn()
   user: User;
+
+  @OneToMany(() => Room, (room) => room.nounou)
+  nounouRooms: Room[];
+
+  @OneToMany(() => Contracts, (contract) => contract.nounu, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  contracts: Contracts[];
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   createdAt: Date;

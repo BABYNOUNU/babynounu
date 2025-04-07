@@ -83,7 +83,7 @@ export class SettingController {
         ToAdd.push(element);
     }
 
-    console.log(ToAdd);
+  
 
     return ToAdd;
   }

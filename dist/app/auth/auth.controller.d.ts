@@ -18,13 +18,11 @@ export declare class AuthController {
             medias: import("../media/models/media.model").Medias[];
             notifications: import("../notification/models/notification.model").Notification[];
             sentNotifications: import("../notification/models/notification.model").Notification[];
-            conversations_sender: import("../chat/models/rooms.model").Rooms[];
-            conversations_receiver: import("../chat/models/rooms.model").Rooms[];
-            messages: import("../chat/models/rooms.model").Rooms[];
             job_to_apply: import("../job-application/models/job-application.model").JobApplication[];
             jobs: import("../job/models/job.model").Job[];
             paiements: import("../paiement/models/paiement.model").Paiements[];
             role: import("../parameter/models/parameter.model").Parameter;
+            messages: import("../messages/models/message.model").Message[];
         };
     }>;
     SignIn(signInBody: SginInAuthDto): Promise<{
@@ -42,13 +40,11 @@ export declare class AuthController {
             medias: import("../media/models/media.model").Medias[];
             notifications: import("../notification/models/notification.model").Notification[];
             sentNotifications: import("../notification/models/notification.model").Notification[];
-            conversations_sender: import("../chat/models/rooms.model").Rooms[];
-            conversations_receiver: import("../chat/models/rooms.model").Rooms[];
-            messages: import("../chat/models/rooms.model").Rooms[];
             job_to_apply: import("../job-application/models/job-application.model").JobApplication[];
             jobs: import("../job/models/job.model").Job[];
             paiements: import("../paiement/models/paiement.model").Paiements[];
             role: import("../parameter/models/parameter.model").Parameter;
+            messages: import("../messages/models/message.model").Message[];
         };
     }>;
 }

@@ -35,7 +35,6 @@ let JobsController = class JobsController {
         return this.jobsService.findJobById(id);
     }
     async findAllJobByUser(userId) {
-        console.log(userId);
         return this.jobsService.findAllJobByUser(userId);
     }
     async updateJob(id, updateJobDto, files) {
