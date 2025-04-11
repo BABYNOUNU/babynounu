@@ -64,7 +64,7 @@ __decorate([
     __metadata("design:type", String)
 ], Nounus.prototype, "tarif_horaire", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ type: 'varchar', default: 'disponible' }),
     __metadata("design:type", String)
 ], Nounus.prototype, "status", void 0);
 __decorate([

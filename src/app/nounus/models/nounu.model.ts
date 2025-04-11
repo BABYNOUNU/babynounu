@@ -36,7 +36,7 @@ export class Nounus {
   @Column()
   tarif_horaire: string;
 
-  @Column()
+  @Column({type: 'varchar', default: 'disponible'})
   status: string;
 
   @Column()
