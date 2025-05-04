@@ -18,16 +18,19 @@ const typeorm_1 = require("typeorm");
 const slug_utils_1 = require("../../utils/slug.utils");
 const bcryptjs = require("bcryptjs");
 const jwt_1 = require("@nestjs/jwt");
+const user_service_1 = require("../user/user.service");
 let AuthService = class AuthService {
     userRepository;
     roleRepository;
     paremeterProfileRepository;
     jwtService;
-    constructor(userRepository, roleRepository, paremeterProfileRepository, jwtService) {
+    userService;
+    constructor(userRepository, roleRepository, paremeterProfileRepository, jwtService, userService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.paremeterProfileRepository = paremeterProfileRepository;
         this.jwtService = jwtService;
+        this.userService = userService;
     }
     async signUp({ signUpBody }) {
         signUpBody.slug = await new slug_utils_1.SlugUtils().slug(signUpBody.email, this.userRepository);
@@ -55,7 +58,7 @@ let AuthService = class AuthService {
             email: signUpBody.email,
             password: signUpBody.password,
             role: { id: isRole.id },
-            type_profil: { id: isTypeProfil.id }
+            type_profil: { id: isTypeProfil.id },
         });
         const userSave = await this.userRepository.save(newUser);
         if (!userSave) {
@@ -92,12 +95,19 @@ let AuthService = class AuthService {
             user: {
                 ...user,
                 access_token: (await this.authentificate(user)).access_token,
-                profil: isUserExist.parent.length > 0 ? isUserExist.parent : isUserExist.nounu,
+                profil: isUserExist.parent.length > 0
+                    ? isUserExist.parent
+                    : isUserExist.nounu,
             },
         };
     }
     async authentificate(user) {
-        const payload = { email: user.email, id: user.id };
+        const payload = {
+            email: user.email,
+            id: user.id,
+            profileType: user.type_profil.slug,
+        };
+        console.log(payload);
         return {
             access_token: this.jwtService.sign(payload, {
                 secret: process.env.JWT_SECRET,
@@ -107,6 +117,22 @@ let AuthService = class AuthService {
     async isUserAuthentificateExist(email) {
         const isExist = await this.userRepository.findOne({ where: { email } });
         return isExist;
+    }
+    async getUserFromSocket(socket) {
+        try {
+            const token = socket.handshake.auth?.token;
+            if (!token) {
+                return null;
+            }
+            const payload = this.jwtService.verify(token, {
+                secret: process.env.JWT_SECRET,
+            });
+            const user = await this.userService.findOne(payload.id);
+            return user || null;
+        }
+        catch (error) {
+            return null;
+        }
     }
 };
 exports.AuthService = AuthService;
@@ -118,5 +144,6 @@ exports.AuthService = AuthService = __decorate([
     __metadata("design:paramtypes", [typeorm_1.Repository,
         typeorm_1.Repository,
         typeorm_1.Repository,
-        jwt_1.JwtService])
+        jwt_1.JwtService,
+        user_service_1.UserService])
 ], AuthService);

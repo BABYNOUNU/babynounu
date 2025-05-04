@@ -21,10 +21,22 @@ import {
     async createMessage(
       @Body('content') content: string,
       @Body('roomId', ParseIntPipe) roomId: number,
-      @Body('senderId', ParseIntPipe) senderId: number,
+      @Body('senderId', ParseIntPipe) senderId: string,
+      @Body('isRead', ParseIntPipe) isRead: boolean
     ): Promise<Message> {
-      return this.messageService.create({ content, roomId, senderId });
+      return this.messageService.create({ content, roomId, senderId, isRead, isProposition: false, type: 'Message' });
     }
+
+    
+    @Post('proposal-status')
+    async updateProposalStatus(
+      @Body('roomId', ParseIntPipe) roomId: number,
+      @Body('messageId', ParseIntPipe) messageId: number,
+      @Body('status') status: 'Accepted' | 'Refused' | 'Pending'
+    ): Promise<void> {
+      return this.messageService.updateProposalStatus(roomId, messageId, status);
+    }
+  
   
     @Get('room/:roomId')
     async getMessagesByRoom(

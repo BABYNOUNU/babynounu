@@ -4,7 +4,6 @@ import { Paiements } from './models/paiement.model';
 import { CreatePaymentDto } from './dtos/create-payment.dto';
 import axios from 'axios';
 import { UpdatePaymentDto } from './dtos/update-payment.dto';
-import { NotificationGateway } from '../notification/notification.gateway';
 import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
@@ -43,7 +42,7 @@ export class PaymentService {
       data: {
         apikey: process.env.CINETPAY_API_KEY, // Remplacez par votre clé API
         site_id: process.env.CINETPAY_SITE_ID, // Remplacez par votre site ID
-        mode: 'PRODUCTION', // Mode PRODUCTION ou TEST
+        mode: 'TEST', // Mode PRODUCTION ou TEST
         ...createPaymentDto,
       },
     };
@@ -55,6 +54,7 @@ export class PaymentService {
       });
     }
 
+    console.log(paymentData)
     await this.paymentRepository.update(
       { id: paymentSave.id },
       { payment_token: paymentData.data.payment_token },

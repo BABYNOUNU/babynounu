@@ -20,13 +20,14 @@ import {
   storageMedia,
 } from 'src/config/media.config';
 import { SearchParentCriteriaDto } from './dto/search-parent-criteria.dto';
+import { SharpTransform } from 'src/utils/sharpTransform';
 
-@ApiTags('Parents')
+@ApiTags('ProfilParents')
 @Controller('parent')
 export class ParentController {
   constructor(private readonly parentService: ParentsService) {}
 
-  // Get All Parents
+  // Get All ProfilParents
   @Get('')
   GetParents() {
     return this.parentService.findAll();
@@ -34,7 +35,7 @@ export class ParentController {
 
   // Get Signle Parent
   @Get('/:id')
-  GetParent(@Param('id') id: number) {
+  GetParent(@Param('id') id: string) {
     return this.parentService.findOne(id);
   }
 
@@ -44,8 +45,15 @@ export class ParentController {
     FileFieldsInterceptor([{ name: 'imageParent', maxCount: 4 }], {
       storage: storageMedia,
     }),
+    SharpTransform({
+      fields: ['imageParent'],
+      resizeOptions: { width: 400, height: 400, fit: 'cover', quality: 80 },
+    }), // Intercepteur personnalisé,
   )
-  async Create(@Body() createParentDto: CreateParentDto, @UploadedFiles() files) {
+  async Create(
+    @Body() createParentDto: CreateParentDto,
+    @UploadedFiles() files,
+  ) {
     // Appel du service pour sauvegarder les données
     return this.parentService.create(createParentDto, files);
   }
@@ -58,11 +66,11 @@ export class ParentController {
     }),
   )
   UpdateParent(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Body() updateParentDto: UpdateParentDto,
     @UploadedFiles() files,
   ) {
-   return this.parentService.update(id, updateParentDto, files);
+    return this.parentService.update(id, updateParentDto, files);
   }
 
   // // Delete parent existing
@@ -71,9 +79,8 @@ export class ParentController {
     this.parentService.remove(id.toString());
   }
 
-
   @Post('search_parent')
-async searchParent(@Body() searchCriteria: SearchParentCriteriaDto) {
-  return this.parentService.search(searchCriteria);
-}
+  async searchParent(@Body() searchCriteria: SearchParentCriteriaDto) {
+    return this.parentService.search(searchCriteria);
+  }
 }

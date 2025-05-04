@@ -4,9 +4,10 @@ export declare class AbonnementController {
     private readonly abonnementService;
     constructor(abonnementService: AbonnementService);
     createAbonnement(createAbonnementDto: CreateAbonnementDto): Promise<any>;
-    getAbonnementsByUser(userId: string): Promise<import("./models/abonnement.model").Abonnements[]>;
     getAbonnementById(abonnementId: string): Promise<import("./models/abonnement.model").Abonnements>;
+    getAbonnementByUserId(userId: string): Promise<any>;
     hasActiveAbonnement(userId: string): Promise<{
         hasActiveSubscription: boolean;
     }>;
+    cancelAbonnement(abonnementId: string): Promise<void>;
 }

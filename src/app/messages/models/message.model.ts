@@ -1,25 +1,58 @@
 // src/message/message.entity.ts
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+  OneToMany,
+} from 'typeorm';
 import { User } from 'src/app/user/user.model';
-import { Room } from 'src/app/rooms/models/room.model';
+import { Rooms } from 'src/app/rooms/models/room.model';
+import { Contracts } from 'src/app/contracts/models/contracts.model';
 
 @Entity()
 export class Message {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({type: 'text'})
   content: string;
 
-  @ManyToOne(() => User, user => user.messages)
+  @ManyToOne(() => User, (user) => user.messages, { onDelete: 'CASCADE' })
   sender: User;
 
-  @ManyToOne(() => Room, room => room.messages)
-  room: Room;
+  
+  @OneToMany(() => Contracts, (contract) => contract.message, { onDelete: 'CASCADE' })
+  contract: Contracts;
+
+  @ManyToOne(() => Rooms, (room) => room.messages, { onDelete: 'CASCADE' })
+  room: Rooms;
 
   @Column({ default: false })
   isRead: boolean;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @Column({ type: 'enum', enum: ['Message', 'Proposition'], default: 'Message' })
+  type: 'Message' | 'Proposition';
+
+  @Column({ default: false })
+  isProposition: boolean;
+
+
+  @Column({ nullable: true })
+  propositionExpired: string | null;
+
+  @Column({ type: 'enum', enum: ['Accepted', 'Refused', 'Pending'], default: 'Pending'})
+  proposalStatus: 'Accepted' | 'Refused' | 'Pending';
+
+  @CreateDateColumn()
   createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date | null;
 }

@@ -8,5 +8,6 @@ class CreateNotificationDto {
     is_read;
     senderUserId;
     jobId;
+    tolinkId;
 }
 exports.CreateNotificationDto = CreateNotificationDto;

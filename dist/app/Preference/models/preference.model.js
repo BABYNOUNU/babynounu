@@ -130,16 +130,16 @@ __decorate([
     __metadata("design:type", Array)
 ], Preference.prototype, "criteres_selections", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => parent_model_1.Parents, (parent) => parent.preferences, {
+    (0, typeorm_1.ManyToOne)(() => parent_model_1.ProfilParents, (parent) => parent.preferences, {
         onDelete: 'CASCADE',
     }),
-    __metadata("design:type", parent_model_1.Parents)
+    __metadata("design:type", parent_model_1.ProfilParents)
 ], Preference.prototype, "parents", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => nounu_model_1.Nounus, (nounu) => nounu.preferences, {
+    (0, typeorm_1.ManyToOne)(() => nounu_model_1.ProfilNounus, (nounu) => nounu.preferences, {
         onDelete: 'CASCADE',
     }),
-    __metadata("design:type", nounu_model_1.Nounus)
+    __metadata("design:type", nounu_model_1.ProfilNounus)
 ], Preference.prototype, "nounus", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => job_model_1.Job, (job) => job.preferences, { onDelete: 'CASCADE' }),

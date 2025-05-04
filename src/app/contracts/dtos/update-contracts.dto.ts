@@ -2,10 +2,10 @@ import { IsNumber, IsPositive, IsInt } from 'class-validator';
 export class UpdateContractDto {
     @IsNumber()
     @IsPositive()
-    price?: number;
+    roomId?: number;
   
     @IsNumber()
     @IsInt()
     @IsPositive()
-    duration?: number;
+    messageId?: number;
   }

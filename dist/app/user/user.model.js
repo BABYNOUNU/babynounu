@@ -20,6 +20,7 @@ const job_application_model_1 = require("../job-application/models/job-applicati
 const parameter_model_1 = require("../parameter/models/parameter.model");
 const nounu_model_1 = require("../nounus/models/nounu.model");
 const media_model_1 = require("../media/models/media.model");
+const room_model_1 = require("../rooms/models/room.model");
 const message_model_1 = require("../messages/models/message.model");
 let User = class User {
     id;
@@ -37,6 +38,8 @@ let User = class User {
     job_to_apply;
     jobs;
     paiements;
+    roomSender;
+    roomReceiver;
     role;
     messages;
 };
@@ -66,11 +69,11 @@ __decorate([
     __metadata("design:type", parameter_model_1.Parameter)
 ], User.prototype, "type_profil", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => nounu_model_1.Nounus, (nounu) => nounu.user, { cascade: true }),
+    (0, typeorm_1.OneToMany)(() => nounu_model_1.ProfilNounus, (nounu) => nounu.user, { cascade: true }),
     __metadata("design:type", Array)
 ], User.prototype, "nounu", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => parent_model_1.Parents, (parent) => parent.user, { cascade: true }),
+    (0, typeorm_1.OneToMany)(() => parent_model_1.ProfilParents, (parent) => parent.user, { cascade: true }),
     __metadata("design:type", Array)
 ], User.prototype, "parent", void 0);
 __decorate([
@@ -116,6 +119,18 @@ __decorate([
     }),
     __metadata("design:type", Array)
 ], User.prototype, "paiements", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => room_model_1.Rooms, (room) => room.sender, {
+        cascade: true,
+    }),
+    __metadata("design:type", Array)
+], User.prototype, "roomSender", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => room_model_1.Rooms, (room) => room.receiver, {
+        cascade: true,
+    }),
+    __metadata("design:type", Array)
+], User.prototype, "roomReceiver", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => parameter_model_1.Parameter, (parameter) => parameter.role, {
         onDelete: 'CASCADE',

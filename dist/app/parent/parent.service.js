@@ -52,7 +52,7 @@ let ParentsService = class ParentsService {
         if (!parents) {
             throw new common_1.NotFoundException(`Parent with not found`);
         }
-        const Parents = await this.nounuService.ReturnN(parents, [
+        const ProfilParents = await this.nounuService.ReturnN(parents, [
             'besions_specifiques',
             'garde_enfants',
             'aide_menagere',
@@ -65,7 +65,7 @@ let ParentsService = class ParentsService {
             'disponibility_du_prestataire',
             'mode_de_paiement',
         ]);
-        return Parents;
+        return ProfilParents;
     }
     async findOne(id) {
         const parent = await this.parentsRepository.findOne({

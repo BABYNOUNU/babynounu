@@ -9,13 +9,12 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Nounus = void 0;
-const contracts_model_1 = require("../../contracts/models/contracts.model");
+exports.ProfilNounus = void 0;
 const preference_model_1 = require("../../Preference/models/preference.model");
 const room_model_1 = require("../../rooms/models/room.model");
 const user_model_1 = require("../../user/user.model");
 const typeorm_1 = require("typeorm");
-let Nounus = class Nounus {
+let ProfilNounus = class ProfilNounus {
     id;
     fullname;
     age;
@@ -33,103 +32,95 @@ let Nounus = class Nounus {
     preferences;
     user;
     nounouRooms;
-    contracts;
     createdAt;
     updatedAt;
     deletedAt;
 };
-exports.Nounus = Nounus;
+exports.ProfilNounus = ProfilNounus;
 __decorate([
-    (0, typeorm_1.PrimaryGeneratedColumn)(),
-    __metadata("design:type", Number)
-], Nounus.prototype, "id", void 0);
+    (0, typeorm_1.PrimaryGeneratedColumn)('uuid'),
+    __metadata("design:type", String)
+], ProfilNounus.prototype, "id", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
-], Nounus.prototype, "fullname", void 0);
+], ProfilNounus.prototype, "fullname", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
-], Nounus.prototype, "age", void 0);
+], ProfilNounus.prototype, "age", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
-], Nounus.prototype, "phone", void 0);
+], ProfilNounus.prototype, "phone", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
-], Nounus.prototype, "annees_experience", void 0);
+], ProfilNounus.prototype, "annees_experience", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
-], Nounus.prototype, "tarif_horaire", void 0);
+], ProfilNounus.prototype, "tarif_horaire", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: 'varchar', default: 'disponible' }),
     __metadata("design:type", String)
-], Nounus.prototype, "status", void 0);
+], ProfilNounus.prototype, "status", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
-], Nounus.prototype, "tarif_mensuel", void 0);
+], ProfilNounus.prototype, "tarif_mensuel", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: 'boolean', default: false }),
     __metadata("design:type", Boolean)
-], Nounus.prototype, "flexibilite_tarifaire", void 0);
+], ProfilNounus.prototype, "flexibilite_tarifaire", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: 'boolean', default: false }),
     __metadata("design:type", Boolean)
-], Nounus.prototype, "urgences", void 0);
+], ProfilNounus.prototype, "urgences", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: 'boolean', default: false }),
     __metadata("design:type", Boolean)
-], Nounus.prototype, "certif", void 0);
+], ProfilNounus.prototype, "certif", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: 'text' }),
     __metadata("design:type", String)
-], Nounus.prototype, "evaluation_precedentes", void 0);
+], ProfilNounus.prototype, "evaluation_precedentes", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: 'text' }),
     __metadata("design:type", String)
-], Nounus.prototype, "references", void 0);
+], ProfilNounus.prototype, "references", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: 'text' }),
     __metadata("design:type", String)
-], Nounus.prototype, "courte_biographie", void 0);
+], ProfilNounus.prototype, "courte_biographie", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => preference_model_1.Preference, (preference) => preference.nounus, {
         cascade: true,
         onDelete: 'CASCADE',
     }),
     __metadata("design:type", Array)
-], Nounus.prototype, "preferences", void 0);
+], ProfilNounus.prototype, "preferences", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => user_model_1.User, (user) => user.nounu, { onDelete: 'CASCADE' }),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", user_model_1.User)
-], Nounus.prototype, "user", void 0);
+], ProfilNounus.prototype, "user", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => room_model_1.Room, (room) => room.nounou),
+    (0, typeorm_1.OneToMany)(() => room_model_1.Rooms, (room) => room.nounou),
     __metadata("design:type", Array)
-], Nounus.prototype, "nounouRooms", void 0);
-__decorate([
-    (0, typeorm_1.OneToMany)(() => contracts_model_1.Contracts, (contract) => contract.nounu, {
-        cascade: true,
-        onDelete: 'CASCADE',
-    }),
-    __metadata("design:type", Array)
-], Nounus.prototype, "contracts", void 0);
+], ProfilNounus.prototype, "nounouRooms", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)({ name: 'created_at', type: 'timestamp' }),
     __metadata("design:type", Date)
-], Nounus.prototype, "createdAt", void 0);
+], ProfilNounus.prototype, "createdAt", void 0);
 __decorate([
     (0, typeorm_1.UpdateDateColumn)({ name: 'updated_at', type: 'timestamp' }),
     __metadata("design:type", Date)
-], Nounus.prototype, "updatedAt", void 0);
+], ProfilNounus.prototype, "updatedAt", void 0);
 __decorate([
     (0, typeorm_1.DeleteDateColumn)({ name: 'deleted_at', type: 'timestamp', nullable: true }),
     __metadata("design:type", Date)
-], Nounus.prototype, "deletedAt", void 0);
-exports.Nounus = Nounus = __decorate([
+], ProfilNounus.prototype, "deletedAt", void 0);
+exports.ProfilNounus = ProfilNounus = __decorate([
     (0, typeorm_1.Entity)()
-], Nounus);
+], ProfilNounus);

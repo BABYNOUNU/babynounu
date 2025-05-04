@@ -1,7 +1,7 @@
 import { Job } from 'src/app/job/models/job.model';
-import { Nounus } from 'src/app/nounus/models/nounu.model';
+import { ProfilNounus } from 'src/app/nounus/models/nounu.model';
 import { Parameter } from 'src/app/parameter/models/parameter.model';
-import { Parents } from 'src/app/parent/models/parent.model';
+import { ProfilParents } from 'src/app/parent/models/parent.model';
 import { User } from 'src/app/user/user.model';
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 

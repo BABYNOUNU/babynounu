@@ -20,7 +20,6 @@ import { NounusModule } from './app/nounus/nounus.module';
 import { RoomsModule } from './app/rooms/rooms.module';
 import { MessagesModule } from './app/messages/messages.module';
 import { ChatModule } from './app/chat/chat.module';
-import { NotificationGateway } from './app/notification/notification.gateway';
 import { NotificationService } from './app/notification/notification.service';
 import { AbonnementService } from './app/abonnement/abonnement.service';
 import { NotificationProviders } from './app/notification/notification';
@@ -31,6 +30,9 @@ import { databaseProviders } from './database/database.providers';
 import { DatabaseModule } from './database/database.module';
 import { AdministrateurModule } from './app/administrateur/administrateur.module';
 import { ContractsModule } from './app/contracts/contracts.module';
+import { AuthService } from './app/auth/auth.service';
+import { UserProviders } from './app/user/user.providers';
+import { ChatGateway } from './app/chat/chat.gateway';
 
 @Module({
   imports: [
@@ -64,13 +66,7 @@ import { ContractsModule } from './app/contracts/contracts.module';
   ],
   controllers: [],
   providers: [
-    NotificationGateway,
-    NotificationService,
-    AbonnementService,
-    PaymentService,
-    ...PaiementProviders,
-    ...NotificationProviders,
-    ...AbonnementProviders,
+   
   ],
   exports: [],
 })

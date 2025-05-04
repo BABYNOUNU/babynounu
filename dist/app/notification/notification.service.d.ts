@@ -10,6 +10,7 @@ export declare class NotificationService {
         count: number;
     }>;
     markAsRead(notificationId: number): Promise<void>;
+    markAsReadById(notificationId: number): Promise<void>;
     updateViewByUserId(senderUserId: string): Promise<{
         notifications: Notification[];
         count: number;

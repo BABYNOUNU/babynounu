@@ -1,44 +1,73 @@
-import { Socket, Server } from 'socket.io';
+import { OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
+import { Server, Socket } from 'socket.io';
 import { RoomsService } from '../rooms/rooms.service';
+import { AuthService } from '../auth/auth.service';
 import { MessageService } from '../messages/messages.service';
-import { UserService } from '../user/user.service';
-import { User } from '../user/user.model';
-export declare class ChatGateway {
+import { AbonnementService } from '../abonnement/abonnement.service';
+import { NotificationService } from '../notification/notification.service';
+export declare class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly roomService;
+    private readonly authService;
     private readonly messageService;
-    private readonly userService;
+    private readonly abonnementService;
+    private readonly notificationService;
     server: Server;
-    constructor(roomService: RoomsService, messageService: MessageService, userService: UserService);
-    handleJoinRoom(data: {
+    private readonly logger;
+    private connectedUsers;
+    private readonly connectionLock;
+    constructor(roomService: RoomsService, authService: AuthService, messageService: MessageService, abonnementService: AbonnementService, notificationService: NotificationService);
+    afterInit(server: Server): void;
+    handleConnection(client: Socket): Promise<void>;
+    private handleNewConnection;
+    private cleanupSocket;
+    private removeAllListeners;
+    private handleUserDisconnect;
+    handleDisconnect(client: Socket): void;
+    handleJoinRoom(client: Socket, roomId: number): Promise<{
+        success: boolean;
         roomId: number;
-    }, client: Socket): Promise<void>;
-    handleMessage(data: {
+    }>;
+    handleLeaveRoom(client: Socket, roomId: number): Promise<{
+        success: boolean;
+    }>;
+    handleSendMessage(client: Socket, data: {
         roomId: number;
         content: string;
-        toSender?: any;
-    }, client: any): Promise<void>;
-    private updateUnreadCounters;
-    private handleUserNotifications;
-    getConversationsForUser(client: any): Promise<void>;
-    handleGetGlobalUnreadCounts(data: {
-        roomId: number;
-    }, client: any): Promise<{
-        parentUnread: number;
-        nounouUnread: number;
-        adminUnread: number;
+        isProposition?: boolean;
+        type?: 'Message' | 'Proposition';
+        propositionExpired?: string;
+    }): Promise<{
+        success: boolean;
+        message: import("../messages/models/message.model").Message;
     }>;
-    handleMarkAsRead(data: {
-        roomId: number;
-    }, client: any): Promise<void>;
-    handleRequestRefreshUnreadCounts(data: {
-        roomId: number;
-    }, client: any): Promise<void>;
-    private resetUnreadCounter;
-    handleTyping(data: {
+    private updateConversationList;
+    handleSeenMessage(client: Socket, roomId: number): Promise<void>;
+    handleTyping(client: Socket, data: {
         roomId: number;
         isTyping: boolean;
-    }, client: Socket & {
-        user: User;
     }): Promise<void>;
-    private hasAccessToRoom;
+    handleTypingStop(client: Socket, data: {
+        roomId: number;
+    }): Promise<void>;
+    handleMarkAsRead(client: Socket, roomId: number): Promise<{
+        success: boolean;
+    }>;
+    getTotalUnreadCount(client: Socket, userId: string): Promise<void>;
+    notifyNewMessage(roomId: number, senderId: string): Promise<void>;
+    GetNotifications(data: {
+        userId: string;
+    }, client: Socket): Promise<void>;
+    markAsReadNotification(data: {
+        notificationId: number;
+        userId: string;
+    }, client: Socket): Promise<void>;
+    getUnreadCountsNotification(data: {
+        userId: string;
+    }, client: Socket): Promise<void>;
+    IsAbonnement(data: {
+        userId: string;
+        transactionId: string;
+    }, client: Socket): Promise<void>;
+    isUserOnline(userId: string): boolean;
+    getUserSocket(userId: string): Socket | undefined;
 }

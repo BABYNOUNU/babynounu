@@ -28,11 +28,17 @@ let ContractsController = class ContractsController {
     findAll() {
         return this.contractsService.findAll();
     }
+    findAllByUserId(userId) {
+        return this.contractsService.findAllByUserId(userId);
+    }
     findOne(id) {
         return this.contractsService.findOne(id);
     }
     update(id, updateContractDto) {
         return this.contractsService.update(id, updateContractDto);
+    }
+    updateStatus(id, status) {
+        return this.contractsService.updateStatus(id, status);
     }
     remove(id) {
         return this.contractsService.remove(id);
@@ -56,6 +62,13 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ContractsController.prototype, "findAll", null);
 __decorate([
+    (0, common_1.Get)('user/:userId'),
+    __param(0, (0, common_1.Param)('userId', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], ContractsController.prototype, "findAllByUserId", null);
+__decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
@@ -70,6 +83,14 @@ __decorate([
     __metadata("design:paramtypes", [Number, update_contracts_dto_1.UpdateContractDto]),
     __metadata("design:returntype", Promise)
 ], ContractsController.prototype, "update", null);
+__decorate([
+    (0, common_1.Patch)(':id/status'),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)('status')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, String]),
+    __metadata("design:returntype", Promise)
+], ContractsController.prototype, "updateStatus", null);
 __decorate([
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),

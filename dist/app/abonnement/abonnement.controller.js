@@ -25,15 +25,18 @@ let AbonnementController = class AbonnementController {
     async createAbonnement(createAbonnementDto) {
         return this.abonnementService.createAbonnement(createAbonnementDto);
     }
-    async getAbonnementsByUser(userId) {
-        return this.abonnementService.getAbonnementsByUser(userId);
-    }
     async getAbonnementById(abonnementId) {
         return this.abonnementService.getAbonnementById(abonnementId);
+    }
+    async getAbonnementByUserId(userId) {
+        return this.abonnementService.getAbonnementByUserId(userId);
     }
     async hasActiveAbonnement(userId) {
         const hasActiveSubscription = await this.abonnementService.hasActiveAbonnement(userId);
         return { hasActiveSubscription };
+    }
+    async cancelAbonnement(abonnementId) {
+        return this.abonnementService.cancelAbonnement(abonnementId);
     }
 };
 exports.AbonnementController = AbonnementController;
@@ -53,20 +56,6 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AbonnementController.prototype, "createAbonnement", null);
 __decorate([
-    (0, common_1.Get)('user/:userId'),
-    (0, swagger_1.ApiOperation)({ summary: 'Get subscriptions for a user' }),
-    (0, swagger_1.ApiParam)({ name: 'userId', type: String, description: 'ID of the user' }),
-    (0, swagger_1.ApiResponse)({
-        status: 200,
-        description: 'Subscriptions retrieved successfully',
-    }),
-    (0, swagger_1.ApiResponse)({ status: 404, description: 'User not found' }),
-    __param(0, (0, common_1.Param)('userId')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", Promise)
-], AbonnementController.prototype, "getAbonnementsByUser", null);
-__decorate([
     (0, common_1.Get)(':abonnementId'),
     (0, swagger_1.ApiOperation)({ summary: 'Get a subscription by ID' }),
     (0, swagger_1.ApiParam)({ name: 'abonnementId', type: String, description: 'ID of the subscription' }),
@@ -80,6 +69,20 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], AbonnementController.prototype, "getAbonnementById", null);
+__decorate([
+    (0, common_1.Get)('user/:userId'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get a subscription for a user' }),
+    (0, swagger_1.ApiParam)({ name: 'userId', type: String, description: 'ID of the user' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Subscription retrieved successfully',
+    }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'User not found' }),
+    __param(0, (0, common_1.Param)('userId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AbonnementController.prototype, "getAbonnementByUserId", null);
 __decorate([
     (0, common_1.Get)('user/has-active-subscription/:userId'),
     (0, swagger_1.ApiOperation)({ summary: 'Check if user has an active subscription' }),
@@ -95,6 +98,20 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], AbonnementController.prototype, "hasActiveAbonnement", null);
+__decorate([
+    (0, common_1.Post)('cancel/:abonnementId'),
+    (0, swagger_1.ApiOperation)({ summary: 'Cancel a subscription' }),
+    (0, swagger_1.ApiParam)({ name: 'abonnementId', type: String, description: 'ID of the subscription' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Subscription canceled successfully',
+    }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Subscription not found' }),
+    __param(0, (0, common_1.Param)('abonnementId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AbonnementController.prototype, "cancelAbonnement", null);
 exports.AbonnementController = AbonnementController = __decorate([
     (0, swagger_1.ApiTags)('abonnements'),
     (0, common_1.Controller)('abonnements'),

@@ -1,6 +1,6 @@
 import { DataSource } from 'typeorm';
 import { User } from '../user/user.model';
-import { Parents } from '../parent/models/parent.model';
+import { ProfilParents } from '../parent/models/parent.model';
 import { Parameter } from '../parameter/models/parameter.model';
 export declare const AuthProviders: ({
     provide: string;
@@ -8,7 +8,7 @@ export declare const AuthProviders: ({
     inject: string[];
 } | {
     provide: string;
-    useFactory: (dataSource: DataSource) => import("typeorm").Repository<Parents>;
+    useFactory: (dataSource: DataSource) => import("typeorm").Repository<ProfilParents>;
     inject: string[];
 } | {
     provide: string;

@@ -1,6 +1,6 @@
 import { Paiements } from 'src/app/paiement/models/paiement.model';
 import { Parameter } from 'src/app/parameter/models/parameter.model';
-import { Parents } from 'src/app/parent/models/parent.model';
+import { ProfilParents } from 'src/app/parent/models/parent.model';
 import { User } from 'src/app/user/user.model';
 import {
   Entity,

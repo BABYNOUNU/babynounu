@@ -27,13 +27,6 @@ const nounus_module_1 = require("./app/nounus/nounus.module");
 const rooms_module_1 = require("./app/rooms/rooms.module");
 const messages_module_1 = require("./app/messages/messages.module");
 const chat_module_1 = require("./app/chat/chat.module");
-const notification_gateway_1 = require("./app/notification/notification.gateway");
-const notification_service_1 = require("./app/notification/notification.service");
-const abonnement_service_1 = require("./app/abonnement/abonnement.service");
-const notification_1 = require("./app/notification/notification");
-const abonnement_1 = require("./app/abonnement/abonnement");
-const paiement_1 = require("./app/paiement/paiement");
-const paiement_service_1 = require("./app/paiement/paiement.service");
 const database_module_1 = require("./database/database.module");
 const administrateur_module_1 = require("./app/administrateur/administrateur.module");
 const contracts_module_1 = require("./app/contracts/contracts.module");
@@ -72,15 +65,7 @@ exports.AppModule = AppModule = __decorate([
             contracts_module_1.ContractsModule,
         ],
         controllers: [],
-        providers: [
-            notification_gateway_1.NotificationGateway,
-            notification_service_1.NotificationService,
-            abonnement_service_1.AbonnementService,
-            paiement_service_1.PaymentService,
-            ...paiement_1.PaiementProviders,
-            ...notification_1.NotificationProviders,
-            ...abonnement_1.AbonnementProviders,
-        ],
+        providers: [],
         exports: [],
     })
 ], AppModule);

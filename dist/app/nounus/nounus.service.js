@@ -166,7 +166,7 @@ let NounusService = class NounusService {
             ],
         });
         if (!nounu) {
-            throw new common_1.NotFoundException(`Nounus with ID ${id} not found`);
+            throw new common_1.NotFoundException(`ProfilNounus with ID ${id} not found`);
         }
         const nounuOne = await this.ReturnN([nounu], [
             'zone_de_travail',
@@ -182,7 +182,7 @@ let NounusService = class NounusService {
     async update(id, updateNounuDto, files) {
         const { userId, ...nounuData } = updateNounuDto;
         const existingNounu = await this.nounuRepository.findOne({
-            where: { id: +id },
+            where: { id: id },
             relations: ['user'],
         });
         if (!existingNounu) {

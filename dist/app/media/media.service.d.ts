@@ -10,6 +10,7 @@ export declare class MediaService {
     create(createMediaDto: CreateMediaDto): Promise<Medias>;
     findOne(id: number): Promise<Medias | undefined>;
     findAll(): Promise<Medias[]>;
+    getGalleryNounus(userId: any): Promise<Medias[]>;
     update({ id, typeMedia }: {
         id: string;
         typeMedia: string;

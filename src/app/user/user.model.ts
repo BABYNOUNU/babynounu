@@ -8,7 +8,7 @@ import {
   JoinColumn,
   OneToOne,
 } from 'typeorm';
-import { Parents } from '../parent/models/parent.model';
+import { ProfilParents } from '../parent/models/parent.model';
 import { Roles } from '../role/models/role.model';
 import { Abonnements } from '../abonnement/models/abonnement.model';
 import { Notification } from '../notification/models/notification.model';
@@ -17,9 +17,9 @@ import { Paiements } from '../paiement/models/paiement.model';
 import { JobApplication } from '../job-application/models/job-application.model';
 import { Preference } from '../Preference/models/preference.model';
 import { Parameter } from '../parameter/models/parameter.model';
-import { Nounus } from '../nounus/models/nounu.model';
+import { ProfilNounus } from '../nounus/models/nounu.model';
 import { Medias } from '../media/models/media.model';
-import { Room } from '../rooms/models/room.model';
+import { Rooms } from '../rooms/models/room.model';
 import { Message } from '../messages/models/message.model';
 
 @Entity()
@@ -42,11 +42,11 @@ export class User {
   @ManyToOne(() => Parameter, (SN) => SN.type_profil, { onDelete: 'CASCADE' })
   type_profil: Parameter;
 
-  @OneToMany(() => Nounus, (nounu) => nounu.user, { cascade: true })
-  nounu: Nounus[];
+  @OneToMany(() => ProfilNounus, (nounu) => nounu.user, { cascade: true })
+  nounu: ProfilNounus[];
 
-  @OneToMany(() => Parents, (parent) => parent.user, { cascade: true })
-  parent: Parents[];
+  @OneToMany(() => ProfilParents, (parent) => parent.user, { cascade: true })
+  parent: ProfilParents[];
 
   @OneToMany(() => Abonnements, (abonnement) => abonnement.user, {
     cascade: true,
@@ -85,6 +85,16 @@ export class User {
   })
   paiements: Paiements[];
 
+  @OneToMany(() => Rooms, (room) => room.sender, {
+    cascade: true,
+  })
+  roomSender: Rooms[];
+
+  @OneToMany(() => Rooms, (room) => room.receiver, {
+    cascade: true,
+  })
+  roomReceiver: Rooms[];
+
   @ManyToOne(() => Parameter, (parameter) => parameter.role, {
     onDelete: 'CASCADE',
   })
@@ -92,6 +102,7 @@ export class User {
 
   @OneToMany(() => Message, message => message.sender)
   messages: Message[];
+
   
 
   

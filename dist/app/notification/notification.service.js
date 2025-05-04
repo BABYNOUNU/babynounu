@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.NotificationService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("typeorm");
-const notification_model_1 = require("./models/notification.model");
 let NotificationService = class NotificationService {
     notificationRepository;
     constructor(notificationRepository) {
@@ -29,6 +28,7 @@ let NotificationService = class NotificationService {
             isRead: createNotificationDto.is_read,
             sender: { id: createNotificationDto.senderUserId },
             job: { id: createNotificationDto.jobId },
+            tolinkId: createNotificationDto.tolinkId
         });
         const saveNotification = await this.notificationRepository.save(notification);
         if (!saveNotification) {
@@ -41,6 +41,9 @@ let NotificationService = class NotificationService {
             where: { sender: { id: userId } },
             relations: {
                 user: {
+                    medias: {
+                        type_media: true
+                    },
                     nounu: true,
                     parent: true,
                 },
@@ -50,6 +53,7 @@ let NotificationService = class NotificationService {
         notifications = notifications.map((notify) => {
             return {
                 ...notify,
+                photo: notify.user.medias.length > 0 ? notify.user.medias.find((media) => media.type_media.slug === 'image-profil') : null,
                 profil: notify.user.nounu.length > 0
                     ? notify.user.nounu[0]
                     : notify.user.parent[0],
@@ -61,23 +65,19 @@ let NotificationService = class NotificationService {
         return { notifications, count };
     }
     async markAsRead(notificationId) {
+        await this.notificationRepository.update({ id: notificationId }, { isRead: true });
+    }
+    async markAsReadById(notificationId) {
         await this.notificationRepository.update(notificationId, { isRead: true });
     }
     async updateViewByUserId(senderUserId) {
-        await this.notificationRepository
-            .createQueryBuilder('notification')
-            .innerJoin('notification.sender', 'sender')
-            .update(notification_model_1.Notification)
-            .set({ isRead: true })
-            .where('sender.id = :senderUserId', { senderUserId })
-            .execute();
+        await this.notificationRepository.update({ sender: { id: senderUserId } }, { isRead: true });
         return this.getNotifications(senderUserId);
     }
     async getAllCountByReceiverId(receiverId) {
         return await this.notificationRepository.count({
             where: {
                 sender: { id: receiverId },
-                user: { id: (0, typeorm_1.Not)(receiverId) },
                 isRead: false,
             },
         });

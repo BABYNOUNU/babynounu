@@ -5,9 +5,12 @@ export declare class Notification {
     type: string;
     job: Job;
     message: string;
+    tolinkId: string;
     isRead: boolean;
     user: User;
     sender: User;
+    isActions: boolean;
+    isDeleted: boolean;
     createdAt: Date;
     updatedAt: Date;
     deletedAt: Date | null;

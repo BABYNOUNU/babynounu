@@ -7,7 +7,6 @@ import {
 import { Not, Repository } from 'typeorm';
 import { Notification } from './models/notification.model';
 import { CreateNotificationDto } from './dtos/create-notification.dto';
-import { NotificationGateway } from './notification.gateway';
 
 @Injectable()
 export class NotificationService {
@@ -30,6 +29,7 @@ export class NotificationService {
       isRead: createNotificationDto.is_read,
       sender: { id: createNotificationDto.senderUserId },
       job: { id: createNotificationDto.jobId },
+      tolinkId: createNotificationDto.tolinkId
     });
 
     const saveNotification =
@@ -52,6 +52,9 @@ export class NotificationService {
       where: { sender: { id: userId } },
       relations: {
         user: {
+          medias: {
+            type_media: true
+          },
           nounu: true,
           parent: true,
         },
@@ -62,6 +65,7 @@ export class NotificationService {
     notifications = notifications.map((notify) => {
       return {
         ...notify,
+        photo: notify.user.medias.length > 0 ? notify.user.medias.find((media) => media.type_media.slug === 'image-profil') : null,
         profil:
           notify.user.nounu.length > 0
             ? notify.user.nounu[0]
@@ -81,6 +85,15 @@ export class NotificationService {
    * @returns void
    */
   async markAsRead(notificationId: number) {
+    await this.notificationRepository.update({id: notificationId}, { isRead: true });
+  }
+
+  /**
+   * Mark a notification as read by ID.
+   * @param notificationId - ID of the notification.
+   * @returns void
+   */
+  async markAsReadById(notificationId: number) {
     await this.notificationRepository.update(notificationId, { isRead: true });
   }
 
@@ -90,13 +103,10 @@ export class NotificationService {
    * @returns void
    */
   async updateViewByUserId(senderUserId: string) {
-    await this.notificationRepository
-      .createQueryBuilder('notification')
-      .innerJoin('notification.sender', 'sender')
-      .update(Notification)
-      .set({ isRead: true })
-      .where('sender.id = :senderUserId', { senderUserId })
-      .execute();
+    await this.notificationRepository.update(
+      { sender: { id: senderUserId } },
+      { isRead: true },
+    );
 
     return this.getNotifications(senderUserId);
   }
@@ -111,7 +121,6 @@ async getAllCountByReceiverId(receiverId: string): Promise<number> {
   return await this.notificationRepository.count({
     where: {
       sender: { id: receiverId },
-      user: { id: Not(receiverId) },
       isRead: false,
     },
   });

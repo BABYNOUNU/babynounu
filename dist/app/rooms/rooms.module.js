@@ -14,6 +14,14 @@ const rooms_1 = require("./rooms");
 const database_module_1 = require("../../database/database.module");
 const user_service_1 = require("../user/user.service");
 const user_providers_1 = require("../user/user.providers");
+const messages_service_1 = require("../messages/messages.service");
+const messages_1 = require("../messages/messages");
+const notification_service_1 = require("../notification/notification.service");
+const notification_1 = require("../notification/notification");
+const contracts_1 = require("../contracts/contracts");
+const contracts_service_1 = require("../contracts/contracts.service");
+const nounus_1 = require("../nounus/nounus");
+const parent_1 = require("../parent/parent");
 let RoomsModule = class RoomsModule {
 };
 exports.RoomsModule = RoomsModule;
@@ -21,6 +29,6 @@ exports.RoomsModule = RoomsModule = __decorate([
     (0, common_1.Module)({
         imports: [database_module_1.DatabaseModule],
         controllers: [rooms_controller_1.RoomsController],
-        providers: [rooms_service_1.RoomsService, user_service_1.UserService, ...rooms_1.RoomProviders, ...user_providers_1.UserProviders]
+        providers: [rooms_service_1.RoomsService, user_service_1.UserService, messages_service_1.MessageService, notification_service_1.NotificationService, contracts_service_1.ContractsService, ...contracts_1.ContractsProviders, ...nounus_1.NounusProviders, ...parent_1.ParentProviders, ...notification_1.NotificationProviders, ...messages_1.MessageProviders, ...rooms_1.RoomProviders, ...user_providers_1.UserProviders]
     })
 ], RoomsModule);

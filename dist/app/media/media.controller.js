@@ -34,6 +34,9 @@ let MediaController = class MediaController {
     findOne(id) {
         return this.mediaService.findOne(+id);
     }
+    getGalleryNounus(userId) {
+        return this.mediaService.getGalleryNounus(userId);
+    }
     update(id, typeMedia, updateMediaDto) {
         return this.mediaService.update({ id, typeMedia }, updateMediaDto);
     }
@@ -75,6 +78,14 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], MediaController.prototype, "findOne", null);
+__decorate([
+    (0, common_1.Get)('gallery/:userId'),
+    (0, swagger_1.ApiOkResponse)({ description: 'List of gallery media by user ID', type: [media_model_1.Medias] }),
+    __param(0, (0, common_1.Param)('userId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], MediaController.prototype, "getGalleryNounus", null);
 __decorate([
     (0, common_1.Patch)(':id'),
     (0, swagger_1.ApiOkResponse)({ description: 'Media updated', type: media_model_1.Medias }),

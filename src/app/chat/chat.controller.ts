@@ -1,10 +1,18 @@
 // src/chat/chat.controller.ts
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/auh.guard';
 import { User } from '../user/user.model';
-import { RoomsService } from '../rooms/rooms.service';
 import { MessageService } from '../messages/messages.service';
-
+import { GetUser } from '../auth/getUser';
+import { RoomsService } from '../rooms/rooms.service';
 
 @Controller('chat')
 @UseGuards(JwtAuthGuard)
@@ -14,29 +22,46 @@ export class ChatController {
     private messageService: MessageService,
   ) {}
 
-  @Get('conversations')
-  async getConversations(@Query('userId') userId: string) {
-    return this.roomService.getConversationsForUser(userId);
-  }
-
   @Get('messages')
   async getMessages(@Query('roomId') roomId: number) {
     // Vérifier que l'utilisateur a accès à cette conversation
     // const room = await this.roomService.findOne(roomId);
-   
-      return this.messageService.findByRoom(roomId);
-   
+    return this.messageService.findByRoom(roomId);
+  }
+
+  @Get('conversations')
+  async getUserConversations(@GetUser() user: User) {
+    console.log(user)
+    return this.roomService.getUserConversations(user.id);
   }
 
   @Get('find-or-create-room')
-  async findOrCreateRoom(@Query('parentId') parentId: number, @Query('nounouId') nounouId: number) {
-    return this.roomService.findOrCreate(parentId, nounouId);
+  async createOrGetRoom(
+    @GetUser() user: User,
+    @Query('nounouId') nounouId: string,
+    @Query('parentId') parentId: string,
+  ) {
+    return this.roomService.createOrGetRoom(user.id, parentId, nounouId);
   }
 
+  @Get('unread-total')
+  async getTotalUnreadCount(@GetUser() user: User) {
+    return this.roomService.getTotalUnreadCount(user.id);
+  }
 
   @Get('room/:id')
-  async findOne(@Query('id') id: number) {
-    return this.roomService.findOne(id);
+  async getRoom(@GetUser() user: User,
+  @Param('id') roomId: number) {
+    return this.roomService.getRoom(roomId, user.id);
   }
 
+  @Get(':id/unread')
+  async getRoomUnreadCount(@Param('id') roomId: number, @GetUser() user: User) {
+    return this.roomService.getRoomUnreadCount(roomId, user.id);
+  }
+
+  @Post(':id/mark-as-read')
+  async markAsRead(@Param('id') roomId: number, @GetUser() user: User) {
+    return this.roomService.resetUnreadCount(roomId, user.id);
+  }
 }

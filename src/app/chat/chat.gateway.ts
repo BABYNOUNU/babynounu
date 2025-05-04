@@ -1,292 +1,450 @@
-// src/chat/chat.gateway.ts
-
 import {
   WebSocketGateway,
   SubscribeMessage,
   MessageBody,
-  ConnectedSocket,
   WebSocketServer,
+  ConnectedSocket,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  WsException,
 } from '@nestjs/websockets';
-import { Socket, Server } from 'socket.io';
-import { UseGuards } from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/auh.guard';
+import { Server, Socket } from 'socket.io';
 import { RoomsService } from '../rooms/rooms.service';
+import { AuthService } from '../auth/auth.service';
+import { Logger, UseGuards } from '@nestjs/common';
+import { WsJwtGuard } from '../auth/ws-auth.guard';
 import { MessageService } from '../messages/messages.service';
-import { UserService } from '../user/user.service';
-import { Room } from '../rooms/models/room.model';
-import { User } from '../user/user.model';
+import { AbonnementService } from '../abonnement/abonnement.service';
+import { CreateAbonnementDto } from '../abonnement/dtos/create-abonnement.dto';
+import { NotificationService } from '../notification/notification.service';
+import { use } from 'passport';
 
-/**
- * WebSocket Gateway pour gérer les fonctionnalités de chat en temps réel
- * Ce gateway gère les événements liés aux messages, aux rooms et aux notifications
- */
 @WebSocketGateway({
   cors: {
-    origin: '*', // Autorise toutes les origines (à restreindre en production)
+    origin: '*',
   },
+  transports: ['websocket'], // Force WebSocket transport
+  pingTimeout: 60000, // 10s
+  pingInterval: 8000, // 5s
 })
-// @UseGuards(JwtAuthGuard) // Protection globale par JWT
-export class ChatGateway {
+export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
-  server: Server; // Instance du serveur Socket.IO
+  server: Server;
+
+  private readonly logger = new Logger(ChatGateway.name);
+  private connectedUsers: Map<string, Socket> = new Map();
+  private readonly connectionLock = new Map<string, Promise<void>>();
 
   constructor(
     private readonly roomService: RoomsService,
+    private readonly authService: AuthService,
     private readonly messageService: MessageService,
-    private readonly userService: UserService,
+    private readonly abonnementService: AbonnementService,
+    private readonly notificationService: NotificationService,
   ) {}
 
-  //#region Room Management
-
-  /**
-   * Gère l'événement de rejoindre une room
-   * @param data Contient l'ID de la room à rejoindre
-   * @param client Socket du client
-   */
-  @SubscribeMessage('joinRoom')
-  async handleJoinRoom(
-    @MessageBody() data: { roomId: number },
-    @ConnectedSocket() client: Socket,
-  ) {
-    client.join(`room_${data.roomId}`);
+  afterInit(server: Server) {
+    server.sockets.setMaxListeners(200); // Reasonable limit
+    this.logger.log('WebSocket Gateway initialized');
   }
 
-  //#endregion
-
-  //#region Message Handling
-
-  /**
-   * Gère l'envoi d'un nouveau message
-   * @param data Contient le contenu du message, l'ID de la room et le destinataire optionnel
-   * @param client Socket du client avec les informations d'authentification
-   */
-  @SubscribeMessage('sendMessage')
-  async handleMessage(
-    @MessageBody() data: { roomId: number; content: string; toSender?: any },
-    @ConnectedSocket() client: any,
-  ) {
-    const userClient = client.handshake.auth.user;
-    const room = await this.roomService.findOne(data.roomId);
-
-    // Création du message en base de données
-    const message = await this.messageService.create({
-      content: data.content,
-      roomId: data.roomId,
-      senderId: userClient.id,
-    });
-
-    // Mise à jour des compteurs de messages non lus selon le type de profil
-    await this.updateUnreadCounters(userClient, room.id);
-
-    // Diffusion du message à tous les participants de la room
-    this.server.to(`room_${data.roomId}`).emit('newMessage', message);
-    this.server.emit('updateConversationList');
-    this.server.emit('requestRefreshUnreadCounts');
-
-    // Gestion des notifications pour les différents types d'utilisateurs
-    await this.handleUserNotifications(userClient, data, room);
-  }
-
-  /**
-   * Met à jour les compteurs de messages non lus selon le type de profil
-   * @param user Utilisateur qui envoie le message
-   * @param roomId ID de la room concernée
-   */
-  private async updateUnreadCounters(user: any, roomId: number) {
-    if (user.type_profil.slug === 'parent') {
-      await this.roomService.incrementUnreadCount(roomId, 'nounu');
-      await this.roomService.incrementUnreadCount(roomId, 'administrateur');
-    } else if (user.type_profil.slug === 'nounu') {
-      await this.roomService.incrementUnreadCount(roomId, 'parent');
-    } else if (user.type_profil.slug === 'administrateur') {
-      const room = await this.roomService.findOne(roomId);
-      if (room.parent.user.id == user.id) {
-        await this.roomService.incrementUnreadCount(roomId, 'nounu');
-      } else {
-        await this.roomService.incrementUnreadCount(roomId, 'parent');
-      }
-    }
-  }
-
-  /**
-   * Gère les notifications pour les différents types d'utilisateurs
-   * @param userClient Utilisateur qui envoie le message
-   * @param messageData Données du message envoyé
-   * @param room Room concernée
-   */
-  private async handleUserNotifications(
-    userClient: any,
-    messageData: { toSender?: any },
-    room: Room,
-  ) {
-    if (userClient.type_profil.slug === 'parent') {
-      // Notification pour les nounous
-      this.userService.registerSocket(messageData.toSender, userClient.id);
-      const nounuSocket = await this.userService.findSocket(
-        messageData.toSender,
-      );
-      if (nounuSocket) {
-        this.server.emit('updateConversationList');
-        this.userService.removeSocket(messageData.toSender);
-      }
-      this.userService.removeSocket(messageData.toSender);
-    } else if (userClient.type_profil.slug === 'administrateur') {
-      // Notification pour les parents
-      this.userService.registerSocket(room.parent.user.id, userClient.id);
-      const parentSocket = await this.userService.findSocket(
-        room.parent.user.id,
-      );
-      if (parentSocket) {
-        this.server.to(parentSocket).emit('updateConversationList');
-        this.userService.removeSocket(room.parent.user.id);
-      }
-      this.userService.removeSocket(room.parent.user.id);
-    }
-  }
-
-  //#endregion
-
-  //#region Conversation Management
-
-  /**
-   * Récupère toutes les conversations pour un utilisateur
-   * @param client Socket du client
-   */
-  @SubscribeMessage('AllConversations')
-  async getConversationsForUser(@ConnectedSocket() client: any) {
-    const userClient = client.handshake.auth.user;
-    const AllConversations = await this.roomService.getConversationsForUser(
-      userClient.id,
-    );
-    this.server.emit('updateConversationList', AllConversations);
-  }
-
-  //#endregion
-
-  //#region Unread Messages Management
-
-  /**
-   * Gère la demande de compteurs de messages non lus
-   * @param client Socket du client
-   */
-  @SubscribeMessage('getGlobalUnreadCounts')
-  async handleGetGlobalUnreadCounts(
-    @MessageBody() data: { roomId: number },
-    @ConnectedSocket() client: any,
-  ) {
-    const userClient = client.handshake.auth.user;
-    const counts = await this.roomService.getGlobalUnreadCounts(
-      data.roomId,
-      userClient.id,
-    );
-    this.server.emit('globalUnreadCounts', counts);
-    return counts;
-  }
-
-  /**
-   * Marque les messages d'une room comme lus
-   * @param data Contient l'ID de la room
-   * @param client Socket du client
-   */
-  @SubscribeMessage('markAsRead')
-  async handleMarkAsRead(
-    @MessageBody() data: { roomId: number },
-    @ConnectedSocket() client: any,
-  ) {
-    const userClient = client.handshake.auth.user;
-    const room = await this.roomService.findOne(data.roomId);
-
-    // Marquer les messages comme lus
-    await this.messageService.markMessagesAsRead(room.id, userClient.id);
-
-    // Réinitialiser le compteur selon le type de profil
-    await this.resetUnreadCounter(userClient, room.id);
-
-    // Notifier les autres participants
-    this.server.to(`room_${data.roomId}`).emit('messagesRead', {
-      roomId: room.id,
-      readerId: userClient.id,
-    });
-
-    this.server.emit('requestRefreshUnreadCounts');
-  }
-
-  // Ajouter un handler
-  @SubscribeMessage('requestRefreshUnreadCounts')
-  async handleRequestRefreshUnreadCounts(
-    @MessageBody() data: { roomId: number },
-    @ConnectedSocket() client: any,
-  ) {
-    const userClient = client.handshake.auth.user;
-    const counts = await this.roomService.getGlobalUnreadCounts(
-      data.roomId,
-      userClient.id,
-    );
-    this.server.emit('globalUnreadCounts', counts);
-  }
-
-  /**
-   * Réinitialise le compteur de messages non lus selon le type de profil
-   * @param user Utilisateur qui marque les messages comme lus
-   * @param roomId ID de la room concernée
-   */
-  private async resetUnreadCounter(user: any, roomId: number) {
-    if (user.type_profil.slug === 'parent') {
-      await this.roomService.resetUnreadCount(roomId, 'parent');
-    } else if (user.type_profil.slug === 'nounu') {
-      await this.roomService.resetUnreadCount(roomId, 'nounu');
-    } else if (user.type_profil.slug === 'administrateur') {
-      await this.roomService.resetUnreadCount(roomId, 'administrateur');
-    }
-  }
-
-  //#endregion
-
-  //#region Typing Indicators
-
-  /**
-   * Gère l'indicateur de saisie (typing)
-   * @param data Contient l'ID de la room et l'état de saisie
-   * @param client Socket du client avec les informations utilisateur
-   */
-  @SubscribeMessage('typing')
-  async handleTyping(
-    @MessageBody() data: { roomId: number; isTyping: boolean },
-    @ConnectedSocket() client: Socket & { user: User },
-  ) {
-    const userClient = client.handshake.auth.user;
-    const room = await this.roomService.findOne(data.roomId);
-
-    // Vérification des permissions
-    if (!(await this.hasAccessToRoom(userClient.id, room))) {
+  async handleConnection(client: Socket) {
+    const userId = await this.authService.getUserFromSocket(client);
+    if (!userId) {
+      client.disconnect(true);
       return;
     }
 
-    // Diffusion de l'événement aux autres membres de la room
-    client.broadcast.to(`room_${data.roomId}`).emit('userTyping', {
-      userId: userClient.id,
-      isTyping: data.isTyping,
-    });
+    // Verrou pour éviter les connexions parallèles
+    if (!this.connectionLock.has(userId.id)) {
+      const connectionPromise = (async () => {
+        try {
+          await this.handleNewConnection(userId.id, client);
+        } finally {
+          this.connectionLock.delete(userId.id);
+        }
+      })();
+
+      this.connectionLock.set(userId.id, connectionPromise);
+    }
+
+    await this.connectionLock.get(userId.id);
   }
 
-  //#endregion
+  private async handleNewConnection(userId: string, client: Socket) {
+    // Nettoyer les anciennes connexions
+    // const existingSocket = this.connectedUsers.get(userId);
+    // if (existingSocket && existingSocket.id !== client.id) {
+    //   this.logger.log(`Cleaning old connection for user ${userId}`);
+    //   this.cleanupSocket(existingSocket);
+    //   this.connectedUsers.delete(userId);
+    // }
 
-  //#region Helper Methods
+    // Enregistrer la nouvelle connexion
+    this.connectedUsers.set(userId, client);
+    client.join(`user_${userId}`);
 
-  /**
-   * Vérifie si un utilisateur a accès à une room
-   * @param userId ID de l'utilisateur
-   * @param room Room à vérifier
-   * @returns Boolean indiquant si l'utilisateur a accès
-   */
-  private async hasAccessToRoom(userId: any, room: Room): Promise<boolean> {
-    const user = await this.userService.findOne(userId);
-    return (
-      user.type_profil.slug === 'administrateur' ||
-      (user.type_profil.slug === 'parent' && room.parent.user.id === user.id) ||
-      (user.type_profil.slug === 'nounu' && room.nounou.user.id === user.id)
-    );
+    // Configurer le handler de déconnexion
+    const disconnectHandler = () =>
+      this.handleUserDisconnect(userId, client.id);
+    client.on('disconnect', disconnectHandler);
+    client.data.disconnectHandler = disconnectHandler;
+
+    this.logger.log(`User ${userId} connected (Socket ${client.id})`);
   }
 
-  //#endregion
+  private cleanupSocket(socket: Socket) {
+    if (socket.data?.disconnectHandler) {
+      socket.off('disconnect', socket.data.disconnectHandler);
+    }
+    socket.disconnect(true);
+  }
+
+  private removeAllListeners(socket: Socket) {
+    if (socket.data?.listeners) {
+      Object.entries(socket.data.listeners).forEach(([event, handler]) => {
+        socket.off(event, handler as (...args: any[]) => void);
+      });
+      delete socket.data.listeners;
+    }
+  }
+
+  private handleUserDisconnect(userId: string, socketId: string) {
+    const currentSocket = this.connectedUsers.get(userId);
+    if (currentSocket?.id === socketId) {
+      this.removeAllListeners(currentSocket);
+      this.connectedUsers.delete(userId);
+      this.logger.log(`User ${userId} disconnected (Socket ${socketId})`);
+    }
+  }
+
+  handleDisconnect(client: Socket) {
+    // Additional cleanup if needed
+  }
+
+  @SubscribeMessage('joinRoom')
+  @UseGuards(WsJwtGuard)
+  async handleJoinRoom(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() roomId: number,
+  ) {
+    try {
+      const user = await this.authService.getUserFromSocket(client);
+
+      if (!user) {
+        throw new WsException('Unauthorized');
+      }
+
+      const room = await this.roomService.getRoom(roomId);
+      if (!room) {
+        throw new WsException('Rooms not found');
+      }
+
+      // Verify user is part of this room
+      if (room.sender.id !== user.id && room.receiver.id !== user.id) {
+        throw new WsException('Not a member of this room');
+      }
+
+      client.join(`room_${roomId}`);
+      this.logger.log(`User ${user.id} joined room ${roomId}`);
+
+      return { success: true, roomId };
+    } catch (error) {
+      this.logger.error(`JoinRoom error: ${error.message}`);
+      throw new WsException(error.message);
+    }
+  }
+
+  @SubscribeMessage('leaveRoom')
+  @UseGuards(WsJwtGuard)
+  async handleLeaveRoom(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() roomId: number,
+  ) {
+    client.leave(`room_${roomId}`);
+    return { success: true };
+  }
+
+  @SubscribeMessage('sendMessage')
+  @UseGuards(WsJwtGuard)
+  async handleSendMessage(
+    @ConnectedSocket() client: Socket,
+    @MessageBody()
+    data: {
+      roomId: number;
+      content: string;
+      isProposition?: boolean;
+      type?: 'Message' | 'Proposition';
+      propositionExpired?: string;
+    },
+  ) {
+    try {
+      const sender = await this.authService.getUserFromSocket(client);
+      if (!sender) {
+        throw new WsException('Unauthorized');
+      }
+
+      const room = await this.roomService.getRoom(data.roomId);
+      if (!room) {
+        throw new WsException('Rooms not found');
+      }
+
+      // Verify user is part of this room
+      if (room.sender.id !== sender.id && room.receiver.id !== sender.id) {
+        throw new WsException('Not a member of this room');
+      }
+
+      const receiverId =
+        room.sender.id === sender.id ? room.receiver.id : room.sender.id;
+      const isReceiverOnline = this.isUserOnline(receiverId);
+      const newMessage = await this.messageService.create({
+        content: data.content,
+        roomId: data.roomId,
+        senderId: sender.id,
+        isRead: false,
+        isProposition: data.isProposition ? true : false,
+        type: data.type,
+        propositionExpired: data.propositionExpired,
+      });
+
+      // Emit to room members
+      this.server.to(`room_${data.roomId}`).emit('newMessage', newMessage);
+
+      // Update conversation lists
+      this.updateConversationList(sender.id);
+      this.updateConversationList(receiverId);
+
+      // Handle notifications if receiver is offline
+      // if (!isReceiverOnline) {
+      await this.notifyNewMessage(data.roomId, sender.id);
+      // }
+
+      return { success: true, message: newMessage };
+    } catch (error) {
+      this.logger.error(`SendMessage error: ${error.message}`);
+      throw new WsException(error.message);
+    }
+  }
+
+  private async updateConversationList(userId: string) {
+    try {
+      const conversations = await this.roomService.getUserConversations(userId);
+      this.server
+        .to(`user_${userId}`)
+        .emit('conversationsUpdated', conversations);
+    } catch (error) {
+      this.logger.error(
+        `UpdateConversationList error for user ${userId}: ${error.message}`,
+      );
+    }
+  }
+
+  @SubscribeMessage('conversationsUpdated')
+  @UseGuards(WsJwtGuard)
+  async handleSeenMessage(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() roomId: number,
+  ) {
+    const user = await this.authService.getUserFromSocket(client);
+    if (user) {
+      this.updateConversationList(user.id);
+    }
+  }
+
+  @SubscribeMessage('typingStart')
+  @UseGuards(WsJwtGuard)
+  async handleTyping(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: { roomId: number; isTyping: boolean },
+  ) {
+    const user = await this.authService.getUserFromSocket(client);
+    if (user) {
+      client.to(`room_${data.roomId}`).emit('userTyping', {
+        userId: user.id,
+        isTyping: data.isTyping,
+      });
+    }
+  }
+
+  @SubscribeMessage('typingStop')
+  @UseGuards(WsJwtGuard)
+  async handleTypingStop(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: { roomId: number },
+  ) {
+    const user = await this.authService.getUserFromSocket(client);
+    if (user) {
+      client.to(`room_${data.roomId}`).emit('userStoppedTyping', {
+        userId: user.id,
+      });
+    }
+  }
+
+  @SubscribeMessage('markAsRead')
+  @UseGuards(WsJwtGuard)
+  async handleMarkAsRead(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() roomId: number,
+  ) {
+    const user = await this.authService.getUserFromSocket(client);
+    if (user) {
+      // this.updateConversationList(user.id);
+      const result = await this.roomService.resetUnreadCount(roomId, user.id);
+      const totalUnread = await this.roomService.getTotalUnreadCount(user.id);
+
+      this.server.to(`user_${user.id}`).emit('unreadUpdated', {
+        roomId,
+        count: result.count,
+        totalUnread,
+      });
+
+      return { success: true };
+    }
+    return { success: false };
+  }
+
+  @SubscribeMessage('getUnreadCounts')
+  @UseGuards(WsJwtGuard)
+  async getTotalUnreadCount(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() userId: string,
+  ) {
+    const user = await this.authService.getUserFromSocket(client);
+    if (user && user.id === userId) {
+      this.server.to(`user_${user.id}`).emit('unreadCounts', {
+        totalUnread: await this.roomService.getTotalUnreadCount(userId),
+      });
+    }
+  }
+
+  async notifyNewMessage(roomId: number, senderId: string) {
+    try {
+      const room = await this.roomService.getRoom(roomId);
+      if (!room) return;
+
+      const receiverId =
+        room.sender.id === senderId ? room.receiver.id : room.sender.id;
+      const unreadCount = await this.roomService.incrementUnreadCount(
+        roomId,
+        receiverId,
+      );
+      const totalUnread =
+        await this.roomService.getTotalUnreadCount(receiverId);
+
+      this.server.to(`user_${receiverId}`).emit('unreadUpdated', {
+        roomId,
+        unreadCount,
+        totalUnread,
+      });
+    } catch (error) {
+      this.logger.error(`NotifyNewMessage error: ${error.message}`);
+    }
+  }
+
+  //#region Notification
+
+  @SubscribeMessage('getNotifications')
+  @UseGuards(WsJwtGuard)
+  async GetNotifications(
+    @MessageBody() data: { userId: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    try {
+      const user = await this.authService.getUserFromSocket(client);
+      if (!user) {
+        throw new WsException('Unauthorized');
+      }
+
+      const notifications = await this.notificationService.getNotifications(
+        data.userId,
+      );
+      this.server.to(`user_${user.id}`).emit('notifications', notifications);
+    } catch (error) {
+      this.logger.error(`GetNotifications error: ${error.message}`);
+      throw new WsException(error.message);
+    }
+  }
+
+  @SubscribeMessage('markAsReadNotification')
+  @UseGuards(WsJwtGuard)
+  async markAsReadNotification(
+    @MessageBody() data: { notificationId: number; userId: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    try {
+      const user = await this.authService.getUserFromSocket(client);
+      if (!user || user.id !== data.userId) {
+        throw new WsException('Unauthorized');
+      }
+
+      await this.notificationService.markAsRead(data.notificationId);
+      client.emit('notificationMarkedAsRead', {
+        userId: data.userId,
+        success: true,
+      });
+    } catch (error) {
+      this.logger.error(`MarkAsReadNotification error: ${error.message}`);
+      client.emit('notificationMarkedAsRead', {
+        userId: data.userId,
+        success: false,
+      });
+    }
+  }
+
+  @SubscribeMessage('getUnreadCountsNotification')
+  @UseGuards(WsJwtGuard)
+  async getUnreadCountsNotification(
+    @MessageBody() data: { userId: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    try {
+      const user = await this.authService.getUserFromSocket(client);
+      if (!user) {
+        throw new WsException('Unauthorized');
+      }
+
+      const unreadCountsNotification =
+        await this.notificationService.getAllCountByReceiverId(data.userId);
+
+      client.emit('unreadCountsNotification', unreadCountsNotification);
+    } catch (error) {
+      this.logger.error(`GetUnreadCountsNotification error: ${error.message}`);
+      throw new WsException(error.message);
+    }
+  }
+
+  //#endregion Notification
+
+  @SubscribeMessage('checkIsAbonnement')
+  @UseGuards(WsJwtGuard)
+  async IsAbonnement(
+    @MessageBody() data: { userId: string; transactionId: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    try {
+      const user = await this.authService.getUserFromSocket(client);
+      if (!user || user.id !== data.userId) {
+        throw new WsException('Unauthorized');
+      }
+
+      const hasActiveAbonnement =
+        await this.abonnementService.createAbonnement(data);
+
+      this.server
+        .to(`user_${user.id}`)
+        .emit('isAbonnement', hasActiveAbonnement);
+    } catch (error) {
+      this.logger.error(`IsAbonnement error: ${error.message}`);
+      throw new WsException(error.message);
+    }
+  }
+
+  // Utility methods
+  isUserOnline(userId: string): boolean {
+    return this.connectedUsers.has(userId);
+  }
+
+  getUserSocket(userId: string): Socket | undefined {
+    return this.connectedUsers.get(userId);
+  }
 }

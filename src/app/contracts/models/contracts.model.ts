@@ -1,40 +1,33 @@
-import { Nounus } from 'src/app/nounus/models/nounu.model';
-import { Parents } from 'src/app/parent/models/parent.model';
-import { User } from 'src/app/user/user.model';
+// src/message/message.entity.ts
 import {
-  Column,
-  CreateDateColumn,
-  DeleteDateColumn,
   Entity,
-  JoinColumn,
+  PrimaryGeneratedColumn,
+  Column,
   ManyToOne,
   OneToMany,
-  OneToOne,
-  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  DeleteDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-
+import { User } from 'src/app/user/user.model';
+import { Rooms } from 'src/app/rooms/models/room.model';
+import { Message } from 'src/app/messages/models/message.model';
 
 @Entity()
 export class Contracts {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'numeric', nullable: false })
-  price: number;
+  @ManyToOne(() => Rooms, (room) => room.contract, { onDelete: 'CASCADE' })
+  room: Rooms;
 
-  @Column({ type: 'numeric', nullable: false })
-  duration: number;
+  @ManyToOne(() => Message, (message) => message.contract, { onDelete: 'CASCADE' })
+  message: Message;
 
-  @ManyToOne(() => Nounus, (nounu) => nounu.contracts, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'nounu_id' })
-  nounu: Nounus;
+  @Column({ type: 'enum', enum: ['Accepted', 'Pending', 'Canceled'], default: 'Pending' })
+  status: 'Accepted' | 'Pending' | 'Canceled';
 
-  @ManyToOne(() => Parents, (parent) => parent.contracts, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'parent_id' })
-  parent: Parents;
-
-  @CreateDateColumn({ type: 'timestamp' })
+@CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 
   @UpdateDateColumn({ type: 'timestamp' })

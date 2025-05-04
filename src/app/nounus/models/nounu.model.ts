@@ -1,7 +1,7 @@
 import { Contracts } from 'src/app/contracts/models/contracts.model';
 import { Medias } from 'src/app/media/models/media.model';
 import { Preference } from 'src/app/Preference/models/preference.model';
-import { Room } from 'src/app/rooms/models/room.model';
+import { Rooms } from 'src/app/rooms/models/room.model';
 import { User } from 'src/app/user/user.model';
 import {
   Entity,
@@ -17,9 +17,9 @@ import {
 } from 'typeorm';
 
 @Entity()
-export class Nounus {
-  @PrimaryGeneratedColumn()
-  id: number;
+export class ProfilNounus {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column()
   fullname: string;
@@ -70,14 +70,8 @@ export class Nounus {
   @JoinColumn()
   user: User;
 
-  @OneToMany(() => Room, (room) => room.nounou)
-  nounouRooms: Room[];
-
-  @OneToMany(() => Contracts, (contract) => contract.nounu, {
-    cascade: true,
-    onDelete: 'CASCADE',
-  })
-  contracts: Contracts[];
+  @OneToMany(() => Rooms, (room) => room.nounou)
+  nounouRooms: Rooms[];
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   createdAt: Date;

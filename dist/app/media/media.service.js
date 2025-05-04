@@ -38,6 +38,21 @@ let MediaService = class MediaService {
     async findAll() {
         return this.mediaRepository.find();
     }
+    async getGalleryNounus(userId) {
+        try {
+            const NounuMedias = await this.mediaRepository.find({
+                where: {
+                    type_media: { slug: 'gallery-image' },
+                    user: { id: userId }
+                },
+            });
+            return NounuMedias;
+        }
+        catch (error) {
+            console.log(error);
+            throw new Error('Error while fetching gallery nounus');
+        }
+    }
     async update({ id, typeMedia }, updateMediaDto) {
         const media = await this.mediaRepository.find({ where: { user: { id }, type_media: { slug: typeMedia } } });
         if (!media) {

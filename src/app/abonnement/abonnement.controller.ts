@@ -37,18 +37,6 @@ import { JwtAuthGuard } from '../auth/auh.guard';
       return this.abonnementService.createAbonnement(createAbonnementDto);
     }
   
-    @Get('user/:userId')
-    @ApiOperation({ summary: 'Get subscriptions for a user' }) // Description de l'opération
-    @ApiParam({ name: 'userId', type: String, description: 'ID of the user' }) // Documenter le paramètre de route
-    @ApiResponse({
-      status: 200,
-      description: 'Subscriptions retrieved successfully',
-    })
-    @ApiResponse({ status: 404, description: 'User not found' })
-    async getAbonnementsByUser(@Param('userId') userId: string) {
-      return this.abonnementService.getAbonnementsByUser(userId);
-    }
-  
     @Get(':abonnementId')
     @ApiOperation({ summary: 'Get a subscription by ID' }) // Description de l'opération
     @ApiParam({ name: 'abonnementId', type: String, description: 'ID of the subscription' }) // Documenter le paramètre de route
@@ -60,6 +48,20 @@ import { JwtAuthGuard } from '../auth/auh.guard';
     async getAbonnementById(@Param('abonnementId') abonnementId: string) {
       return this.abonnementService.getAbonnementById(abonnementId);
     }
+
+    
+    @Get('user/:userId')
+    @ApiOperation({ summary: 'Get a subscription for a user' }) // Description de l'opération
+    @ApiParam({ name: 'userId', type: String, description: 'ID of the user' }) // Documenter le paramètre de route
+    @ApiResponse({
+      status: 200,
+      description: 'Subscription retrieved successfully',
+    })
+    @ApiResponse({ status: 404, description: 'User not found' })
+    async getAbonnementByUserId(@Param('userId') userId: string) {
+      return this.abonnementService.getAbonnementByUserId(userId);
+    }
+  
   
 
     @Get('user/has-active-subscription/:userId')
@@ -74,5 +76,18 @@ import { JwtAuthGuard } from '../auth/auh.guard';
     async hasActiveAbonnement(@Param('userId') userId: string): Promise<{ hasActiveSubscription: boolean }> {
       const hasActiveSubscription = await this.abonnementService.hasActiveAbonnement(userId);
       return { hasActiveSubscription };
+    }
+
+  
+    @Post('cancel/:abonnementId')
+    @ApiOperation({ summary: 'Cancel a subscription' }) // Description de l'opération
+    @ApiParam({ name: 'abonnementId', type: String, description: 'ID of the subscription' }) // Documenter le paramètre de route
+    @ApiResponse({
+      status: 200,
+      description: 'Subscription canceled successfully',
+    })
+    @ApiResponse({ status: 404, description: 'Subscription not found' })
+    async cancelAbonnement(@Param('abonnementId') abonnementId: string) {
+      return this.abonnementService.cancelAbonnement(abonnementId);
     }
   }

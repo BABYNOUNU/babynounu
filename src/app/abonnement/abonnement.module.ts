@@ -10,7 +10,6 @@ import { PaymentService } from '../paiement/paiement.service';
 import { NotificationService } from '../notification/notification.service';
 import { NotificationModule } from '../notification/notification.module';
 import { NotificationProviders } from '../notification/notification';
-import { NotificationGateway } from '../notification/notification.gateway';
 
 @Module({
   imports: [DatabaseModule],
@@ -18,7 +17,6 @@ import { NotificationGateway } from '../notification/notification.gateway';
   providers: [
     AbonnementService,
     PaymentService,
-    NotificationGateway,
     NotificationService,
     ...NotificationProviders,
     ...PaiementProviders,

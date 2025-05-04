@@ -6,28 +6,17 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
   UseInterceptors,
-  UploadedFile,
-  ParseFilePipe,
-  MaxFileSizeValidator,
-  FileTypeValidator,
   UploadedFiles,
 } from '@nestjs/common';
 import { CreateMediaDto } from './dtos/create-media.dto';
 import { UpdateMediaDto } from './dtos/update-media.dto';
 import {
   ApiTags,
-  ApiConsumes,
-  ApiBody,
-  ApiCreatedResponse,
   ApiOkResponse,
 } from '@nestjs/swagger';
 import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer'; // For local file storage
-import { extname } from 'path';
 import { Medias } from './models/media.model';
-import { In } from 'typeorm';
 import { fileFilterMedia, LimiterMedia, storageMedia } from 'src/config/media.config';
 
 @ApiTags('media')
@@ -77,6 +66,13 @@ export class MediaController {
   @ApiOkResponse({ description: 'Media by ID', type: Medias })
   findOne(@Param('id') id: string) {
     return this.mediaService.findOne(+id);
+  }
+
+  
+  @Get('gallery/:userId')
+  @ApiOkResponse({ description: 'List of gallery media by user ID', type: [Medias] })
+  getGalleryNounus(@Param('userId') userId: string) {
+    return this.mediaService.getGalleryNounus(userId);
   }
 
   @Patch(':id')

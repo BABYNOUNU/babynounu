@@ -1,7 +1,12 @@
 import { DataSource } from 'typeorm';
-import { Room } from './models/room.model';
-export declare const RoomProviders: {
+import { Rooms } from './models/room.model';
+import { RoomMessageCount } from './models/unreadCount.model';
+export declare const RoomProviders: ({
     provide: string;
-    useFactory: (dataSource: DataSource) => import("typeorm").Repository<Room>;
+    useFactory: (dataSource: DataSource) => import("typeorm").Repository<Rooms>;
     inject: string[];
-}[];
+} | {
+    provide: string;
+    useFactory: (dataSource: DataSource) => import("typeorm").Repository<RoomMessageCount>;
+    inject: string[];
+})[];

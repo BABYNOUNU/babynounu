@@ -1,4 +1,4 @@
-import { Parents } from 'src/app/parent/models/parent.model';
+import { ProfilParents } from 'src/app/parent/models/parent.model';
 import { Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from 'src/app/user/user.model';
 

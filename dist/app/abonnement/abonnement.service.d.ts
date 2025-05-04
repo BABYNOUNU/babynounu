@@ -18,8 +18,9 @@ export declare class AbonnementService {
     private createNewAbonnement;
     private sendSubscriptionNotification;
     private buildResponse;
-    getAbonnementsByUser(userId: string): Promise<Abonnements[]>;
     getAbonnementById(abonnementId: string): Promise<Abonnements>;
+    getAbonnementByUserId(userId: string): Promise<any>;
     hasActiveAbonnement(userId: string): Promise<boolean>;
     private isSubscriptionActive;
+    cancelAbonnement(abonnementId: string): Promise<void>;
 }

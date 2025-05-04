@@ -5,10 +5,10 @@ import { SearchParentCriteriaDto } from './dto/search-parent-criteria.dto';
 export declare class ParentController {
     private readonly parentService;
     constructor(parentService: ParentsService);
-    GetParents(): Promise<import("./models/parent.model").Parents[]>;
-    GetParent(id: number): Promise<any>;
-    Create(createParentDto: CreateParentDto, files: any): Promise<import("./models/parent.model").Parents>;
-    UpdateParent(id: number, updateParentDto: UpdateParentDto, files: any): Promise<import("./models/parent.model").Parents>;
+    GetParents(): Promise<import("./models/parent.model").ProfilParents[]>;
+    GetParent(id: string): Promise<any>;
+    Create(createParentDto: CreateParentDto, files: any): Promise<import("./models/parent.model").ProfilParents>;
+    UpdateParent(id: string, updateParentDto: UpdateParentDto, files: any): Promise<import("./models/parent.model").ProfilParents>;
     DeleteParent(id: number): void;
     searchParent(searchCriteria: SearchParentCriteriaDto): Promise<any[]>;
 }

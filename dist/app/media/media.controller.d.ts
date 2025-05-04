@@ -10,6 +10,7 @@ export declare class MediaController {
     }): void;
     findAll(): Promise<Medias[]>;
     findOne(id: string): Promise<Medias>;
+    getGalleryNounus(userId: string): Promise<Medias[]>;
     update(id: string, typeMedia: string, updateMediaDto: UpdateMediaDto): Promise<Medias>;
     remove(id: string): Promise<Medias>;
 }

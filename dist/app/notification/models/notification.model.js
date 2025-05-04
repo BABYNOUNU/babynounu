@@ -18,9 +18,12 @@ let Notification = class Notification {
     type;
     job;
     message;
+    tolinkId;
     isRead;
     user;
     sender;
+    isActions;
+    isDeleted;
     createdAt;
     updatedAt;
     deletedAt;
@@ -35,13 +38,17 @@ __decorate([
     __metadata("design:type", String)
 ], Notification.prototype, "type", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => job_model_1.Job, (job) => job.notifications),
+    (0, typeorm_1.ManyToOne)(() => job_model_1.Job, (job) => job.notifications, { onDelete: 'CASCADE' }),
     __metadata("design:type", job_model_1.Job)
 ], Notification.prototype, "job", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
 ], Notification.prototype, "message", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Notification.prototype, "tolinkId", void 0);
 __decorate([
     (0, typeorm_1.Column)({ default: false }),
     __metadata("design:type", Boolean)
@@ -54,6 +61,14 @@ __decorate([
     (0, typeorm_1.ManyToOne)(() => user_model_1.User, (user) => user.sentNotifications, { onDelete: 'CASCADE' }),
     __metadata("design:type", user_model_1.User)
 ], Notification.prototype, "sender", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: false }),
+    __metadata("design:type", Boolean)
+], Notification.prototype, "isActions", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: false }),
+    __metadata("design:type", Boolean)
+], Notification.prototype, "isDeleted", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)(),
     __metadata("design:type", Date)

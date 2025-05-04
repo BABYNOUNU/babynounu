@@ -39,6 +39,23 @@ export class MediaService {
     return this.mediaRepository.find();
   }
 
+
+  
+  async getGalleryNounus(userId: any): Promise<Medias[]> {
+    try {
+      const NounuMedias = await this.mediaRepository.find({
+        where: {
+          type_media: {slug: 'gallery-image'},
+          user: {id: userId}
+        },
+      });
+      return NounuMedias
+    } catch (error) {
+      console.log(error);
+      throw new Error('Error while fetching gallery nounus');
+    }
+  }
+
   async update(
     {id, typeMedia}: {id: string, typeMedia: string},
     updateMediaDto: UpdateMediaDto,

@@ -5,7 +5,6 @@ import { NotificationProviders } from './notification';
 import { DatabaseModule } from 'src/database/database.module';
 import { AbonnementService } from '../abonnement/abonnement.service';
 import { AbonnementProviders } from '../abonnement/abonnement';
-import { NotificationGateway } from './notification.gateway';
 import { AbonnementModule } from '../abonnement/abonnement.module';
 import { PaiementProviders } from '../paiement/paiement';
 import { PaymentService } from '../paiement/paiement.service';
@@ -16,7 +15,6 @@ import { PaymentService } from '../paiement/paiement.service';
   providers: [
     NotificationService,
     PaymentService,
-    NotificationGateway,
     AbonnementService,
     ...AbonnementProviders,
     ...PaiementProviders,

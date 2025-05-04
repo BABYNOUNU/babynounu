@@ -5,4 +5,5 @@ export class CreateNotificationDto {
     is_read: boolean; // Indique si la notification a été lue
     senderUserId: string; // ID de l'utilisateur qui a envoyé la notification
     jobId?: number; // ID du job li  la notification (si type == 'job')
+    tolinkId?: string;
   }

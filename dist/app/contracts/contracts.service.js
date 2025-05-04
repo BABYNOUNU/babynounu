@@ -28,50 +28,133 @@ let ContractsService = class ContractsService {
         this.notificationService = notificationService;
     }
     async create(createContractDto) {
-        const nounu = await this.nounusRepository.findOne({
-            where: { id: createContractDto.nounuId }, relations: { user: true }
+        const contractExist = await this.contractsRepository.findOne({
+            where: {
+                room: { id: createContractDto.roomId },
+                message: { id: createContractDto.messageId },
+            },
+            relations: ['room', 'message'],
         });
-        if (!nounu) {
-            throw new common_1.NotFoundException('Nounu not found');
+        if (contractExist) {
+            throw new common_1.BadRequestException('Contract already exist');
         }
-        const parent = await this.parentsRepository.findOne({
-            where: { id: createContractDto.parentId }, relations: { user: true }
+        const newContract = this.contractsRepository.create({
+            room: { id: createContractDto.roomId },
+            message: { id: createContractDto.messageId },
         });
-        if (!parent) {
-            throw new common_1.NotFoundException('Parent not found');
-        }
-        const contract = this.contractsRepository.create({
-            ...createContractDto,
-            nounu,
-            parent,
+        const contract = await this.contractsRepository.save(newContract);
+        const getContract = await this.findOne(contract.id);
+        await this.notificationService.createNotification({
+            type: 'CONTRAT',
+            userId: getContract.room.parent.user.id,
+            message: `Vous avez une nouvelle missons chez ${getContract.room.parent.fullname} pour une durée de ${JSON.parse(getContract.message.content).duration}jours.`,
+            is_read: false,
+            senderUserId: getContract.room.nounou.user.id,
+            tolinkId: getContract.id.toString(),
         });
         await this.notificationService.createNotification({
             type: 'CONTRAT',
-            userId: nounu.user.id,
-            message: `La missions de ${nounu.fullname} a bien été validé.`,
+            userId: getContract.room.nounou.user.id,
+            message: `${getContract.room.nounou.fullname} à accepté votre mission chez (Vous) pour une durée de  ${JSON.parse(getContract.message.content).duration}jours.`,
             is_read: false,
-            senderUserId: parent.user.id,
+            senderUserId: getContract.room.parent.user.id,
+            tolinkId: getContract.id.toString(),
         });
-        return this.contractsRepository.save(contract);
+        return contract;
     }
     async findAll() {
         return this.contractsRepository.find({
-            relations: ['nounu', 'parent'],
+            relations: {
+                message: true,
+                room: {
+                    nounou: {
+                        user: true,
+                    },
+                    parent: {
+                        user: true,
+                    },
+                },
+            },
+        });
+    }
+    async findAllByUserId(userId) {
+        return this.contractsRepository.find({
+            where: [
+                {
+                    room: {
+                        parent: {
+                            user: { id: userId },
+                        },
+                    },
+                },
+                {
+                    room: {
+                        nounou: {
+                            user: { id: userId },
+                        },
+                    },
+                },
+            ],
+            relations: {
+                message: true,
+                room: {
+                    nounou: {
+                        user: true,
+                    },
+                    parent: {
+                        user: true,
+                    },
+                },
+            },
         });
     }
     async findOne(id) {
         const contract = await this.contractsRepository.findOne({
             where: { id },
-            relations: ['nounu', 'parent'],
+            relations: {
+                message: {
+                    room: true,
+                },
+                room: {
+                    nounou: {
+                        user: {
+                            medias: {
+                                type_media: true,
+                            },
+                        },
+                    },
+                    parent: {
+                        user: {
+                            medias: {
+                                type_media: true,
+                            },
+                        },
+                    },
+                },
+            },
         });
         if (!contract) {
             throw new common_1.NotFoundException(`Contract with ID ${id} not found`);
         }
-        return contract;
+        return {
+            ...contract,
+            photoNounou: contract.room.nounou.user.medias?.find((media) => media?.type_media.slug === 'image-profil'),
+            photoParent: contract.room.parent.user.medias?.find((media) => media?.type_media?.slug === 'image-profil'),
+        };
     }
     async update(id, updateContractDto) {
         const contract = await this.findOne(id);
-        const updated = this.contractsRepository.merge(contract, updateContractDto);
+        const updated = this.contractsRepository.merge(contract, {
+            room: { id: updateContractDto.roomId },
+            message: { id: updateContractDto.messageId },
+        });
+        return this.contractsRepository.save(updated);
+    }
+    async updateStatus(id, status) {
+        const contract = await this.findOne(id);
+        const updated = this.contractsRepository.merge(contract, {
+            status,
+        });
         return this.contractsRepository.save(updated);
     }
     async remove(id) {
@@ -91,9 +174,9 @@ let ContractsService = class ContractsService {
 exports.ContractsService = ContractsService;
 exports.ContractsService = ContractsService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, common_1.Inject)("CONTRACTS_REPOSITORY")),
-    __param(1, (0, common_1.Inject)("NOUNUS_REPOSITORY")),
-    __param(2, (0, common_1.Inject)("PARENT_REPOSITORY")),
+    __param(0, (0, common_1.Inject)('CONTRACTS_REPOSITORY')),
+    __param(1, (0, common_1.Inject)('NOUNUS_REPOSITORY')),
+    __param(2, (0, common_1.Inject)('PARENT_REPOSITORY')),
     __metadata("design:paramtypes", [typeorm_1.Repository,
         typeorm_1.Repository,
         typeorm_1.Repository,

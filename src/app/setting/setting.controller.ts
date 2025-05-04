@@ -123,7 +123,7 @@ export class SettingController {
     );
   }
 
-  // Get All Parents
+  // Get All ProfilParents
   @Post('seed/age-of-children')
   SeederAgeOfChildren() {
     return this.addAllParametres(

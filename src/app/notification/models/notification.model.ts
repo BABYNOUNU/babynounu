@@ -18,11 +18,15 @@ export class Notification {
   @Column()
   type: string; // Type de notification : 'chat', 'job', 'follow'
 
-  @ManyToOne(() => Job, (job) => job.notifications)
+  @ManyToOne(() => Job, (job) => job.notifications, { onDelete: 'CASCADE' })
   job: Job;
 
   @Column()
   message: string; // Contenu de la notification
+
+
+  @Column({nullable: true})
+  tolinkId: string
 
   @Column({ default: false })
   isRead: boolean; // Indique si la notification a été lue
@@ -32,6 +36,15 @@ export class Notification {
 
   @ManyToOne(() => User, (user) => user.sentNotifications, { onDelete: 'CASCADE' })
   sender: User; // Utilisateur qui envoie la notification
+
+  
+
+
+  @Column({ default: false })
+  isActions: boolean;
+
+  @Column({ default: false })
+  isDeleted: boolean;
 
   @CreateDateColumn()
   createdAt: Date;

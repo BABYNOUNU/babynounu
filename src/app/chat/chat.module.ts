@@ -9,6 +9,19 @@ import { DatabaseModule } from 'src/database/database.module';
 import { RoomProviders } from '../rooms/rooms';
 import { MessageProviders } from '../messages/messages';
 import { UserProviders } from '../user/user.providers';
+import { AuthService } from '../auth/auth.service';
+import { AbonnementService } from '../abonnement/abonnement.service';
+import { RoleProviders } from '../role/role';
+import { ParameterProviders } from '../parameter/parameter';
+import { AuthProviders } from '../auth/auth.providers';
+import { AbonnementProviders } from '../abonnement/abonnement';
+import { PaiementProviders } from '../paiement/paiement';
+import { PaymentService } from '../paiement/paiement.service';
+import { NotificationService } from '../notification/notification.service';
+import { NotificationProviders } from '../notification/notification';
+import { ContractsService } from '../contracts/contracts.service';
+import { ContractsProviders } from '../contracts/contracts';
+import { NounusProviders } from '../nounus/nounus';
 
 @Module({
   imports: [DatabaseModule],
@@ -19,6 +32,20 @@ import { UserProviders } from '../user/user.providers';
     RoomsService,
     MessageService,
     UserService,
+    AuthService,
+    AbonnementService,
+    PaymentService,
+    NotificationService,
+    ContractsService,
+    ...ContractsProviders,
+    ...NounusProviders,
+    ...PaiementProviders,
+    ...NotificationProviders,
+    ...AbonnementProviders,
+    ...PaiementProviders,
+    ...AuthProviders,
+    ...ParameterProviders,
+    ...RoleProviders,
     ...RoomProviders,
     ...MessageProviders,
     ...UserProviders,

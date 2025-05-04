@@ -15,6 +15,7 @@ const database_module_1 = require("../../database/database.module");
 const jwt_1 = require("@nestjs/jwt");
 const auth_strategy_1 = require("./auth.strategy");
 const role_1 = require("../role/role");
+const user_service_1 = require("../user/user.service");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -26,6 +27,6 @@ exports.AuthModule = AuthModule = __decorate([
                 global: true
             })],
         controllers: [auth_controller_1.AuthController],
-        providers: [auth_service_1.AuthService, ...auth_providers_1.AuthProviders, ...role_1.RoleProviders, auth_strategy_1.JwtStrategy],
+        providers: [auth_service_1.AuthService, user_service_1.UserService, ...auth_providers_1.AuthProviders, ...role_1.RoleProviders, auth_strategy_1.JwtStrategy],
     })
 ], AuthModule);

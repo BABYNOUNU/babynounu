@@ -1,6 +1,6 @@
 import { DataSource } from 'typeorm';
 import { User } from '../user/user.model';
-import { Parents } from '../parent/models/parent.model';
+import { ProfilParents } from '../parent/models/parent.model';
 import { Parameter } from '../parameter/models/parameter.model';
 
 export const AuthProviders = [
@@ -11,7 +11,7 @@ export const AuthProviders = [
   },
   {
     provide: 'PARENT_REPOSITORY',
-    useFactory: (dataSource: DataSource) => dataSource.getRepository(Parents),
+    useFactory: (dataSource: DataSource) => dataSource.getRepository(ProfilParents),
     inject: ['DATA_SOURCE'],
   },
   {

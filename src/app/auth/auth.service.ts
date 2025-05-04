@@ -1,3 +1,4 @@
+import { use } from 'passport';
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import type { AUTH_SIGN_IN_TYPE, AUTH_SIGN_UP_TYPE } from 'src/types/authTypes';
 import { Repository } from 'typeorm';
@@ -9,6 +10,8 @@ import * as bcryptjs from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { Roles } from '../role/models/role.model';
 import { Parameter } from '../parameter/models/parameter.model';
+import { Socket } from 'socket.io';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class AuthService {
@@ -20,6 +23,7 @@ export class AuthService {
     @Inject('PARAMETER_PROFILE_REPOSITORY')
     private readonly paremeterProfileRepository: Repository<Parameter>,
     private readonly jwtService: JwtService,
+    private readonly userService: UserService,
   ) {}
 
   // SIGN UP NEW USER
@@ -48,7 +52,7 @@ export class AuthService {
 
     // Checked if type_profil exist
     const isTypeProfil = await this.paremeterProfileRepository.findOne({
-      where: { slug: signUpBody.type_profil }, 
+      where: { slug: signUpBody.type_profil },
     });
     if (!isTypeProfil) {
       throw new BadRequestException('The type_profil enter not exists');
@@ -62,8 +66,8 @@ export class AuthService {
       slug: signUpBody.slug,
       email: signUpBody.email,
       password: signUpBody.password,
-      role: {id: isRole.id},
-      type_profil: {id: isTypeProfil.id}
+      role: { id: isRole.id },
+      type_profil: { id: isTypeProfil.id },
     });
     const userSave = await this.userRepository.save(newUser);
     if (!userSave) {
@@ -78,7 +82,7 @@ export class AuthService {
     // RETURN DATA USER CREATE
     return {
       user: {
-        ...User, 
+        ...User,
         access_token: (await this.authentificate(userSave)).access_token,
       },
     };
@@ -114,20 +118,27 @@ export class AuthService {
       relations: ['type_profil', 'nounu', 'parent', 'role'],
     });
 
-
     // RETURN DATA USER CREATE
     return {
       user: {
         ...user,
         access_token: (await this.authentificate(user)).access_token,
-        profil: isUserExist.parent.length > 0 ? isUserExist.parent : isUserExist.nounu,
+        profil:
+          isUserExist.parent.length > 0
+            ? isUserExist.parent
+            : isUserExist.nounu,
       },
     };
   }
 
   // USER AUTHENTICATION
   async authentificate(user: User) {
-    const payload = { email: user.email, id: user.id };
+    const payload = {
+      email: user.email,
+      id: user.id,
+      profileType: user.type_profil.slug,
+    };
+    console.log(payload);
     return {
       access_token: this.jwtService.sign(payload, {
         secret: process.env.JWT_SECRET,
@@ -139,5 +150,26 @@ export class AuthService {
   async isUserAuthentificateExist(email) {
     const isExist = await this.userRepository.findOne({ where: { email } });
     return isExist;
+  }
+
+  async getUserFromSocket(socket: Socket): Promise<User | null> {
+    try {
+      // Get the token from the socket handshake or query parameters
+      const token = socket.handshake.auth?.token;
+      if (!token) {
+        return null;
+      }
+
+      // Verify and decode the token
+      const payload = this.jwtService.verify(token, {
+        secret: process.env.JWT_SECRET,
+      });
+      // Get the user from the database
+      const user = await this.userService.findOne(payload.id);
+
+      return user || null;
+    } catch (error) {
+      return null;
+    }
   }
 }

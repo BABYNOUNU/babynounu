@@ -15,10 +15,11 @@ import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { NounusService } from './nounus.service';
 import { CreateNounuDto } from './dtos/create-nounu.dto';
 import { UpdateNounuDto } from './dtos/update-nounu.dto';
-import { Nounus } from './models/nounu.model';
+import { ProfilNounus } from './models/nounu.model';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { storageMedia } from 'src/config/media.config';
 import { SearchNounuCriteriaDto } from './dtos/search-nounu-criteria.dto';
+import { SharpTransform } from 'src/utils/sharpTransform';
 
 @ApiTags('nounu') // Tag pour Swagger
 @Controller('nounu')
@@ -37,65 +38,84 @@ export class NounusController {
         storage: storageMedia,
       },
     ),
+    SharpTransform({
+      fields: ['imageNounu'],
+      resizeOptions: { width: 400, height: 400, fit: 'cover', quality: 80 },
+    }), // Intercepteur personnalisé
   )
-  @ApiOperation({ summary: 'Create a new Nounus' })
+  @ApiOperation({ summary: 'Create a new ProfilNounus' })
   @ApiResponse({
     status: 201,
-    description: 'Nounus created successfully',
-    type: Nounus,
+    description: 'ProfilNounus created successfully',
+    type: ProfilNounus,
   })
   async create(
-    @Body() createNounuDto: CreateNounuDto,
-    @UploadedFiles() files,
-  ): Promise<Nounus> {
-    return await this.nounuService.create(createNounuDto, files);
+    @UploadedFiles()
+    files: any,
+    @Body() createProfilNounusDto: CreateNounuDto,
+  ): Promise<ProfilNounus> {
+    return await this.nounuService.create(createProfilNounusDto, files);
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all Nounus' })
-  @ApiResponse({ status: 200, description: 'List of Nounus', type: [Nounus] })
-  async findAllNotCurrentUser(@Query() userId: string): Promise<Nounus[]> {
+  @ApiOperation({ summary: 'Get all ProfilNounus' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of ProfilNounus',
+    type: [ProfilNounus],
+  })
+  async findAllNotCurrentUser(
+    @Query() userId: string,
+  ): Promise<ProfilNounus[]> {
     return await this.nounuService.findAllNotCurrentUser(userId);
   }
 
   @Get('all')
-  @ApiOperation({ summary: 'Get all Nounus' })
-  @ApiResponse({ status: 200, description: 'List of Nounus', type: [Nounus] })
-  async findAll(): Promise<Nounus[]> {
+  @ApiOperation({ summary: 'Get all ProfilNounus' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of ProfilNounus',
+    type: [ProfilNounus],
+  })
+  async findAll(): Promise<ProfilNounus[]> {
     return await this.nounuService.findAll();
   }
 
   @Get('non-certified')
-  @ApiOperation({ summary: 'Get all Nounus which are not certified' })
+  @ApiOperation({ summary: 'Get all ProfilNounus which are not certified' })
   @ApiResponse({
     status: 200,
-    description: 'List of Nounus which are not certified',
-    type: [Nounus],
+    description: 'List of ProfilNounus which are not certified',
+    type: [ProfilNounus],
   })
-  async getNonCertifiedNounus(): Promise<Nounus[]> {
-    console.log('test')
+  async getNonCertifiedNounus(): Promise<ProfilNounus[]> {
+    console.log('test');
     return await this.nounuService.getNonCertifiedNounus();
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get a Nounus by ID' })
-  @ApiParam({ name: 'id', description: 'Nounus ID', type: Number })
-  @ApiResponse({ status: 200, description: 'Nounus found', type: Nounus })
-  @ApiResponse({ status: 404, description: 'Nounus not found' })
-  async findOne(@Param('id') id: number): Promise<Nounus> {
+  @ApiOperation({ summary: 'Get a ProfilNounus by ID' })
+  @ApiParam({ name: 'id', description: 'ProfilNounus ID', type: Number })
+  @ApiResponse({
+    status: 200,
+    description: 'ProfilNounus found',
+    type: ProfilNounus,
+  })
+  @ApiResponse({ status: 404, description: 'ProfilNounus not found' })
+  async findOne(@Param('id') id: string): Promise<ProfilNounus> {
     return await this.nounuService.findOne(id);
   }
 
   @Post('update-status/:id')
-  @ApiOperation({ summary: 'Update status of a Nounus by ID' })
-  @ApiParam({ name: 'id', description: 'Nounus ID', type: Number })
+  @ApiOperation({ summary: 'Update status of a ProfilNounus by ID' })
+  @ApiParam({ name: 'id', description: 'ProfilNounus ID', type: Number })
   @ApiResponse({
     status: 200,
-    description: 'Nounus updated successfully',
+    description: 'ProfilNounus updated successfully',
   })
-  @ApiResponse({ status: 404, description: 'Nounus not found' })
+  @ApiResponse({ status: 404, description: 'ProfilNounus not found' })
   async updateStatus(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Body() { status }: { status: string },
   ): Promise<{ status: string }> {
     return await this.nounuService.updateStatus(id, status);
@@ -113,45 +133,51 @@ export class NounusController {
         storage: storageMedia,
       },
     ),
+    SharpTransform({
+      fields: ['imageNounu'],
+      resizeOptions: { width: 400, height: 400, fit: 'cover', quality: 80 },
+    }), // Intercepteur personnalisé
   )
-  @ApiOperation({ summary: 'Update a Nounus by ID' })
-  @ApiParam({ name: 'id', description: 'Nounus ID', type: Number })
+  @ApiOperation({ summary: 'Update a ProfilNounus by ID' })
+  @ApiParam({ name: 'id', description: 'ProfilNounus ID', type: Number })
   @ApiResponse({
     status: 200,
-    description: 'Nounus updated successfully',
-    type: Nounus,
+    description: 'ProfilNounus updated successfully',
+    type: ProfilNounus,
   })
-  @ApiResponse({ status: 404, description: 'Nounus not found' })
+  @ApiResponse({ status: 404, description: 'ProfilNounus not found' })
   async update(
     @Param('id') id: string,
     @Body() updateNounuDto: UpdateNounuDto,
     @UploadedFiles() files,
-  ): Promise<Nounus> {
+  ): Promise<ProfilNounus> {
     return await this.nounuService.update(id, updateNounuDto, files);
   }
 
-  
- 
-
   @Post('approve-certification/:id')
-  @ApiOperation({ summary: 'Approve a Nounus by ID' })
-  @ApiParam({ name: 'id', description: 'Nounus ID', type: Number })
+  @ApiOperation({ summary: 'Approve a ProfilNounus by ID' })
+  @ApiParam({ name: 'id', description: 'ProfilNounus ID', type: Number })
   @ApiResponse({
     status: 200,
-    description: 'Nounus updated successfully',
-    type: Nounus,
+    description: 'ProfilNounus updated successfully',
+    type: ProfilNounus,
   })
-  @ApiResponse({ status: 404, description: 'Nounus not found' })
-  async approveCertification(@Param('id') id: number): Promise<{ certif: boolean }> {
+  @ApiResponse({ status: 404, description: 'ProfilNounus not found' })
+  async approveCertification(
+    @Param('id') id: string,
+  ): Promise<{ certif: boolean }> {
     return await this.nounuService.approveCertification(id);
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete a Nounus by ID' })
-  @ApiParam({ name: 'id', description: 'Nounus ID', type: Number })
-  @ApiResponse({ status: 204, description: 'Nounus deleted successfully' })
-  @ApiResponse({ status: 404, description: 'Nounus not found' })
-  async remove(@Param('id') id: number): Promise<void> {
+  @ApiOperation({ summary: 'Delete a ProfilNounus by ID' })
+  @ApiParam({ name: 'id', description: 'ProfilNounus ID', type: Number })
+  @ApiResponse({
+    status: 204,
+    description: 'ProfilNounus deleted successfully',
+  })
+  @ApiResponse({ status: 404, description: 'ProfilNounus not found' })
+  async remove(@Param('id') id: string): Promise<void> {
     return await this.nounuService.remove(id);
   }
 
@@ -159,6 +185,4 @@ export class NounusController {
   async searchNounu(@Body() searchCriteria: SearchNounuCriteriaDto) {
     return this.nounuService.search(searchCriteria);
   }
-
- 
 }

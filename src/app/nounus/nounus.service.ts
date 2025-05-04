@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, In, Like, Not, Repository } from 'typeorm';
-import { Nounus } from './models/nounu.model';
+import { ProfilNounus } from './models/nounu.model';
 import { CreateNounuDto } from './dtos/create-nounu.dto';
 import { UpdateNounuDto } from './dtos/update-nounu.dto';
 import { MediaService } from '../media/media.service';
@@ -17,7 +17,7 @@ import { Preference } from '../Preference/models/preference.model';
 export class NounusService {
   constructor(
     @Inject('NOUNUS_REPOSITORY')
-    private readonly nounuRepository: Repository<Nounus>,
+    private readonly nounuRepository: Repository<ProfilNounus>,
     @Inject('PREFERENCE_REPOSITORY')
     private readonly preferenceRepository: Repository<Preference>,
 
@@ -31,7 +31,7 @@ export class NounusService {
       documents: Express.Multer.File[];
       gallery: Express.Multer.File[];
     },
-  ): Promise<Nounus> {
+  ): Promise<ProfilNounus> {
     const { userId, ...nounuData } = createNounuDto;
     // Create and save the nounu
     const savedNounu = await this.nounuRepository.save({
@@ -174,7 +174,7 @@ export class NounusService {
     ]);
   }
 
-  async findOne(id: number): Promise<any> {
+  async findOne(id: string): Promise<any> {
     const nounu = await this.nounuRepository.findOne({
       where: { id },
       relations: [
@@ -192,7 +192,7 @@ export class NounusService {
       ],
     });
     if (!nounu) {
-      throw new NotFoundException(`Nounus with ID ${id} not found`);
+      throw new NotFoundException(`ProfilNounus with ID ${id} not found`);
     }
 
     const nounuOne = await this.ReturnN(
@@ -219,12 +219,12 @@ export class NounusService {
       documents: Express.Multer.File[];
       gallery: Express.Multer.File[];
     },
-  ): Promise<Nounus> {
+  ): Promise<ProfilNounus> {
     const { userId, ...nounuData } = updateNounuDto;
 
     // Récupérer le Nounu existant
     const existingNounu = await this.nounuRepository.findOne({
-      where: { id: +id },
+      where: { id: id },
       relations: ['user'],
     });
 
@@ -330,7 +330,7 @@ export class NounusService {
     return updatedNounu;
   }
 
-  async remove(id: number): Promise<void> {
+  async remove(id: string): Promise<void> {
     const nounu = await this.findOne(id);
     await this.nounuRepository.remove(nounu);
   }
@@ -477,7 +477,7 @@ export class NounusService {
     });
   }
 
-  async approveCertification(nounuId: number): Promise<{ certif: boolean }> {
+  async approveCertification(nounuId: string): Promise<{ certif: boolean }> {
     const nounu = await this.nounuRepository.findOne({
       where: { id: nounuId },
     });
@@ -495,7 +495,7 @@ export class NounusService {
   }
 
   
-  async updateStatus(nounuId: number, status: string): Promise<{ status: string }> {
+  async updateStatus(nounuId: string, status: string): Promise<{ status: string }> {
     const nounu = await this.nounuRepository.findOne({
       where: { id: nounuId },
     });
@@ -542,7 +542,7 @@ export class NounusService {
     });
   }
 
-  async ReturnSearchN(datas: any[], preferenceKey: any[]): Promise<Nounus[]> {
+  async ReturnSearchN(datas: any[], preferenceKey: any[]): Promise<ProfilNounus[]> {
     return datas.map((data) => {
       // Regrouper les libellés similaires dans des tableaux distincts
       const aggregatedPreferences = {};

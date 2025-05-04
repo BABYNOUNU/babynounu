@@ -1,6 +1,6 @@
 import { MediaService } from './../media/media.service';
 import { Repository } from 'typeorm';
-import { Parents } from './models/parent.model';
+import { ProfilParents } from './models/parent.model';
 import { CreateParentDto } from './dto/create-parent.dto';
 import { UpdateParentDto } from './dto/update-parent.dto';
 import { Preference } from '../Preference/models/preference.model';
@@ -10,15 +10,15 @@ export declare class ParentsService {
     private readonly preferenceRepository;
     private readonly mediaService;
     private readonly nounuService;
-    constructor(parentsRepository: Repository<Parents>, preferenceRepository: Repository<Preference>, mediaService: MediaService, nounuService: NounusService);
-    findAll(): Promise<Parents[]>;
-    findOne(id: number): Promise<any>;
+    constructor(parentsRepository: Repository<ProfilParents>, preferenceRepository: Repository<Preference>, mediaService: MediaService, nounuService: NounusService);
+    findAll(): Promise<ProfilParents[]>;
+    findOne(id: string): Promise<any>;
     create(createParentDto: CreateParentDto, files: {
         imageParent: Express.Multer.File[];
-    }): Promise<Parents>;
-    update(id: number, updateParentDto: UpdateParentDto, files: {
+    }): Promise<ProfilParents>;
+    update(id: string, updateParentDto: UpdateParentDto, files: {
         imageParent: Express.Multer.File[];
-    }): Promise<Parents>;
+    }): Promise<ProfilParents>;
     remove(id: string): Promise<void>;
     search(searchCriteria: any): Promise<any[]>;
 }

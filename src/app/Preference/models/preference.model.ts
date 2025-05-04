@@ -7,9 +7,9 @@ import {
   DeleteDateColumn,
 } from 'typeorm';
 import { Parameter } from 'src/app/parameter/models/parameter.model';
-import { Parents } from 'src/app/parent/models/parent.model';
+import { ProfilParents } from 'src/app/parent/models/parent.model';
 import { Job } from 'src/app/job/models/job.model';
-import { Nounus } from 'src/app/nounus/models/nounu.model';
+import { ProfilNounus } from 'src/app/nounus/models/nounu.model';
 
 @Entity('user_preferences')
 export class Preference {
@@ -77,15 +77,15 @@ export class Preference {
   @ManyToOne(() => Parameter, { onDelete: 'CASCADE' })
   criteres_selections: Parameter[];
 
-  @ManyToOne(() => Parents, (parent) => parent.preferences, {
+  @ManyToOne(() => ProfilParents, (parent) => parent.preferences, {
     onDelete: 'CASCADE',
   })
-  parents: Parents;
+  parents: ProfilParents;
 
-  @ManyToOne(() => Nounus, (nounu) => nounu.preferences, {
+  @ManyToOne(() => ProfilNounus, (nounu) => nounu.preferences, {
     onDelete: 'CASCADE',
   })
-  nounus: Nounus;
+  nounus: ProfilNounus;
 
   @ManyToOne(() => Job, (job) => job.preferences, { onDelete: 'CASCADE' })
   jobs: Job;

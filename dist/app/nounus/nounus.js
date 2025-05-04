@@ -5,7 +5,7 @@ const nounu_model_1 = require("./models/nounu.model");
 exports.NounusProviders = [
     {
         provide: 'NOUNUS_REPOSITORY',
-        useFactory: (dataSource) => dataSource.getRepository(nounu_model_1.Nounus),
+        useFactory: (dataSource) => dataSource.getRepository(nounu_model_1.ProfilNounus),
         inject: ['DATA_SOURCE'],
     },
 ];

@@ -20,8 +20,11 @@ let MessageController = class MessageController {
     constructor(messageService) {
         this.messageService = messageService;
     }
-    async createMessage(content, roomId, senderId) {
-        return this.messageService.create({ content, roomId, senderId });
+    async createMessage(content, roomId, senderId, isRead) {
+        return this.messageService.create({ content, roomId, senderId, isRead, isProposition: false, type: 'Message' });
+    }
+    async updateProposalStatus(roomId, messageId, status) {
+        return this.messageService.updateProposalStatus(roomId, messageId, status);
     }
     async getMessagesByRoom(roomId) {
         return this.messageService.findByRoom(roomId);
@@ -42,10 +45,20 @@ __decorate([
     __param(0, (0, common_1.Body)('content')),
     __param(1, (0, common_1.Body)('roomId', common_1.ParseIntPipe)),
     __param(2, (0, common_1.Body)('senderId', common_1.ParseIntPipe)),
+    __param(3, (0, common_1.Body)('isRead', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Number, Number]),
+    __metadata("design:paramtypes", [String, Number, String, Boolean]),
     __metadata("design:returntype", Promise)
 ], MessageController.prototype, "createMessage", null);
+__decorate([
+    (0, common_1.Post)('proposal-status'),
+    __param(0, (0, common_1.Body)('roomId', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)('messageId', common_1.ParseIntPipe)),
+    __param(2, (0, common_1.Body)('status')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Number, String]),
+    __metadata("design:returntype", Promise)
+], MessageController.prototype, "updateProposalStatus", null);
 __decorate([
     (0, common_1.Get)('room/:roomId'),
     __param(0, (0, common_1.Param)('roomId', common_1.ParseIntPipe)),

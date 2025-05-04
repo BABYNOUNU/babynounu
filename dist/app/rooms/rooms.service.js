@@ -15,126 +15,152 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RoomsService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("typeorm");
-const user_service_1 = require("../user/user.service");
+const unreadCount_model_1 = require("./models/unreadCount.model");
 let RoomsService = class RoomsService {
     roomRepository;
-    userService;
-    constructor(roomRepository, userService) {
+    messageRepository;
+    unreadCountRepository;
+    constructor(roomRepository, messageRepository, unreadCountRepository) {
         this.roomRepository = roomRepository;
-        this.userService = userService;
+        this.messageRepository = messageRepository;
+        this.unreadCountRepository = unreadCountRepository;
     }
-    async findOne(id) {
-        const getRoom = await this.roomRepository.findOne({
-            where: { id },
-            relations: {
-                nounou: { user: { medias: { type_media: true } } },
-                parent: { user: { medias: { type_media: true } } },
-            },
+    async getUserConversations(userId) {
+        const rooms = await this.roomRepository.find({
+            where: [{ receiver: { id: userId } }, { sender: { id: userId } }],
+            relations: [
+                'receiver',
+                'sender',
+                'nounou.user.medias.type_media',
+                'parent.user.medias.type_media',
+            ],
         });
-        let photo;
-        if (getRoom) {
-            getRoom.photo = getRoom[getRoom.nounou?.id ? 'nounou' : 'parent'].user.medias.find((uk) => uk.type_media.slug == 'image-profil');
-        }
-        return getRoom;
+        const conversations = await Promise.all(rooms.map(async (room) => {
+            const lastMessage = await this.messageRepository.findOne({
+                where: { room: { id: room.id } },
+                order: { createdAt: 'DESC' },
+            });
+            const unreadCount = await this.unreadCountRepository.findOne({
+                where: {
+                    room: { id: room.id },
+                    user: { id: userId },
+                    count: (0, typeorm_1.MoreThan)(0),
+                },
+            });
+            return {
+                room,
+                nounuPhoto: room.nounou.user.medias.length > 0
+                    ? room.nounou.user.medias.find((media) => media.type_media.slug === 'image-profil')
+                    : null,
+                parentPhoto: room.parent.user.medias.length > 0
+                    ? room.parent.user.medias.find((media) => media.type_media.slug === 'image-profil')
+                    : null,
+                lastMessage,
+                unreadCount: unreadCount ? unreadCount.count : 0,
+            };
+        }));
+        return conversations;
     }
-    async findOrCreate(parentId, nounouId) {
+    async createOrGetRoom(senderId, parentId, nounouId) {
+        let receiverId = process.env.USER_ADMIN_ID;
         let room = await this.roomRepository.findOne({
-            where: { parent: { id: parentId }, nounou: { id: nounouId } },
+            where: [{ nounou: { id: nounouId }, parent: { id: parentId } }],
+            relations: [
+                'nounou.user.medias.type_media',
+                'parent.user.medias.type_media',
+            ],
         });
         if (!room) {
             room = this.roomRepository.create({
+                sender: { id: senderId },
+                receiver: { id: process.env.USER_ADMIN_ID },
                 parent: { id: parentId },
                 nounou: { id: nounouId },
             });
             await this.roomRepository.save(room);
+            await this.initializeUnreadCounts(room.id, senderId, receiverId);
         }
         return {
-            ...room
+            ...room,
+            photo: senderId == room.parent.user.id
+                ? room.parent.user.medias?.find((media) => media.type_media.slug === 'image-profil')
+                : room.nounou.user.medias?.find((media) => media.type_media.slug === 'image-profil'),
         };
     }
-    async incrementUnreadCount(roomId, role) {
-        const field = `${role}UnreadCount`;
-        await this.roomRepository.increment({ id: roomId }, field, 1);
+    async initializeUnreadCounts(roomId, user1Id, user2Id) {
+        const count1 = this.unreadCountRepository.create({
+            room: { id: roomId },
+            user: { id: user1Id },
+            count: 0,
+        });
+        const count2 = this.unreadCountRepository.create({
+            room: { id: roomId },
+            user: { id: user2Id },
+            count: 0,
+        });
+        await this.unreadCountRepository.save([count1, count2]);
     }
-    async resetUnreadCount(roomId, role) {
-        const field = `${role}UnreadCount`;
-        await this.roomRepository.update(roomId, { [field]: 0 });
+    async getTotalUnreadCount(userId) {
+        const result = await this.unreadCountRepository
+            .createQueryBuilder('unread')
+            .select('SUM(unread.count)', 'total')
+            .where('unread.user.id = :userId', { userId })
+            .getRawOne();
+        return parseInt(result.total) || 0;
     }
-    async getConversationsForUser(userId) {
-        const user = await this.userService.findOne(userId);
-        let rooms;
-        if (user.type_profil.slug === 'administrateur') {
-            rooms = await this.roomRepository.find({
-                relations: {
-                    parent: { user: { medias: { type_media: true } }, contracts: true },
-                    nounou: { user: { medias: { type_media: true } } },
-                    messages: true,
-                },
-            });
-        }
-        else if (user.type_profil.slug === 'parent') {
-            rooms = await this.roomRepository.find({
-                where: { parent: { user: { id: user.id } } },
-                relations: {
-                    nounou: { user: { medias: { type_media: true } } },
-                    messages: true,
-                },
-            });
-        }
-        else if (user.type_profil.slug === 'nounou') {
-            rooms = await this.roomRepository.find({
-                where: { nounou: { user: { id: user.id.toString() } } },
-                relations: {
-                    parent: { user: { medias: { type_media: true } } },
-                    messages: true,
-                },
-            });
-        }
-        else {
-            return [];
-        }
-        return rooms.map((room) => {
-            const lastMessage = room.messages?.length > 0
-                ? room.messages.sort((a, b) => new Date(b.createdAt).getTime() -
-                    new Date(a.createdAt).getTime())[0]
-                : null;
-            return {
-                ...room,
-                photo: room['nounou'].user.medias.find((uk) => uk.type_media.slug == 'image-profil'),
-                photoParent: room['parent'] ? room['parent'].user.medias.find((uk) => uk.type_media.slug == 'image-profil') : null,
-                lastMessage: lastMessage
-                    ? {
-                        content: lastMessage.content,
-                        createdAt: lastMessage.createdAt,
-                        isRead: lastMessage.isRead,
-                    }
-                    : null,
-            };
-        }).reverse();
+    async incrementUnreadCount(roomId, userId) {
+        await this.unreadCountRepository
+            .createQueryBuilder()
+            .update(unreadCount_model_1.RoomMessageCount)
+            .set({ count: () => 'count + 1' })
+            .where('room.id = :roomId AND user.id = :userId', { roomId, userId })
+            .execute();
+        return this.getRoomUnreadCount(roomId, userId);
     }
-    async getGlobalUnreadCounts(roomId, userId) {
-        const rooms = await this.roomRepository.find({
-            where: [
-                { parent: { user: { id: userId } } },
-                { nounou: { user: { id: (0, typeorm_1.Not)(userId) } } },
+    async resetUnreadCount(roomId, userId) {
+        await this.unreadCountRepository
+            .createQueryBuilder()
+            .update(unreadCount_model_1.RoomMessageCount)
+            .set({ count: 0 })
+            .where('room.id = :roomId AND user.id = :userId', { roomId, userId })
+            .execute();
+        return { roomId, userId, count: 0 };
+    }
+    async getRoom(roomId, senderId) {
+        const room = await this.roomRepository.findOne({
+            where: { id: roomId },
+            relations: [
+                'receiver',
+                'sender',
+                'nounou.user.medias.type_media',
+                'parent.user.medias.type_media',
+                'contract.message',
             ],
-            relations: { parent: { user: true }, nounou: { user: true } }
         });
-        let parentUnread = 0;
-        let nounouUnread = 0;
-        let adminUnread = 0;
-        rooms.forEach((room) => {
-            parentUnread += room.parentUnreadCount;
-            nounouUnread += room.nounuUnreadCount;
-            adminUnread += room.administrateurUnreadCount;
+        return {
+            ...room,
+            photo: senderId == room.parent.user.id
+                ? room.parent.user.medias?.find((media) => media.type_media.slug === 'image-profil')
+                : room.nounou.user.medias?.find((media) => media.type_media.slug === 'image-profil'),
+        };
+    }
+    async getRoomUnreadCount(roomId, userId) {
+        const unread = await this.unreadCountRepository.findOne({
+            where: {
+                room: { id: roomId },
+                user: { id: userId },
+            },
         });
-        return { parentUnread, nounouUnread, adminUnread };
+        return unread ? unread.count : 0;
     }
 };
 exports.RoomsService = RoomsService;
 exports.RoomsService = RoomsService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)('ROOMS_REPOSITORY')),
+    __param(1, (0, common_1.Inject)('MESSAGE_REPOSITORY')),
+    __param(2, (0, common_1.Inject)('UNREAD_REPOSITORY')),
     __metadata("design:paramtypes", [typeorm_1.Repository,
-        user_service_1.UserService])
+        typeorm_1.Repository,
+        typeorm_1.Repository])
 ], RoomsService);

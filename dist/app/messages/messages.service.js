@@ -16,23 +16,53 @@ exports.MessageService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("typeorm");
 const message_model_1 = require("./models/message.model");
+const notification_service_1 = require("../notification/notification.service");
+const contracts_service_1 = require("../contracts/contracts.service");
 let MessageService = class MessageService {
     messageRepository;
     roomRepository;
-    constructor(messageRepository, roomRepository) {
+    notificationService;
+    contractService;
+    constructor(messageRepository, roomRepository, notificationService, contractService) {
         this.messageRepository = messageRepository;
         this.roomRepository = roomRepository;
+        this.notificationService = notificationService;
+        this.contractService = contractService;
     }
-    async create({ content, roomId, senderId, }) {
+    async create({ content, roomId, senderId, isRead, isProposition, type, propositionExpired, }) {
         const message = this.messageRepository.create({
             content,
             room: { id: roomId },
-            sender: { id: senderId.toString() },
+            sender: { id: senderId },
+            isRead: isRead,
+            isProposition: isProposition,
+            type: type,
+            propositionExpired: propositionExpired,
         });
         const savedMessage = await this.messageRepository.save(message);
-        return this.messageRepository.findOne({
+        const getMessage = await this.messageRepository.findOne({
             where: { id: savedMessage.id },
-            relations: ['sender', 'room'],
+            relations: ['sender', 'room.parent.user', 'room.nounou.user', 'contract'],
+        });
+        const ToSenderId = getMessage.sender.id == senderId
+            ? getMessage.room.nounou
+            : getMessage.room.parent;
+        const ToReceiverId = getMessage.sender.id == senderId
+            ? getMessage.room.parent
+            : getMessage.room.nounou;
+        if (type === 'Proposition') {
+            await this.sendPropositionNotification(ToSenderId, ToReceiverId, getMessage);
+        }
+        return getMessage;
+    }
+    async sendPropositionNotification(userId, senderUserId, Message) {
+        await this.notificationService.createNotification({
+            type: 'PROPOSITION',
+            userId: userId.user.id,
+            message: `Nouvelle proposition de <span class="font-bold">${userId.fullname}</span> vous avez échanger recenement. Missions: pour une durée de ${JSON.parse(Message.content).duration} jours et une rénumeration de ${JSON.parse(Message.content).price} Fcfa`,
+            is_read: false,
+            senderUserId: senderUserId.user.id,
+            tolinkId: Message.room.id
         });
     }
     async findByRoom(roomId) {
@@ -77,6 +107,23 @@ let MessageService = class MessageService {
             relations: ['sender'],
         });
     }
+    async updateProposalStatus(roomId, messageId, status) {
+        console.log(roomId, messageId, status);
+        const message = await this.messageRepository.update({
+            id: messageId
+        }, {
+            room: { id: roomId },
+            proposalStatus: status,
+        });
+        if (!message) {
+            throw new common_1.NotFoundException(`Message with ID ${messageId} not found`);
+        }
+        const contract = await this.contractService.create({
+            messageId,
+            roomId,
+        });
+        return contract;
+    }
 };
 exports.MessageService = MessageService;
 exports.MessageService = MessageService = __decorate([
@@ -84,5 +131,7 @@ exports.MessageService = MessageService = __decorate([
     __param(0, (0, common_1.Inject)('MESSAGE_REPOSITORY')),
     __param(1, (0, common_1.Inject)('ROOMS_REPOSITORY')),
     __metadata("design:paramtypes", [typeorm_1.Repository,
-        typeorm_1.Repository])
+        typeorm_1.Repository,
+        notification_service_1.NotificationService,
+        contracts_service_1.ContractsService])
 ], MessageService);

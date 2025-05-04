@@ -39,7 +39,7 @@ let AbonnementService = class AbonnementService {
         if (existingAbonnement) {
             return this.buildResponse(true, await this.hasActiveAbonnement(createAbonnementDto.userId), existingAbonnement);
         }
-        const isPaymentValid = await this.validateCinetPayPayment(payment.payment_token, createAbonnementDto.userId, createAbonnementDto.transactionId);
+        const isPaymentValid = await this.validateCinetPayPayment(payment.transaction_id, createAbonnementDto.userId, createAbonnementDto.transactionId);
         if (!isPaymentValid) {
             return this.buildResponse(true, await this.hasActiveAbonnement(createAbonnementDto.userId));
         }
@@ -62,24 +62,54 @@ let AbonnementService = class AbonnementService {
             relations: ['user', 'paiement'],
         });
     }
-    async validateCinetPayPayment(paymentToken, userId, transactionId) {
+    async validateCinetPayPayment(transaction_id, userId, transactionId) {
         try {
             const response = await axios_1.default.post('https://api-checkout.cinetpay.com/v2/payment/check', {
                 apikey: process.env.CINETPAY_API_KEY,
                 site_id: process.env.CINETPAY_SITE_ID,
-                token: paymentToken,
+                transaction_id: transaction_id,
                 return_url: `${process.env.CINETPAY_RETURN_URL}?userId=${userId}&transactionId=${transactionId}`,
             }, {
                 headers: { 'Content-Type': 'application/json' },
             });
-            return !!response.data.data;
+            if (response.data.data) {
+                const payment = await this.paymentRepository.update(transaction_id, {
+                    status: response.data.data.status,
+                    paymentMethod: response.data.data.payment_method,
+                    operator_id: response.data.data.operator_id,
+                    payment_date: response.data.data.payment_date,
+                    amount: response.data.data.amount,
+                    currency: response.data.data.currency,
+                    payment_token: response.data.data.payment_token,
+                });
+                if (payment.affected === 1) {
+                    return true;
+                }
+            }
+            return false;
         }
         catch (error) {
-            console.error('CinetPay validation error:', error);
             return false;
         }
     }
     async createNewAbonnement(userId, paymentId) {
+        const isOperationId = await this.paymentRepository.find({
+            where: {
+                id: paymentId,
+            },
+        });
+        if (!isOperationId) {
+            throw new common_1.NotFoundException(`Paiement avec l'ID ${paymentId} introuvable`);
+        }
+        const isAbonnementExist = await this.abonnementRepository.findOne({
+            where: {
+                user: { id: userId },
+                paiement: { id: paymentId },
+            },
+        });
+        if (isAbonnementExist) {
+            throw new common_1.BadRequestException(`L'utilisateur ${userId} a deja un abonnement`);
+        }
         const abonnement = this.abonnementRepository.create({
             paiement: { id: paymentId },
             user: { id: userId },
@@ -106,12 +136,6 @@ let AbonnementService = class AbonnementService {
             hasActiveSubscription,
         };
     }
-    async getAbonnementsByUser(userId) {
-        return this.abonnementRepository.find({
-            where: { user: { id: userId } },
-            relations: ['paiement', 'user'],
-        });
-    }
     async getAbonnementById(abonnementId) {
         const abonnement = await this.abonnementRepository.findOne({
             where: { id: abonnementId },
@@ -121,6 +145,20 @@ let AbonnementService = class AbonnementService {
             throw new common_1.NotFoundException(`Abonnement avec l'ID ${abonnementId} introuvable`);
         }
         return abonnement;
+    }
+    async getAbonnementByUserId(userId) {
+        const abonnement = await this.abonnementRepository.findOne({
+            where: { user: { id: userId } },
+            order: { createdAt: 'DESC' },
+            relations: ['paiement', 'type', 'user'],
+        });
+        if (!abonnement) {
+            throw new common_1.NotFoundException(`Aucun abonnement pour l'utilisateur ${userId} n'a été trouvé`);
+        }
+        return {
+            ...abonnement,
+            isActived: await this.hasActiveAbonnement(userId),
+        };
     }
     async hasActiveAbonnement(userId) {
         const abonnement = await this.abonnementRepository.findOne({
@@ -137,6 +175,22 @@ let AbonnementService = class AbonnementService {
         const daysSinceSubscription = Math.floor((currentDate.getTime() - subscriptionDate.getTime()) /
             (1000 * 60 * 60 * 24));
         return daysSinceSubscription <= this.SUBSCRIPTION_DURATION_DAYS;
+    }
+    async cancelAbonnement(abonnementId) {
+        const abonnement = await this.abonnementRepository.findOne({
+            where: { id: abonnementId },
+        });
+        if (!abonnement) {
+            throw new common_1.NotFoundException(`Abonnement avec l'ID ${abonnementId} introuvable`);
+        }
+        await this.abonnementRepository.softRemove(abonnement);
+        await this.notificationService.createNotification({
+            type: 'ABONNEMENT_CANCEL',
+            userId: abonnement.user.id,
+            message: 'Votre abonnement a été annulé.',
+            is_read: false,
+            senderUserId: abonnement.user.id,
+        });
     }
 };
 exports.AbonnementService = AbonnementService;

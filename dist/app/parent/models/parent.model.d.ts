@@ -1,9 +1,8 @@
 import { User } from 'src/app/user/user.model';
 import { Preference } from 'src/app/Preference/models/preference.model';
-import { Room } from 'src/app/rooms/models/room.model';
-import { Contracts } from 'src/app/contracts/models/contracts.model';
-export declare class Parents {
-    id: number;
+import { Rooms } from 'src/app/rooms/models/room.model';
+export declare class ProfilParents {
+    id: string;
     fullname: string;
     adresse_mail: string;
     phone: string;
@@ -11,8 +10,7 @@ export declare class Parents {
     budget_estimated: string;
     preferences: Preference[];
     user: User;
-    parentRooms: Room[];
-    contracts: Contracts[];
+    parentRooms: Rooms[];
     informations_complementaires: string;
     createdAt: Date;
     updatedAt: Date;

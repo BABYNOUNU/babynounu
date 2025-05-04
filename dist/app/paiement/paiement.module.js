@@ -12,7 +12,6 @@ const paiement_controller_1 = require("./paiement.controller");
 const paiement_service_1 = require("./paiement.service");
 const paiement_1 = require("./paiement");
 const database_module_1 = require("../../database/database.module");
-const notification_gateway_1 = require("../notification/notification.gateway");
 const notification_service_1 = require("../notification/notification.service");
 const notification_1 = require("../notification/notification");
 const abonnement_service_1 = require("../abonnement/abonnement.service");
@@ -27,7 +26,6 @@ exports.PaiementModule = PaiementModule = __decorate([
         providers: [
             paiement_service_1.PaymentService,
             abonnement_service_1.AbonnementService,
-            notification_gateway_1.NotificationGateway,
             notification_service_1.NotificationService,
             ...abonnement_1.AbonnementProviders,
             ...notification_1.NotificationProviders,

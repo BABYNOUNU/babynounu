@@ -16,7 +16,6 @@ const abonnement_1 = require("./abonnement");
 const paiement_service_1 = require("../paiement/paiement.service");
 const notification_service_1 = require("../notification/notification.service");
 const notification_1 = require("../notification/notification");
-const notification_gateway_1 = require("../notification/notification.gateway");
 let AbonnementModule = class AbonnementModule {
 };
 exports.AbonnementModule = AbonnementModule;
@@ -27,7 +26,6 @@ exports.AbonnementModule = AbonnementModule = __decorate([
         providers: [
             abonnement_service_1.AbonnementService,
             paiement_service_1.PaymentService,
-            notification_gateway_1.NotificationGateway,
             notification_service_1.NotificationService,
             ...notification_1.NotificationProviders,
             ...paiement_1.PaiementProviders,

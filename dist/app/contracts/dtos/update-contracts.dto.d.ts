@@ -1,4 +1,4 @@
 export declare class UpdateContractDto {
-    price?: number;
-    duration?: number;
+    roomId?: number;
+    messageId?: number;
 }

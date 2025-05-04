@@ -21,6 +21,7 @@ const update_parent_dto_1 = require("./dto/update-parent.dto");
 const platform_express_1 = require("@nestjs/platform-express");
 const media_config_1 = require("../../config/media.config");
 const search_parent_criteria_dto_1 = require("./dto/search-parent-criteria.dto");
+const sharpTransform_1 = require("../../utils/sharpTransform");
 let ParentController = class ParentController {
     parentService;
     constructor(parentService) {
@@ -56,13 +57,16 @@ __decorate([
     (0, common_1.Get)('/:id'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], ParentController.prototype, "GetParent", null);
 __decorate([
     (0, common_1.Post)('create'),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileFieldsInterceptor)([{ name: 'imageParent', maxCount: 4 }], {
         storage: media_config_1.storageMedia,
+    }), (0, sharpTransform_1.SharpTransform)({
+        fields: ['imageParent'],
+        resizeOptions: { width: 400, height: 400, fit: 'cover', quality: 80 },
     })),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.UploadedFiles)()),
@@ -79,7 +83,7 @@ __decorate([
     __param(1, (0, common_1.Body)()),
     __param(2, (0, common_1.UploadedFiles)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, update_parent_dto_1.UpdateParentDto, Object]),
+    __metadata("design:paramtypes", [String, update_parent_dto_1.UpdateParentDto, Object]),
     __metadata("design:returntype", void 0)
 ], ParentController.prototype, "UpdateParent", null);
 __decorate([
@@ -97,7 +101,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ParentController.prototype, "searchParent", null);
 exports.ParentController = ParentController = __decorate([
-    (0, swagger_1.ApiTags)('Parents'),
+    (0, swagger_1.ApiTags)('ProfilParents'),
     (0, common_1.Controller)('parent'),
     __metadata("design:paramtypes", [parent_service_1.ParentsService])
 ], ParentController);

@@ -1,12 +1,13 @@
-import { Parents } from '../parent/models/parent.model';
+import { ProfilParents } from '../parent/models/parent.model';
 import { Abonnements } from '../abonnement/models/abonnement.model';
 import { Notification } from '../notification/models/notification.model';
 import { Job } from '../job/models/job.model';
 import { Paiements } from '../paiement/models/paiement.model';
 import { JobApplication } from '../job-application/models/job-application.model';
 import { Parameter } from '../parameter/models/parameter.model';
-import { Nounus } from '../nounus/models/nounu.model';
+import { ProfilNounus } from '../nounus/models/nounu.model';
 import { Medias } from '../media/models/media.model';
+import { Rooms } from '../rooms/models/room.model';
 import { Message } from '../messages/models/message.model';
 export declare class User {
     id: string;
@@ -15,8 +16,8 @@ export declare class User {
     password: string;
     access_token: string;
     type_profil: Parameter;
-    nounu: Nounus[];
-    parent: Parents[];
+    nounu: ProfilNounus[];
+    parent: ProfilParents[];
     abonnement: Abonnements;
     medias: Medias[];
     notifications: Notification[];
@@ -24,6 +25,8 @@ export declare class User {
     job_to_apply: JobApplication[];
     jobs: Job[];
     paiements: Paiements[];
+    roomSender: Rooms[];
+    roomReceiver: Rooms[];
     role: Parameter;
     messages: Message[];
 }

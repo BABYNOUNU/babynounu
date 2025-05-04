@@ -18,7 +18,6 @@ const abonnement_service_1 = require("../abonnement/abonnement.service");
 const abonnement_1 = require("../abonnement/abonnement");
 const paiement_service_1 = require("../paiement/paiement.service");
 const paiement_1 = require("../paiement/paiement");
-const notification_gateway_1 = require("../notification/notification.gateway");
 let JobApplicationModule = class JobApplicationModule {
 };
 exports.JobApplicationModule = JobApplicationModule;
@@ -31,7 +30,6 @@ exports.JobApplicationModule = JobApplicationModule = __decorate([
             notification_service_1.NotificationService,
             abonnement_service_1.AbonnementService,
             paiement_service_1.PaymentService,
-            notification_gateway_1.NotificationGateway,
             ...paiement_1.PaiementProviders,
             ...abonnement_1.AbonnementProviders,
             ...notification_1.NotificationProviders,

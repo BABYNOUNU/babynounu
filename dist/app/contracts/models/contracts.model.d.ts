@@ -1,11 +1,10 @@
-import { Nounus } from 'src/app/nounus/models/nounu.model';
-import { Parents } from 'src/app/parent/models/parent.model';
+import { Rooms } from 'src/app/rooms/models/room.model';
+import { Message } from 'src/app/messages/models/message.model';
 export declare class Contracts {
     id: number;
-    price: number;
-    duration: number;
-    nounu: Nounus;
-    parent: Parents;
+    room: Rooms;
+    message: Message;
+    status: 'Accepted' | 'Pending' | 'Canceled';
     createdAt: Date;
     updatedAt: Date;
     deletedAt: Date | null;

@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
-import { Parents } from './models/parent.model';
+import { ProfilParents } from './models/parent.model';
 import { CreateParentDto } from './dto/create-parent.dto';
 import { UpdateParentDto } from './dto/update-parent.dto';
 import { Preference } from '../Preference/models/preference.model';
@@ -18,7 +18,7 @@ import { NounusService } from '../nounus/nounus.service';
 export class ParentsService {
   constructor(
     @Inject('PARENT_REPOSITORY')
-    private readonly parentsRepository: Repository<Parents>,
+    private readonly parentsRepository: Repository<ProfilParents>,
 
     @Inject('PREFERENCE_REPOSITORY')
     private readonly preferenceRepository: Repository<Preference>,
@@ -27,7 +27,7 @@ export class ParentsService {
     private readonly nounuService: NounusService,
   ) {}
 
-  async findAll(): Promise<Parents[]> {
+  async findAll(): Promise<ProfilParents[]> {
     const parents = await this.parentsRepository.find({
       relations: [
         'user',
@@ -50,7 +50,7 @@ export class ParentsService {
     if (!parents) {
       throw new NotFoundException(`Parent with not found`);
     }
-    const Parents = await this.nounuService.ReturnN(parents, [
+    const ProfilParents = await this.nounuService.ReturnN(parents, [
       'besions_specifiques',
       'garde_enfants',
       'aide_menagere',
@@ -64,10 +64,10 @@ export class ParentsService {
       'mode_de_paiement',
     ]);
 
-    return Parents;
+    return ProfilParents;
   }
 
-  async findOne(id: number): Promise<any> {
+  async findOne(id: string): Promise<any> {
     const parent = await this.parentsRepository.findOne({
       where: { id },
       relations: [
@@ -114,7 +114,7 @@ export class ParentsService {
   async create(
     createParentDto: CreateParentDto,
     files: { imageParent: Express.Multer.File[] },
-  ): Promise<Parents> {
+  ): Promise<ProfilParents> {
     const { userId, ...parentData } = createParentDto;
 
     // Create and save the parent
@@ -169,10 +169,10 @@ export class ParentsService {
     return savedParent;
   }
   async update(
-    id: number, // L'ID du parent à mettre à jour
+    id: string, // L'ID du parent à mettre à jour
     updateParentDto: UpdateParentDto,
     files: { imageParent: Express.Multer.File[] },
-  ): Promise<Parents> {
+  ): Promise<ProfilParents> {
     try {
       const { userId, ...parentData } = updateParentDto;
 

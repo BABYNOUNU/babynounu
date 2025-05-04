@@ -10,15 +10,14 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Contracts = void 0;
-const nounu_model_1 = require("../../nounus/models/nounu.model");
-const parent_model_1 = require("../../parent/models/parent.model");
 const typeorm_1 = require("typeorm");
+const room_model_1 = require("../../rooms/models/room.model");
+const message_model_1 = require("../../messages/models/message.model");
 let Contracts = class Contracts {
     id;
-    price;
-    duration;
-    nounu;
-    parent;
+    room;
+    message;
+    status;
     createdAt;
     updatedAt;
     deletedAt;
@@ -29,23 +28,17 @@ __decorate([
     __metadata("design:type", Number)
 ], Contracts.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'numeric', nullable: false }),
-    __metadata("design:type", Number)
-], Contracts.prototype, "price", void 0);
+    (0, typeorm_1.ManyToOne)(() => room_model_1.Rooms, (room) => room.contract, { onDelete: 'CASCADE' }),
+    __metadata("design:type", room_model_1.Rooms)
+], Contracts.prototype, "room", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'numeric', nullable: false }),
-    __metadata("design:type", Number)
-], Contracts.prototype, "duration", void 0);
+    (0, typeorm_1.ManyToOne)(() => message_model_1.Message, (message) => message.contract, { onDelete: 'CASCADE' }),
+    __metadata("design:type", message_model_1.Message)
+], Contracts.prototype, "message", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => nounu_model_1.Nounus, (nounu) => nounu.contracts, { onDelete: 'CASCADE' }),
-    (0, typeorm_1.JoinColumn)({ name: 'nounu_id' }),
-    __metadata("design:type", nounu_model_1.Nounus)
-], Contracts.prototype, "nounu", void 0);
-__decorate([
-    (0, typeorm_1.ManyToOne)(() => parent_model_1.Parents, (parent) => parent.contracts, { onDelete: 'CASCADE' }),
-    (0, typeorm_1.JoinColumn)({ name: 'parent_id' }),
-    __metadata("design:type", parent_model_1.Parents)
-], Contracts.prototype, "parent", void 0);
+    (0, typeorm_1.Column)({ type: 'enum', enum: ['Accepted', 'Pending', 'Canceled'], default: 'Pending' }),
+    __metadata("design:type", String)
+], Contracts.prototype, "status", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)({ type: 'timestamp' }),
     __metadata("design:type", Date)

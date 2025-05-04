@@ -5,7 +5,7 @@ const parent_model_1 = require("./models/parent.model");
 exports.ParentProviders = [
     {
         provide: 'PARENT_REPOSITORY',
-        useFactory: (dataSource) => dataSource.getRepository(parent_model_1.Parents),
+        useFactory: (dataSource) => dataSource.getRepository(parent_model_1.ProfilParents),
         inject: ['DATA_SOURCE'],
     }
 ];

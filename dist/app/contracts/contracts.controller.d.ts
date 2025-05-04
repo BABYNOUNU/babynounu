@@ -7,8 +7,10 @@ export declare class ContractsController {
     constructor(contractsService: ContractsService);
     create(createContractDto: CreateContractDto): Promise<Contracts>;
     findAll(): Promise<Contracts[]>;
+    findAllByUserId(userId: string): Promise<Contracts[]>;
     findOne(id: number): Promise<Contracts>;
     update(id: number, updateContractDto: UpdateContractDto): Promise<Contracts>;
+    updateStatus(id: number, status: 'Accepted' | 'Pending' | 'Canceled'): Promise<Contracts>;
     remove(id: number): Promise<void>;
     restore(id: number): Promise<Contracts>;
 }

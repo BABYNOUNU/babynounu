@@ -15,8 +15,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatController = void 0;
 const common_1 = require("@nestjs/common");
 const auh_guard_1 = require("../auth/auh.guard");
-const rooms_service_1 = require("../rooms/rooms.service");
+const user_model_1 = require("../user/user.model");
 const messages_service_1 = require("../messages/messages.service");
+const getUser_1 = require("../auth/getUser");
+const rooms_service_1 = require("../rooms/rooms.service");
 let ChatController = class ChatController {
     roomService;
     messageService;
@@ -24,27 +26,30 @@ let ChatController = class ChatController {
         this.roomService = roomService;
         this.messageService = messageService;
     }
-    async getConversations(userId) {
-        return this.roomService.getConversationsForUser(userId);
-    }
     async getMessages(roomId) {
         return this.messageService.findByRoom(roomId);
     }
-    async findOrCreateRoom(parentId, nounouId) {
-        return this.roomService.findOrCreate(parentId, nounouId);
+    async getUserConversations(user) {
+        console.log(user);
+        return this.roomService.getUserConversations(user.id);
     }
-    async findOne(id) {
-        return this.roomService.findOne(id);
+    async createOrGetRoom(user, nounouId, parentId) {
+        return this.roomService.createOrGetRoom(user.id, parentId, nounouId);
+    }
+    async getTotalUnreadCount(user) {
+        return this.roomService.getTotalUnreadCount(user.id);
+    }
+    async getRoom(user, roomId) {
+        return this.roomService.getRoom(roomId, user.id);
+    }
+    async getRoomUnreadCount(roomId, user) {
+        return this.roomService.getRoomUnreadCount(roomId, user.id);
+    }
+    async markAsRead(roomId, user) {
+        return this.roomService.resetUnreadCount(roomId, user.id);
     }
 };
 exports.ChatController = ChatController;
-__decorate([
-    (0, common_1.Get)('conversations'),
-    __param(0, (0, common_1.Query)('userId')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", Promise)
-], ChatController.prototype, "getConversations", null);
 __decorate([
     (0, common_1.Get)('messages'),
     __param(0, (0, common_1.Query)('roomId')),
@@ -53,20 +58,52 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ChatController.prototype, "getMessages", null);
 __decorate([
-    (0, common_1.Get)('find-or-create-room'),
-    __param(0, (0, common_1.Query)('parentId')),
-    __param(1, (0, common_1.Query)('nounouId')),
+    (0, common_1.Get)('conversations'),
+    __param(0, (0, getUser_1.GetUser)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Number]),
+    __metadata("design:paramtypes", [user_model_1.User]),
     __metadata("design:returntype", Promise)
-], ChatController.prototype, "findOrCreateRoom", null);
+], ChatController.prototype, "getUserConversations", null);
+__decorate([
+    (0, common_1.Get)('find-or-create-room'),
+    __param(0, (0, getUser_1.GetUser)()),
+    __param(1, (0, common_1.Query)('nounouId')),
+    __param(2, (0, common_1.Query)('parentId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [user_model_1.User, String, String]),
+    __metadata("design:returntype", Promise)
+], ChatController.prototype, "createOrGetRoom", null);
+__decorate([
+    (0, common_1.Get)('unread-total'),
+    __param(0, (0, getUser_1.GetUser)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [user_model_1.User]),
+    __metadata("design:returntype", Promise)
+], ChatController.prototype, "getTotalUnreadCount", null);
 __decorate([
     (0, common_1.Get)('room/:id'),
-    __param(0, (0, common_1.Query)('id')),
+    __param(0, (0, getUser_1.GetUser)()),
+    __param(1, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [user_model_1.User, Number]),
     __metadata("design:returntype", Promise)
-], ChatController.prototype, "findOne", null);
+], ChatController.prototype, "getRoom", null);
+__decorate([
+    (0, common_1.Get)(':id/unread'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, getUser_1.GetUser)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, user_model_1.User]),
+    __metadata("design:returntype", Promise)
+], ChatController.prototype, "getRoomUnreadCount", null);
+__decorate([
+    (0, common_1.Post)(':id/mark-as-read'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, getUser_1.GetUser)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, user_model_1.User]),
+    __metadata("design:returntype", Promise)
+], ChatController.prototype, "markAsRead", null);
 exports.ChatController = ChatController = __decorate([
     (0, common_1.Controller)('chat'),
     (0, common_1.UseGuards)(auh_guard_1.JwtAuthGuard),

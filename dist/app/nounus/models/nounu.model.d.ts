@@ -1,9 +1,8 @@
-import { Contracts } from 'src/app/contracts/models/contracts.model';
 import { Preference } from 'src/app/Preference/models/preference.model';
-import { Room } from 'src/app/rooms/models/room.model';
+import { Rooms } from 'src/app/rooms/models/room.model';
 import { User } from 'src/app/user/user.model';
-export declare class Nounus {
-    id: number;
+export declare class ProfilNounus {
+    id: string;
     fullname: string;
     age: string;
     phone: string;
@@ -19,8 +18,7 @@ export declare class Nounus {
     courte_biographie: string;
     preferences: Preference[];
     user: User;
-    nounouRooms: Room[];
-    contracts: Contracts[];
+    nounouRooms: Rooms[];
     createdAt: Date;
     updatedAt: Date;
     deletedAt: Date | null;

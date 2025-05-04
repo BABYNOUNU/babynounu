@@ -1,7 +1,7 @@
 import { Parameter } from 'src/app/parameter/models/parameter.model';
-import { Parents } from 'src/app/parent/models/parent.model';
+import { ProfilParents } from 'src/app/parent/models/parent.model';
 import { Job } from 'src/app/job/models/job.model';
-import { Nounus } from 'src/app/nounus/models/nounu.model';
+import { ProfilNounus } from 'src/app/nounus/models/nounu.model';
 export declare class Preference {
     id: number;
     horaire_disponible: Parameter[];
@@ -24,8 +24,8 @@ export declare class Preference {
     taches: Parameter[];
     langue_parler: Parameter[];
     criteres_selections: Parameter[];
-    parents: Parents;
-    nounus: Nounus;
+    parents: ProfilParents;
+    nounus: ProfilNounus;
     jobs: Job;
     created_at: Date;
     updated_at: Date;

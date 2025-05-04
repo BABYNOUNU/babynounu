@@ -12,30 +12,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateContractDto = void 0;
 const class_validator_1 = require("class-validator");
 class CreateContractDto {
-    price;
-    duration;
-    nounuId;
-    parentId;
+    roomId;
+    messageId;
 }
 exports.CreateContractDto = CreateContractDto;
 __decorate([
     (0, class_validator_1.IsNumber)(),
-    (0, class_validator_1.IsPositive)(),
-    __metadata("design:type", Number)
-], CreateContractDto.prototype, "price", void 0);
-__decorate([
-    (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.IsInt)(),
     (0, class_validator_1.IsPositive)(),
     __metadata("design:type", Number)
-], CreateContractDto.prototype, "duration", void 0);
+], CreateContractDto.prototype, "roomId", void 0);
 __decorate([
     (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.IsInt)(),
     __metadata("design:type", Number)
-], CreateContractDto.prototype, "nounuId", void 0);
-__decorate([
-    (0, class_validator_1.IsNumber)(),
-    (0, class_validator_1.IsInt)(),
-    __metadata("design:type", Number)
-], CreateContractDto.prototype, "parentId", void 0);
+], CreateContractDto.prototype, "messageId", void 0);

@@ -1,5 +1,5 @@
 import { Repository } from 'typeorm';
-import { Nounus } from './models/nounu.model';
+import { ProfilNounus } from './models/nounu.model';
 import { CreateNounuDto } from './dtos/create-nounu.dto';
 import { UpdateNounuDto } from './dtos/update-nounu.dto';
 import { MediaService } from '../media/media.service';
@@ -8,29 +8,29 @@ export declare class NounusService {
     private readonly nounuRepository;
     private readonly preferenceRepository;
     private readonly mediaService;
-    constructor(nounuRepository: Repository<Nounus>, preferenceRepository: Repository<Preference>, mediaService: MediaService);
+    constructor(nounuRepository: Repository<ProfilNounus>, preferenceRepository: Repository<Preference>, mediaService: MediaService);
     create(createNounuDto: CreateNounuDto, files: {
         imageNounu: Express.Multer.File[];
         documents: Express.Multer.File[];
         gallery: Express.Multer.File[];
-    }): Promise<Nounus>;
+    }): Promise<ProfilNounus>;
     findAllNotCurrentUser(userId: any): Promise<any>;
     findAll(): Promise<any>;
-    findOne(id: number): Promise<any>;
+    findOne(id: string): Promise<any>;
     update(id: string, updateNounuDto: UpdateNounuDto, files: {
         imageNounu: Express.Multer.File[];
         documents: Express.Multer.File[];
         gallery: Express.Multer.File[];
-    }): Promise<Nounus>;
-    remove(id: number): Promise<void>;
+    }): Promise<ProfilNounus>;
+    remove(id: string): Promise<void>;
     search(searchCriteria: any): Promise<any[]>;
     getNonCertifiedNounus(): Promise<any[]>;
-    approveCertification(nounuId: number): Promise<{
+    approveCertification(nounuId: string): Promise<{
         certif: boolean;
     }>;
-    updateStatus(nounuId: number, status: string): Promise<{
+    updateStatus(nounuId: string, status: string): Promise<{
         status: string;
     }>;
     ReturnN(datas: any[], preferenceKey: any[]): Promise<any[]>;
-    ReturnSearchN(datas: any[], preferenceKey: any[]): Promise<Nounus[]>;
+    ReturnSearchN(datas: any[], preferenceKey: any[]): Promise<ProfilNounus[]>;
 }
