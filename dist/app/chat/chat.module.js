@@ -31,6 +31,11 @@ const notification_1 = require("../notification/notification");
 const contracts_service_1 = require("../contracts/contracts.service");
 const contracts_1 = require("../contracts/contracts");
 const nounus_1 = require("../nounus/nounus");
+const nounus_service_1 = require("../nounus/nounus.service");
+const media_service_1 = require("../media/media.service");
+const parameter_service_1 = require("../parameter/parameter.service");
+const media_1 = require("../media/media");
+const preference_1 = require("../Preference/preference");
 let ChatModule = class ChatModule {
 };
 exports.ChatModule = ChatModule;
@@ -49,6 +54,13 @@ exports.ChatModule = ChatModule = __decorate([
             paiement_service_1.PaymentService,
             notification_service_1.NotificationService,
             contracts_service_1.ContractsService,
+            nounus_service_1.NounusService,
+            media_service_1.MediaService,
+            parameter_service_1.ParameterService,
+            ...parameter_1.ParameterProviders,
+            ...media_1.MediaProviders,
+            ...preference_1.PreferenceProvider,
+            ...nounus_1.NounusProviders,
             ...contracts_1.ContractsProviders,
             ...nounus_1.NounusProviders,
             ...paiement_1.PaiementProviders,

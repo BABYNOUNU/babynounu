@@ -18,6 +18,13 @@ const abonnement_service_1 = require("../abonnement/abonnement.service");
 const abonnement_1 = require("../abonnement/abonnement");
 const paiement_service_1 = require("../paiement/paiement.service");
 const paiement_1 = require("../paiement/paiement");
+const nounus_service_1 = require("../nounus/nounus.service");
+const media_service_1 = require("../media/media.service");
+const parameter_service_1 = require("../parameter/parameter.service");
+const parameter_1 = require("../parameter/parameter");
+const media_1 = require("../media/media");
+const preference_1 = require("../Preference/preference");
+const nounus_1 = require("../nounus/nounus");
 let JobApplicationModule = class JobApplicationModule {
 };
 exports.JobApplicationModule = JobApplicationModule;
@@ -30,6 +37,13 @@ exports.JobApplicationModule = JobApplicationModule = __decorate([
             notification_service_1.NotificationService,
             abonnement_service_1.AbonnementService,
             paiement_service_1.PaymentService,
+            nounus_service_1.NounusService,
+            media_service_1.MediaService,
+            parameter_service_1.ParameterService,
+            ...parameter_1.ParameterProviders,
+            ...media_1.MediaProviders,
+            ...preference_1.PreferenceProvider,
+            ...nounus_1.NounusProviders,
             ...paiement_1.PaiementProviders,
             ...abonnement_1.AbonnementProviders,
             ...notification_1.NotificationProviders,

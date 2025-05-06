@@ -39,6 +39,9 @@ export class ProfilNounus {
   @Column({type: 'varchar', default: 'disponible'})
   status: string;
 
+  @Column({ type: 'numeric', default: 0 })
+  points: number;
+
   @Column()
   tarif_mensuel: string;
 

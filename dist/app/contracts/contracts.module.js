@@ -16,6 +16,12 @@ const parent_1 = require("../parent/parent");
 const nounus_1 = require("../nounus/nounus");
 const notification_service_1 = require("../notification/notification.service");
 const notification_1 = require("../notification/notification");
+const nounus_service_1 = require("../nounus/nounus.service");
+const media_service_1 = require("../media/media.service");
+const parameter_1 = require("../parameter/parameter");
+const media_1 = require("../media/media");
+const preference_1 = require("../Preference/preference");
+const parameter_service_1 = require("../parameter/parameter.service");
 let ContractsModule = class ContractsModule {
 };
 exports.ContractsModule = ContractsModule;
@@ -26,10 +32,17 @@ exports.ContractsModule = ContractsModule = __decorate([
         providers: [
             contracts_service_1.ContractsService,
             notification_service_1.NotificationService,
+            nounus_service_1.NounusService,
+            media_service_1.MediaService,
+            parameter_service_1.ParameterService,
+            ...parameter_1.ParameterProviders,
+            ...media_1.MediaProviders,
+            ...preference_1.PreferenceProvider,
+            ...nounus_1.NounusProviders,
             ...contracts_1.ContractsProviders,
             ...parent_1.ParentProviders,
             ...nounus_1.NounusProviders,
-            ...notification_1.NotificationProviders
+            ...notification_1.NotificationProviders,
         ],
     })
 ], ContractsModule);

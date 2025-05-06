@@ -7,6 +7,13 @@ import { NotificationService } from '../notification/notification.service';
 import { NotificationProviders } from '../notification/notification';
 import { AbonnementService } from '../abonnement/abonnement.service';
 import { AbonnementProviders } from '../abonnement/abonnement';
+import { NounusProviders } from '../nounus/nounus';
+import { NounusService } from '../nounus/nounus.service';
+import { PreferenceProvider } from '../Preference/preference';
+import { MediaService } from '../media/media.service';
+import { MediaProviders } from '../media/media';
+import { ParameterService } from '../parameter/parameter.service';
+import { ParameterProviders } from '../parameter/parameter';
 
 @Module({
   imports: [DatabaseModule],
@@ -15,6 +22,13 @@ import { AbonnementProviders } from '../abonnement/abonnement';
     PaymentService,
     AbonnementService,
     NotificationService,
+    NounusService,
+    MediaService,
+    ParameterService,
+    ...ParameterProviders,
+    ...MediaProviders,
+    ...PreferenceProvider,
+    ...NounusProviders,
     ...AbonnementProviders,
     ...NotificationProviders,
     ...PaiementProviders

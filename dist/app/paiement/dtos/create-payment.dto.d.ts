@@ -2,6 +2,7 @@ export declare class CreatePaymentDto {
     userId: any;
     amount: number;
     transaction_id: string;
+    payment_type: string;
     payment_token: any;
     currency: string;
     description: string;

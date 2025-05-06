@@ -42,7 +42,7 @@ let PaymentService = class PaymentService {
             data: {
                 apikey: process.env.CINETPAY_API_KEY,
                 site_id: process.env.CINETPAY_SITE_ID,
-                mode: 'TEST',
+                mode: 'PRODUCTION',
                 ...createPaymentDto,
             },
         };
@@ -52,7 +52,6 @@ let PaymentService = class PaymentService {
                 message: "Erreur lors de l'initiation du paiement",
             });
         }
-        console.log(paymentData);
         await this.paymentRepository.update({ id: paymentSave.id }, { payment_token: paymentData.data.payment_token });
         return paymentData;
     }

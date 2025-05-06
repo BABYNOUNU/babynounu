@@ -22,6 +22,12 @@ const contracts_1 = require("../contracts/contracts");
 const contracts_service_1 = require("../contracts/contracts.service");
 const nounus_1 = require("../nounus/nounus");
 const parent_1 = require("../parent/parent");
+const nounus_service_1 = require("../nounus/nounus.service");
+const parameter_service_1 = require("../parameter/parameter.service");
+const media_service_1 = require("../media/media.service");
+const parameter_1 = require("../parameter/parameter");
+const media_1 = require("../media/media");
+const preference_1 = require("../Preference/preference");
 let RoomsModule = class RoomsModule {
 };
 exports.RoomsModule = RoomsModule;
@@ -29,6 +35,26 @@ exports.RoomsModule = RoomsModule = __decorate([
     (0, common_1.Module)({
         imports: [database_module_1.DatabaseModule],
         controllers: [rooms_controller_1.RoomsController],
-        providers: [rooms_service_1.RoomsService, user_service_1.UserService, messages_service_1.MessageService, notification_service_1.NotificationService, contracts_service_1.ContractsService, ...contracts_1.ContractsProviders, ...nounus_1.NounusProviders, ...parent_1.ParentProviders, ...notification_1.NotificationProviders, ...messages_1.MessageProviders, ...rooms_1.RoomProviders, ...user_providers_1.UserProviders]
+        providers: [
+            rooms_service_1.RoomsService,
+            user_service_1.UserService,
+            messages_service_1.MessageService,
+            notification_service_1.NotificationService,
+            contracts_service_1.ContractsService,
+            nounus_service_1.NounusService,
+            media_service_1.MediaService,
+            parameter_service_1.ParameterService,
+            ...parameter_1.ParameterProviders,
+            ...media_1.MediaProviders,
+            ...preference_1.PreferenceProvider,
+            ...nounus_1.NounusProviders,
+            ...contracts_1.ContractsProviders,
+            ...nounus_1.NounusProviders,
+            ...parent_1.ParentProviders,
+            ...notification_1.NotificationProviders,
+            ...messages_1.MessageProviders,
+            ...rooms_1.RoomProviders,
+            ...user_providers_1.UserProviders,
+        ],
     })
 ], RoomsModule);

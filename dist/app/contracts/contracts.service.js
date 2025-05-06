@@ -13,6 +13,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ContractsService = void 0;
+const nounus_service_1 = require("./../nounus/nounus.service");
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("typeorm");
 const notification_service_1 = require("../notification/notification.service");
@@ -21,11 +22,13 @@ let ContractsService = class ContractsService {
     nounusRepository;
     parentsRepository;
     notificationService;
-    constructor(contractsRepository, nounusRepository, parentsRepository, notificationService) {
+    nounusService;
+    constructor(contractsRepository, nounusRepository, parentsRepository, notificationService, nounusService) {
         this.contractsRepository = contractsRepository;
         this.nounusRepository = nounusRepository;
         this.parentsRepository = parentsRepository;
         this.notificationService = notificationService;
+        this.nounusService = nounusService;
     }
     async create(createContractDto) {
         const contractExist = await this.contractsRepository.findOne({
@@ -60,6 +63,17 @@ let ContractsService = class ContractsService {
             senderUserId: getContract.room.parent.user.id,
             tolinkId: getContract.id.toString(),
         });
+        const StatusNu = await this.nounusService.updateStatus(getContract.room.nounou.user.id, 'indisponible');
+        if (StatusNu) {
+            await this.notificationService.createNotification({
+                type: 'PROFIL_DETAIL',
+                userId: getContract.room.nounou.user.id,
+                message: `Le statut de votre profil est passé en mode 'Indisponible', car vous avez déjà une mission en cours chez l'un de nos clients.`,
+                is_read: false,
+                senderUserId: getContract.room.nounou.user.id,
+                tolinkId: getContract.id.toString(),
+            });
+        }
         return contract;
     }
     async findAll() {
@@ -180,5 +194,6 @@ exports.ContractsService = ContractsService = __decorate([
     __metadata("design:paramtypes", [typeorm_1.Repository,
         typeorm_1.Repository,
         typeorm_1.Repository,
-        notification_service_1.NotificationService])
+        notification_service_1.NotificationService,
+        nounus_service_1.NounusService])
 ], ContractsService);

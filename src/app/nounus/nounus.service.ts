@@ -330,6 +330,15 @@ export class NounusService {
     return updatedNounu;
   }
 
+  async updatePoints(id: string, points: number): Promise<ProfilNounus> {
+    const nounu = await this.findOne(id);
+    if (!nounu) {
+      throw new NotFoundException(`ProfilNounus with ID ${id} not found`);
+    }
+    this.nounuRepository.increment({ id }, 'points', points);
+    return nounu;
+  }
+
   async remove(id: string): Promise<void> {
     const nounu = await this.findOne(id);
     await this.nounuRepository.remove(nounu);
@@ -490,12 +499,14 @@ export class NounusService {
     await this.nounuRepository.save(nounu);
 
     return {
-      certif: nounu.certif
+      certif: nounu.certif,
     };
   }
 
-  
-  async updateStatus(nounuId: string, status: string): Promise<{ status: string }> {
+  async updateStatus(
+    nounuId: string,
+    status: string,
+  ): Promise<{ status: string }> {
     const nounu = await this.nounuRepository.findOne({
       where: { id: nounuId },
     });
@@ -508,7 +519,7 @@ export class NounusService {
     await this.nounuRepository.save(nounu);
 
     return {
-      status: nounu.status
+      status: nounu.status,
     };
   }
 
@@ -542,7 +553,10 @@ export class NounusService {
     });
   }
 
-  async ReturnSearchN(datas: any[], preferenceKey: any[]): Promise<ProfilNounus[]> {
+  async ReturnSearchN(
+    datas: any[],
+    preferenceKey: any[],
+  ): Promise<ProfilNounus[]> {
     return datas.map((data) => {
       // Regrouper les libellés similaires dans des tableaux distincts
       const aggregatedPreferences = {};
@@ -570,6 +584,4 @@ export class NounusService {
       };
     });
   }
-
- 
 }

@@ -9,6 +9,13 @@ import { AbonnementService } from '../abonnement/abonnement.service';
 import { AbonnementProviders } from '../abonnement/abonnement';
 import { PaymentService } from '../paiement/paiement.service';
 import { PaiementProviders } from '../paiement/paiement';
+import { NounusService } from '../nounus/nounus.service';
+import { MediaService } from '../media/media.service';
+import { ParameterService } from '../parameter/parameter.service';
+import { ParameterProviders } from '../parameter/parameter';
+import { MediaProviders } from '../media/media';
+import { PreferenceProvider } from '../Preference/preference';
+import { NounusProviders } from '../nounus/nounus';
 
 @Module({
   imports: [DatabaseModule],
@@ -18,6 +25,13 @@ import { PaiementProviders } from '../paiement/paiement';
     NotificationService,
     AbonnementService,
     PaymentService,
+    NounusService,
+    MediaService,
+    ParameterService,
+    ...ParameterProviders,
+    ...MediaProviders,
+    ...PreferenceProvider,
+    ...NounusProviders,
     ...PaiementProviders,
     ...AbonnementProviders,
     ...NotificationProviders,

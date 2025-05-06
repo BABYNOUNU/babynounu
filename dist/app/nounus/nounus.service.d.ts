@@ -22,6 +22,7 @@ export declare class NounusService {
         documents: Express.Multer.File[];
         gallery: Express.Multer.File[];
     }): Promise<ProfilNounus>;
+    updatePoints(id: string, points: number): Promise<ProfilNounus>;
     remove(id: string): Promise<void>;
     search(searchCriteria: any): Promise<any[]>;
     getNonCertifiedNounus(): Promise<any[]>;

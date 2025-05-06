@@ -22,6 +22,7 @@ let Paiements = class Paiements {
     currency;
     status;
     payment_token;
+    payment_type;
     paymentMethod;
     abonnement;
     user;
@@ -62,6 +63,10 @@ __decorate([
     (0, typeorm_1.Column)('varchar', { length: 255, nullable: true }),
     __metadata("design:type", String)
 ], Paiements.prototype, "payment_token", void 0);
+__decorate([
+    (0, typeorm_1.Column)('varchar', { length: 255, nullable: true }),
+    __metadata("design:type", String)
+], Paiements.prototype, "payment_type", void 0);
 __decorate([
     (0, typeorm_1.Column)('varchar', { length: 255, nullable: true }),
     __metadata("design:type", String)

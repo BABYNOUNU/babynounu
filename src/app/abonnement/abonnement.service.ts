@@ -12,6 +12,7 @@ import { PaymentService } from '../paiement/paiement.service';
 import axios from 'axios';
 import { Paiements } from '../paiement/models/paiement.model';
 import { ChatGateway } from '../chat/chat.gateway';
+import { NounusService } from '../nounus/nounus.service';
 
 @Injectable()
 export class AbonnementService {
@@ -24,7 +25,55 @@ export class AbonnementService {
     private readonly paymentRepository: Repository<Paiements>,
     private readonly paymentService: PaymentService,
     private readonly notificationService: NotificationService,
+    private readonly nounuService: NounusService
   ) {}
+
+
+/**
+ * Vérifie les points associés à un paiement
+ * @param paymentId - ID du paiement
+ * @returns Nombre de points associés au paiement
+ */
+public async createPaymentPoint({ transactionId, userId,  points}): Promise<any> {
+
+
+  const payment = await this.paymentRepository.findOne({
+    where: { transaction_id: transactionId, user: { id: userId } },
+    relations: ['user'],
+  });
+
+  if (!payment) {
+    throw new NotFoundException(`Paiement avec l'ID ${transactionId} introuvable`);
+  }
+
+  const iSAcceptedPayment = await this.paymentRepository.findOne({
+    where: { transaction_id: transactionId, user: { id: userId }, status: 'ACCEPTED' },
+    relations: ['user'],
+  });
+
+  // Validation du paiement avec CinetPay
+  const isPaymentValid = await this.validateCinetPayPayment(
+    payment.transaction_id,
+    payment.transaction_id,
+    payment.user.id,
+  );
+
+  if(isPaymentValid && iSAcceptedPayment) {
+    await this.nounuService.updatePoints(payment.user.id, points);
+    await this.notificationService.createNotification({
+      type: 'PAIEMENT_VALID',
+      userId: payment.user.id,
+      message: `Vous avez acheté ${points} points de disponibilité pour un prix de ${payment.amount} Fcfa. Votre paiement a bien était validé.`,
+      is_read: false,
+      senderUserId: payment.user.id,
+    });
+  }
+
+  
+
+  return payment;
+}
+
 
   /**
    * Crée un nouvel abonnement ou retourne l'existant

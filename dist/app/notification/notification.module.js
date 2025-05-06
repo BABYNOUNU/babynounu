@@ -16,6 +16,13 @@ const abonnement_service_1 = require("../abonnement/abonnement.service");
 const abonnement_1 = require("../abonnement/abonnement");
 const paiement_1 = require("../paiement/paiement");
 const paiement_service_1 = require("../paiement/paiement.service");
+const nounus_service_1 = require("../nounus/nounus.service");
+const nounus_1 = require("../nounus/nounus");
+const media_service_1 = require("../media/media.service");
+const media_1 = require("../media/media");
+const preference_1 = require("../Preference/preference");
+const parameter_1 = require("../parameter/parameter");
+const parameter_service_1 = require("../parameter/parameter.service");
 let NotificationModule = class NotificationModule {
 };
 exports.NotificationModule = NotificationModule;
@@ -27,6 +34,13 @@ exports.NotificationModule = NotificationModule = __decorate([
             notification_service_1.NotificationService,
             paiement_service_1.PaymentService,
             abonnement_service_1.AbonnementService,
+            nounus_service_1.NounusService,
+            media_service_1.MediaService,
+            parameter_service_1.ParameterService,
+            ...parameter_1.ParameterProviders,
+            ...media_1.MediaProviders,
+            ...preference_1.PreferenceProvider,
+            ...nounus_1.NounusProviders,
             ...abonnement_1.AbonnementProviders,
             ...paiement_1.PaiementProviders,
             ...notification_1.NotificationProviders,

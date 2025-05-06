@@ -8,6 +8,13 @@ import { AbonnementProviders } from '../abonnement/abonnement';
 import { AbonnementModule } from '../abonnement/abonnement.module';
 import { PaiementProviders } from '../paiement/paiement';
 import { PaymentService } from '../paiement/paiement.service';
+import { NounusService } from '../nounus/nounus.service';
+import { NounusProviders } from '../nounus/nounus';
+import { MediaService } from '../media/media.service';
+import { MediaProviders } from '../media/media';
+import { PreferenceProvider } from '../Preference/preference';
+import { ParameterProviders } from '../parameter/parameter';
+import { ParameterService } from '../parameter/parameter.service';
 
 @Module({
   imports: [DatabaseModule],
@@ -16,6 +23,13 @@ import { PaymentService } from '../paiement/paiement.service';
     NotificationService,
     PaymentService,
     AbonnementService,
+    NounusService,
+       MediaService,
+       ParameterService,
+       ...ParameterProviders,
+       ...MediaProviders,
+       ...PreferenceProvider,
+       ...NounusProviders,
     ...AbonnementProviders,
     ...PaiementProviders,
     ...NotificationProviders,

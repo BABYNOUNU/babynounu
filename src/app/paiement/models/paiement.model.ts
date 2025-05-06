@@ -39,6 +39,9 @@ export class Paiements {
   payment_token: string;
 
   @Column('varchar', { length: 255, nullable: true })
+  payment_type: string
+
+  @Column('varchar', { length: 255, nullable: true })
   paymentMethod: string; // Méthode de paiement (ex: "credit_card", "paypal")
 
   @OneToMany(() => Abonnements, (NS) => NS.paiement, { cascade: true, })

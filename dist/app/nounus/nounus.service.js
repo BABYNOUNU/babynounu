@@ -258,6 +258,14 @@ let NounusService = class NounusService {
         }
         return updatedNounu;
     }
+    async updatePoints(id, points) {
+        const nounu = await this.findOne(id);
+        if (!nounu) {
+            throw new common_1.NotFoundException(`ProfilNounus with ID ${id} not found`);
+        }
+        this.nounuRepository.increment({ id }, 'points', points);
+        return nounu;
+    }
     async remove(id) {
         const nounu = await this.findOne(id);
         await this.nounuRepository.remove(nounu);
@@ -361,7 +369,7 @@ let NounusService = class NounusService {
         nounu.certif = true;
         await this.nounuRepository.save(nounu);
         return {
-            certif: nounu.certif
+            certif: nounu.certif,
         };
     }
     async updateStatus(nounuId, status) {
@@ -374,7 +382,7 @@ let NounusService = class NounusService {
         nounu.status = status;
         await this.nounuRepository.save(nounu);
         return {
-            status: nounu.status
+            status: nounu.status,
         };
     }
     async ReturnN(datas, preferenceKey) {

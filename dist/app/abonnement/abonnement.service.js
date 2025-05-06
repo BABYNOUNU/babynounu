@@ -18,17 +18,45 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("typeorm");
 const paiement_service_1 = require("../paiement/paiement.service");
 const axios_1 = require("axios");
+const nounus_service_1 = require("../nounus/nounus.service");
 let AbonnementService = class AbonnementService {
     abonnementRepository;
     paymentRepository;
     paymentService;
     notificationService;
+    nounuService;
     SUBSCRIPTION_DURATION_DAYS = 30;
-    constructor(abonnementRepository, paymentRepository, paymentService, notificationService) {
+    constructor(abonnementRepository, paymentRepository, paymentService, notificationService, nounuService) {
         this.abonnementRepository = abonnementRepository;
         this.paymentRepository = paymentRepository;
         this.paymentService = paymentService;
         this.notificationService = notificationService;
+        this.nounuService = nounuService;
+    }
+    async createPaymentPoint({ transactionId, userId, points }) {
+        const payment = await this.paymentRepository.findOne({
+            where: { transaction_id: transactionId, user: { id: userId } },
+            relations: ['user'],
+        });
+        if (!payment) {
+            throw new common_1.NotFoundException(`Paiement avec l'ID ${transactionId} introuvable`);
+        }
+        const iSAcceptedPayment = await this.paymentRepository.findOne({
+            where: { transaction_id: transactionId, user: { id: userId }, status: 'ACCEPTED' },
+            relations: ['user'],
+        });
+        const isPaymentValid = await this.validateCinetPayPayment(payment.transaction_id, payment.transaction_id, payment.user.id);
+        if (isPaymentValid && iSAcceptedPayment) {
+            await this.nounuService.updatePoints(payment.user.id, points);
+            await this.notificationService.createNotification({
+                type: 'PAIEMENT_VALID',
+                userId: payment.user.id,
+                message: `Vous avez acheté ${points} points de disponibilité pour un prix de ${payment.amount} Fcfa. Votre paiement a bien était validé.`,
+                is_read: false,
+                senderUserId: payment.user.id,
+            });
+        }
+        return payment;
     }
     async createAbonnement(createAbonnementDto) {
         const payment = await this.findPayment(createAbonnementDto);
@@ -201,5 +229,6 @@ exports.AbonnementService = AbonnementService = __decorate([
     __metadata("design:paramtypes", [typeorm_1.Repository,
         typeorm_1.Repository,
         paiement_service_1.PaymentService,
-        notification_service_1.NotificationService])
+        notification_service_1.NotificationService,
+        nounus_service_1.NounusService])
 ], AbonnementService);

@@ -42,7 +42,7 @@ export class PaymentService {
       data: {
         apikey: process.env.CINETPAY_API_KEY, // Remplacez par votre clé API
         site_id: process.env.CINETPAY_SITE_ID, // Remplacez par votre site ID
-        mode: 'TEST', // Mode PRODUCTION ou TEST
+        mode: 'PRODUCTION', // Mode PRODUCTION ou TEST
         ...createPaymentDto,
       },
     };
@@ -54,19 +54,10 @@ export class PaymentService {
       });
     }
 
-    console.log(paymentData)
     await this.paymentRepository.update(
       { id: paymentSave.id },
       { payment_token: paymentData.data.payment_token },
     );
-
-    // this.notificationGateway.CheckIsAbonnement(
-    //   {
-    //     userId: createPaymentDto.userId,
-    //     transactionId: paymentSave.transaction_id,
-    //   },
-    //   null,
-    // );
 
     return paymentData;
   }

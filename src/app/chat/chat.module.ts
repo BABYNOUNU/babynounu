@@ -22,6 +22,11 @@ import { NotificationProviders } from '../notification/notification';
 import { ContractsService } from '../contracts/contracts.service';
 import { ContractsProviders } from '../contracts/contracts';
 import { NounusProviders } from '../nounus/nounus';
+import { NounusService } from '../nounus/nounus.service';
+import { MediaService } from '../media/media.service';
+import { ParameterService } from '../parameter/parameter.service';
+import { MediaProviders } from '../media/media';
+import { PreferenceProvider } from '../Preference/preference';
 
 @Module({
   imports: [DatabaseModule],
@@ -37,6 +42,13 @@ import { NounusProviders } from '../nounus/nounus';
     PaymentService,
     NotificationService,
     ContractsService,
+    NounusService,
+    MediaService,
+    ParameterService,
+    ...ParameterProviders,
+    ...MediaProviders,
+    ...PreferenceProvider,
+    ...NounusProviders,
     ...ContractsProviders,
     ...NounusProviders,
     ...PaiementProviders,

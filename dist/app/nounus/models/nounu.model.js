@@ -22,6 +22,7 @@ let ProfilNounus = class ProfilNounus {
     annees_experience;
     tarif_horaire;
     status;
+    points;
     tarif_mensuel;
     flexibilite_tarifaire;
     urgences;
@@ -65,6 +66,10 @@ __decorate([
     (0, typeorm_1.Column)({ type: 'varchar', default: 'disponible' }),
     __metadata("design:type", String)
 ], ProfilNounus.prototype, "status", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'numeric', default: 0 }),
+    __metadata("design:type", Number)
+], ProfilNounus.prototype, "points", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)

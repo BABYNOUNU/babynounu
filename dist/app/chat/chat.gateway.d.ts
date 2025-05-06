@@ -68,6 +68,11 @@ export declare class ChatGateway implements OnGatewayConnection, OnGatewayDiscon
         userId: string;
         transactionId: string;
     }, client: Socket): Promise<void>;
+    checkPaymentPoint(data: {
+        userId: string;
+        transactionId: string;
+        points: number;
+    }, client: Socket): Promise<void>;
     isUserOnline(userId: string): boolean;
     getUserSocket(userId: string): Socket | undefined;
 }

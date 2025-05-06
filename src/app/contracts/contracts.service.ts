@@ -1,3 +1,4 @@
+import { NounusService } from './../nounus/nounus.service';
 import {
   BadRequestException,
   Inject,
@@ -23,6 +24,7 @@ export class ContractsService {
     @Inject('PARENT_REPOSITORY')
     private readonly parentsRepository: Repository<ProfilParents>,
     private readonly notificationService: NotificationService,
+    private readonly nounusService: NounusService
   ) {}
 
   async create(createContractDto: CreateContractDto): Promise<Contracts> {
@@ -65,6 +67,21 @@ export class ContractsService {
       senderUserId: getContract.room.parent.user.id,
       tolinkId: getContract.id.toString(),
     });
+
+   const StatusNu = await this.nounusService.updateStatus(getContract.room.nounou.user.id, 'indisponible')
+
+    if(StatusNu){
+
+      await this.notificationService.createNotification({
+        type: 'PROFIL_DETAIL',
+        userId: getContract.room.nounou.user.id,
+        message: `Le statut de votre profil est passé en mode 'Indisponible', car vous avez déjà une mission en cours chez l'un de nos clients.`,
+        is_read: false,
+        senderUserId: getContract.room.nounou.user.id,
+        tolinkId: getContract.id.toString(),
+      });
+
+    }
 
     return contract;
   }

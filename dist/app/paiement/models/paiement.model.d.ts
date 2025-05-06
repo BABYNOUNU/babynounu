@@ -9,6 +9,7 @@ export declare class Paiements {
     currency: string;
     status: string;
     payment_token: string;
+    payment_type: string;
     paymentMethod: string;
     abonnement: Abonnements;
     user: User;

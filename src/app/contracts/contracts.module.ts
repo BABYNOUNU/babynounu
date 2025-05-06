@@ -11,6 +11,12 @@ import { ParentProviders } from '../parent/parent';
 import { NounusProviders } from '../nounus/nounus';
 import { NotificationService } from '../notification/notification.service';
 import { NotificationProviders } from '../notification/notification';
+import { NounusService } from '../nounus/nounus.service';
+import { MediaService } from '../media/media.service';
+import { ParameterProviders } from '../parameter/parameter';
+import { MediaProviders } from '../media/media';
+import { PreferenceProvider } from '../Preference/preference';
+import { ParameterService } from '../parameter/parameter.service';
 
 @Module({
   imports: [DatabaseModule],
@@ -18,10 +24,17 @@ import { NotificationProviders } from '../notification/notification';
   providers: [
     ContractsService,
     NotificationService,
+    NounusService,
+    MediaService,
+    ParameterService,
+    ...ParameterProviders,
+    ...MediaProviders,
+    ...PreferenceProvider,
+    ...NounusProviders,
     ...ContractsProviders,
     ...ParentProviders,
     ...NounusProviders,
-    ...NotificationProviders
+    ...NotificationProviders,
   ],
 })
 export class ContractsModule {}

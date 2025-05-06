@@ -15,6 +15,10 @@ export class CreatePaymentDto {
    @IsString()
    transaction_id: string;
 
+   @IsNotEmpty()
+   @IsString()
+   payment_type: string;
+
    @Allow()
    payment_token: any;
 

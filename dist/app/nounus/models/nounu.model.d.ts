@@ -9,6 +9,7 @@ export declare class ProfilNounus {
     annees_experience: string;
     tarif_horaire: string;
     status: string;
+    points: number;
     tarif_mensuel: string;
     flexibilite_tarifaire: boolean;
     urgences: boolean;

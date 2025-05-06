@@ -19,6 +19,12 @@ const contracts_1 = require("../contracts/contracts");
 const contracts_service_1 = require("../contracts/contracts.service");
 const nounus_1 = require("../nounus/nounus");
 const parent_1 = require("../parent/parent");
+const nounus_service_1 = require("../nounus/nounus.service");
+const media_service_1 = require("../media/media.service");
+const parameter_service_1 = require("../parameter/parameter.service");
+const parameter_1 = require("../parameter/parameter");
+const media_1 = require("../media/media");
+const preference_1 = require("../Preference/preference");
 let MessagesModule = class MessagesModule {
 };
 exports.MessagesModule = MessagesModule;
@@ -26,6 +32,23 @@ exports.MessagesModule = MessagesModule = __decorate([
     (0, common_1.Module)({
         imports: [database_module_1.DatabaseModule],
         controllers: [messages_controller_1.MessageController],
-        providers: [messages_service_1.MessageService, notification_service_1.NotificationService, ...notification_1.NotificationProviders, contracts_service_1.ContractsService, ...nounus_1.NounusProviders, ...parent_1.ParentProviders, ...contracts_1.ContractsProviders, ...messages_1.MessageProviders, ...rooms_1.RoomProviders]
+        providers: [
+            messages_service_1.MessageService,
+            notification_service_1.NotificationService,
+            ...notification_1.NotificationProviders,
+            contracts_service_1.ContractsService,
+            nounus_service_1.NounusService,
+            media_service_1.MediaService,
+            parameter_service_1.ParameterService,
+            ...parameter_1.ParameterProviders,
+            ...media_1.MediaProviders,
+            ...preference_1.PreferenceProvider,
+            ...nounus_1.NounusProviders,
+            ...nounus_1.NounusProviders,
+            ...parent_1.ParentProviders,
+            ...contracts_1.ContractsProviders,
+            ...messages_1.MessageProviders,
+            ...rooms_1.RoomProviders,
+        ],
     })
 ], MessagesModule);

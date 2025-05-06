@@ -1,3 +1,4 @@
+import { NounusService } from './../nounus/nounus.service';
 import { Repository } from 'typeorm';
 import { Contracts } from './models/contracts.model';
 import { CreateContractDto } from './dtos/create-contracts.dto';
@@ -10,7 +11,8 @@ export declare class ContractsService {
     private readonly nounusRepository;
     private readonly parentsRepository;
     private readonly notificationService;
-    constructor(contractsRepository: Repository<Contracts>, nounusRepository: Repository<ProfilNounus>, parentsRepository: Repository<ProfilParents>, notificationService: NotificationService);
+    private readonly nounusService;
+    constructor(contractsRepository: Repository<Contracts>, nounusRepository: Repository<ProfilNounus>, parentsRepository: Repository<ProfilParents>, notificationService: NotificationService, nounusService: NounusService);
     create(createContractDto: CreateContractDto): Promise<Contracts>;
     findAll(): Promise<Contracts[]>;
     findAllByUserId(userId: string): Promise<Contracts[]>;

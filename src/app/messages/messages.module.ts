@@ -11,10 +11,33 @@ import { ContractsProviders } from '../contracts/contracts';
 import { ContractsService } from '../contracts/contracts.service';
 import { NounusProviders } from '../nounus/nounus';
 import { ParentProviders } from '../parent/parent';
+import { NounusService } from '../nounus/nounus.service';
+import { MediaService } from '../media/media.service';
+import { ParameterService } from '../parameter/parameter.service';
+import { ParameterProviders } from '../parameter/parameter';
+import { MediaProviders } from '../media/media';
+import { PreferenceProvider } from '../Preference/preference';
 
 @Module({
   imports: [DatabaseModule],
   controllers: [MessageController],
-  providers: [MessageService, NotificationService, ...NotificationProviders, ContractsService, ...NounusProviders, ...ParentProviders, ...ContractsProviders, ...MessageProviders, ...RoomProviders]
+  providers: [
+    MessageService,
+    NotificationService,
+    ...NotificationProviders,
+    ContractsService,
+    NounusService,
+    MediaService,
+    ParameterService,
+    ...ParameterProviders,
+    ...MediaProviders,
+    ...PreferenceProvider,
+    ...NounusProviders,
+    ...NounusProviders,
+    ...ParentProviders,
+    ...ContractsProviders,
+    ...MessageProviders,
+    ...RoomProviders,
+  ],
 })
 export class MessagesModule {}
