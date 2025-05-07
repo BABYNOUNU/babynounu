@@ -13,7 +13,7 @@ export declare class AbonnementService {
     private readonly nounuService;
     private readonly SUBSCRIPTION_DURATION_DAYS;
     constructor(abonnementRepository: Repository<Abonnements>, paymentRepository: Repository<Paiements>, paymentService: PaymentService, notificationService: NotificationService, nounuService: NounusService);
-    createPaymentPoint({ transactionId, userId, points }: {
+    createPaymentPoint({ transactionId, userId, points, }: {
         transactionId: any;
         userId: any;
         points: any;

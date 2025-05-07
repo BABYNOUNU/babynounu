@@ -25,55 +25,58 @@ export class AbonnementService {
     private readonly paymentRepository: Repository<Paiements>,
     private readonly paymentService: PaymentService,
     private readonly notificationService: NotificationService,
-    private readonly nounuService: NounusService
+    private readonly nounuService: NounusService,
   ) {}
 
-
-/**
- * Vérifie les points associés à un paiement
- * @param paymentId - ID du paiement
- * @returns Nombre de points associés au paiement
- */
-public async createPaymentPoint({ transactionId, userId,  points}): Promise<any> {
-
-
-  const payment = await this.paymentRepository.findOne({
-    where: { transaction_id: transactionId, user: { id: userId } },
-    relations: ['user'],
-  });
-
-  if (!payment) {
-    throw new NotFoundException(`Paiement avec l'ID ${transactionId} introuvable`);
-  }
-
-  const iSAcceptedPayment = await this.paymentRepository.findOne({
-    where: { transaction_id: transactionId, user: { id: userId }, status: 'ACCEPTED' },
-    relations: ['user'],
-  });
-
-  // Validation du paiement avec CinetPay
-  const isPaymentValid = await this.validateCinetPayPayment(
-    payment.transaction_id,
-    payment.transaction_id,
-    payment.user.id,
-  );
-
-  if(isPaymentValid && iSAcceptedPayment) {
-    await this.nounuService.updatePoints(payment.user.id, points);
-    await this.notificationService.createNotification({
-      type: 'PAIEMENT_VALID',
-      userId: payment.user.id,
-      message: `Vous avez acheté ${points} points de disponibilité pour un prix de ${payment.amount} Fcfa. Votre paiement a bien était validé.`,
-      is_read: false,
-      senderUserId: payment.user.id,
+  /**
+   * Vérifie les points associés à un paiement
+   * @param paymentId - ID du paiement
+   * @returns Nombre de points associés au paiement
+   */
+  public async createPaymentPoint({
+    transactionId,
+    userId,
+    points,
+  }): Promise<any> {
+    const payment = await this.paymentRepository.findOne({
+      where: { transaction_id: transactionId, user: { id: userId } },
+      relations: ['user'],
     });
+
+    if (!payment) {
+      throw new NotFoundException(
+        `Paiement avec l'ID ${transactionId} introuvable`,
+      );
+    }
+
+    const iSAcceptedPayment = await this.paymentRepository.findOne({
+      where: {
+        transaction_id: transactionId,
+        user: { id: userId },
+        status: 'ACCEPTED',
+      },
+      relations: ['user'],
+    });
+
+    // Validation du paiement avec CinetPay
+    const isPaymentValid = await this.validateCinetPayPayment(
+      payment.transaction_id,
+      payment.user.id,
+    );
+
+    if (isPaymentValid && iSAcceptedPayment) {
+      await this.nounuService.updatePoints(payment.user.id, points);
+      await this.notificationService.createNotification({
+        type: 'PAIEMENT_VALID',
+        userId: payment.user.id,
+        message: `Vous avez acheté ${points} points de disponibilité pour un prix de ${payment.amount} Fcfa. Votre paiement a bien était validé.`,
+        is_read: false,
+        senderUserId: payment.user.id,
+      });
+    }
+
+    return payment;
   }
-
-  
-
-  return payment;
-}
-
 
   /**
    * Crée un nouvel abonnement ou retourne l'existant
@@ -103,9 +106,8 @@ public async createPaymentPoint({ transactionId, userId,  points}): Promise<any>
     }
     // Validation du paiement avec CinetPay
     const isPaymentValid = await this.validateCinetPayPayment(
-      payment.transaction_id,
-      createAbonnementDto.userId,
       createAbonnementDto.transactionId,
+      createAbonnementDto.userId,
     );
 
     if (!isPaymentValid) {
@@ -161,7 +163,6 @@ public async createPaymentPoint({ transactionId, userId,  points}): Promise<any>
   private async validateCinetPayPayment(
     transaction_id: string,
     userId: string,
-    transactionId: string,
   ): Promise<boolean> {
     try {
       const response = await axios.post(
@@ -170,12 +171,14 @@ public async createPaymentPoint({ transactionId, userId,  points}): Promise<any>
           apikey: process.env.CINETPAY_API_KEY,
           site_id: process.env.CINETPAY_SITE_ID,
           transaction_id: transaction_id,
-          return_url: `${process.env.CINETPAY_RETURN_URL}?userId=${userId}&transactionId=${transactionId}`,
+          return_url: `${process.env.CINETPAY_RETURN_URL}?userId=${userId}&transactionId=${transaction_id}`,
         },
         {
           headers: { 'Content-Type': 'application/json' },
         },
       );
+
+      console.log(response)
 
       if (response.data.data) {
         const payment = await this.paymentRepository.update(transaction_id, {

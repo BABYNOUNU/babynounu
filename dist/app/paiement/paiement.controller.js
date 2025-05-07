@@ -29,6 +29,9 @@ let PaymentController = class PaymentController {
     async getPaymentsByUser(userId) {
         return this.paymentService.getPaymentsByUser(userId);
     }
+    async getPaymentByUserIdAndTransactionId(userId, transactionId) {
+        return this.paymentService.getPaymentByUserIdAndTransactionId(userId, transactionId);
+    }
     async getPaymentById(paymentId) {
         return this.paymentService.getPaymentById(paymentId);
     }
@@ -69,6 +72,22 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], PaymentController.prototype, "getPaymentsByUser", null);
+__decorate([
+    (0, common_1.Get)('user/:userId/transaction/:transactionId'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get a payment by user ID and transaction ID' }),
+    (0, swagger_1.ApiParam)({ name: 'userId', type: Number, description: 'ID of the user' }),
+    (0, swagger_1.ApiParam)({ name: 'transactionId', type: String, description: 'ID of the transaction' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Payment retrieved successfully',
+    }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Payment not found' }),
+    __param(0, (0, common_1.Param)('userId')),
+    __param(1, (0, common_1.Param)('transactionId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], PaymentController.prototype, "getPaymentByUserIdAndTransactionId", null);
 __decorate([
     (0, common_1.Get)(':paymentId'),
     (0, swagger_1.ApiOperation)({ summary: 'Get a payment by ID' }),

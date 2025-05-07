@@ -33,7 +33,7 @@ let AbonnementService = class AbonnementService {
         this.notificationService = notificationService;
         this.nounuService = nounuService;
     }
-    async createPaymentPoint({ transactionId, userId, points }) {
+    async createPaymentPoint({ transactionId, userId, points, }) {
         const payment = await this.paymentRepository.findOne({
             where: { transaction_id: transactionId, user: { id: userId } },
             relations: ['user'],
@@ -42,10 +42,14 @@ let AbonnementService = class AbonnementService {
             throw new common_1.NotFoundException(`Paiement avec l'ID ${transactionId} introuvable`);
         }
         const iSAcceptedPayment = await this.paymentRepository.findOne({
-            where: { transaction_id: transactionId, user: { id: userId }, status: 'ACCEPTED' },
+            where: {
+                transaction_id: transactionId,
+                user: { id: userId },
+                status: 'ACCEPTED',
+            },
             relations: ['user'],
         });
-        const isPaymentValid = await this.validateCinetPayPayment(payment.transaction_id, payment.transaction_id, payment.user.id);
+        const isPaymentValid = await this.validateCinetPayPayment(payment.transaction_id, payment.user.id);
         if (isPaymentValid && iSAcceptedPayment) {
             await this.nounuService.updatePoints(payment.user.id, points);
             await this.notificationService.createNotification({
@@ -67,7 +71,7 @@ let AbonnementService = class AbonnementService {
         if (existingAbonnement) {
             return this.buildResponse(true, await this.hasActiveAbonnement(createAbonnementDto.userId), existingAbonnement);
         }
-        const isPaymentValid = await this.validateCinetPayPayment(payment.transaction_id, createAbonnementDto.userId, createAbonnementDto.transactionId);
+        const isPaymentValid = await this.validateCinetPayPayment(createAbonnementDto.transactionId, createAbonnementDto.userId);
         if (!isPaymentValid) {
             return this.buildResponse(true, await this.hasActiveAbonnement(createAbonnementDto.userId));
         }
@@ -90,16 +94,17 @@ let AbonnementService = class AbonnementService {
             relations: ['user', 'paiement'],
         });
     }
-    async validateCinetPayPayment(transaction_id, userId, transactionId) {
+    async validateCinetPayPayment(transaction_id, userId) {
         try {
             const response = await axios_1.default.post('https://api-checkout.cinetpay.com/v2/payment/check', {
                 apikey: process.env.CINETPAY_API_KEY,
                 site_id: process.env.CINETPAY_SITE_ID,
                 transaction_id: transaction_id,
-                return_url: `${process.env.CINETPAY_RETURN_URL}?userId=${userId}&transactionId=${transactionId}`,
+                return_url: `${process.env.CINETPAY_RETURN_URL}?userId=${userId}&transactionId=${transaction_id}`,
             }, {
                 headers: { 'Content-Type': 'application/json' },
             });
+            console.log(response);
             if (response.data.data) {
                 const payment = await this.paymentRepository.update(transaction_id, {
                     status: response.data.data.status,

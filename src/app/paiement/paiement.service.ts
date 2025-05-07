@@ -42,8 +42,18 @@ export class PaymentService {
       data: {
         apikey: process.env.CINETPAY_API_KEY, // Remplacez par votre clé API
         site_id: process.env.CINETPAY_SITE_ID, // Remplacez par votre site ID
-        mode: 'PRODUCTION', // Mode PRODUCTION ou TEST
-        ...createPaymentDto,
+        // mode: 'PRODUCTION', // Mode PRODUCTION ou TEST
+        transaction_id: Math.floor(Math.random() * 100000000).toString(), //
+        amount: createPaymentDto.amount,
+        currency: createPaymentDto.currency,
+        alternative_currency: '',
+        description: createPaymentDto.description,
+        customer_id: Math.floor(Math.random() * 100000000).toString(),
+        notify_url: createPaymentDto.notify_url,
+        return_url: createPaymentDto.return_url,
+        channels: 'ALL',
+        metadata: paymentSave.id,
+        lang: 'FR',
       },
     };
 
@@ -81,6 +91,23 @@ export class PaymentService {
   async getPaymentById(paymentId: string) {
     return this.paymentRepository.findOne({
       where: { id: paymentId.toString() },
+    });
+  }
+
+  
+  /**
+   * Récupère un paiement par son ID de transaction et l'ID de l'utilisateur.
+   * @param userId - ID de l'utilisateur.
+   * @param transactionId - ID de transaction.
+   * @returns Le paiement correspondant si trouvé, null sinon.
+   */
+  async getPaymentByUserIdAndTransactionId(
+    userId: string,
+    transactionId: string,
+  ) {
+    return this.paymentRepository.findOne({
+      where: { user: { id: userId }, transaction_id: transactionId },
+      relations: ['user'],
     });
   }
 

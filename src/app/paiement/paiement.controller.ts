@@ -50,6 +50,26 @@ export class PaymentController {
     return this.paymentService.getPaymentsByUser(userId);
   }
 
+
+  @Get('user/:userId/transaction/:transactionId')
+  @ApiOperation({ summary: 'Get a payment by user ID and transaction ID' }) // Description de l'opération
+  @ApiParam({ name: 'userId', type: Number, description: 'ID of the user' }) // Documenter le paramètre de route
+  @ApiParam({ name: 'transactionId', type: String, description: 'ID of the transaction' }) // Documenter le paramètre de route
+  @ApiResponse({
+    status: 200,
+    description: 'Payment retrieved successfully',
+  })
+  @ApiResponse({ status: 404, description: 'Payment not found' })
+  async getPaymentByUserIdAndTransactionId(
+    @Param('userId') userId: string,
+    @Param('transactionId') transactionId: string,
+  ) {
+    return this.paymentService.getPaymentByUserIdAndTransactionId(
+      userId,
+      transactionId,
+    );
+  }
+
   @Get(':paymentId')
   @ApiOperation({ summary: 'Get a payment by ID' }) // Description de l'opération
   @ApiParam({ name: 'paymentId', type: Number, description: 'ID of the payment' }) // Documenter le paramètre de route

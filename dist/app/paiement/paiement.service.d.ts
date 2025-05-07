@@ -8,6 +8,7 @@ export declare class PaymentService {
     createPayment(createPaymentDto: CreatePaymentDto): Promise<any>;
     getPaymentsByUser(userId: number): Promise<Paiements[]>;
     getPaymentById(paymentId: string): Promise<Paiements>;
+    getPaymentByUserIdAndTransactionId(userId: string, transactionId: string): Promise<Paiements>;
     updatePaymentStatus(paymentId: string, status: string): Promise<Paiements>;
     updatePayment(paymentId: string, updateData: Partial<UpdatePaymentDto>): Promise<Paiements>;
 }

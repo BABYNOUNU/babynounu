@@ -42,8 +42,17 @@ let PaymentService = class PaymentService {
             data: {
                 apikey: process.env.CINETPAY_API_KEY,
                 site_id: process.env.CINETPAY_SITE_ID,
-                mode: 'PRODUCTION',
-                ...createPaymentDto,
+                transaction_id: Math.floor(Math.random() * 100000000).toString(),
+                amount: createPaymentDto.amount,
+                currency: createPaymentDto.currency,
+                alternative_currency: '',
+                description: createPaymentDto.description,
+                customer_id: Math.floor(Math.random() * 100000000).toString(),
+                notify_url: createPaymentDto.notify_url,
+                return_url: createPaymentDto.return_url,
+                channels: 'ALL',
+                metadata: paymentSave.id,
+                lang: 'FR',
             },
         };
         const { data: paymentData } = await (0, axios_1.default)(config);
@@ -63,6 +72,12 @@ let PaymentService = class PaymentService {
     async getPaymentById(paymentId) {
         return this.paymentRepository.findOne({
             where: { id: paymentId.toString() },
+        });
+    }
+    async getPaymentByUserIdAndTransactionId(userId, transactionId) {
+        return this.paymentRepository.findOne({
+            where: { user: { id: userId }, transaction_id: transactionId },
+            relations: ['user'],
         });
     }
     async updatePaymentStatus(paymentId, status) {
