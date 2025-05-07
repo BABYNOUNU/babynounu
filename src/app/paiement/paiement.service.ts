@@ -105,7 +105,7 @@ export class PaymentService {
     userId: string,
     transactionId: string,
   ) {
-    return this.paymentRepository.findOne({
+    return await this.paymentRepository.findOne({
       where: { user: { id: userId }, transaction_id: transactionId },
       relations: ['user'],
     });

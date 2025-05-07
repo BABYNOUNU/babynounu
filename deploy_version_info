@@ -9,3 +9,4 @@
 - "V0.6.5 : Fixed bug, Nounu Model Add default value"
 - "V0.6.6 : Fixed bug, Ameloriation Majeure - Chats Update - Notification Update - Admin Update"
 - "V0.6.7 : Fixed bug, Add Points in Nounu and Update Points, Add New type in Paiements"
+- "V0.6.7.1 : Add New in Paiements : getPaymentByUserIdAndTransactionId (Controller and service)"

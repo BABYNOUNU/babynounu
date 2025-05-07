@@ -75,7 +75,7 @@ let PaymentService = class PaymentService {
         });
     }
     async getPaymentByUserIdAndTransactionId(userId, transactionId) {
-        return this.paymentRepository.findOne({
+        return await this.paymentRepository.findOne({
             where: { user: { id: userId }, transaction_id: transactionId },
             relations: ['user'],
         });
