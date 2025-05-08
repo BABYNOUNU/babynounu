@@ -8,6 +8,7 @@ import {
   UsePipes,
   ValidationPipe,
   Put,
+  Req,
 } from '@nestjs/common';
 import { PaymentService } from './paiement.service';
 import { CreatePaymentDto } from './dtos/create-payment.dto';
@@ -36,6 +37,25 @@ export class PaymentController {
   @UsePipes(new ValidationPipe())
   async createPayment(@Body() createPaymentDto: CreatePaymentDto) {
     return this.paymentService.createPayment(createPaymentDto);
+  }
+
+
+  @Post('notify')
+  async handleNotification(@Body() notificationData: any, @Req() req: Request) {
+    // Log pour le débogage
+    console.log('Notification reçue:', notificationData);
+    
+    try {
+      const result = await this.paymentService.handlePaymentNotification(notificationData);
+      
+      // Mettez à jour votre base de données ici selon le statut
+      console.log('Résultat du traitement:', result);
+      
+      return { status: 'OK' };
+    } catch (error) {
+      console.error('Erreur de traitement:', error);
+      return { status: 'ERROR', message: error.message };
+    }
   }
 
   @Get('user/:userId')

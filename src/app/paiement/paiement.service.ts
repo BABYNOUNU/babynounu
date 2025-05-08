@@ -14,6 +14,14 @@ export class PaymentService {
     // private readonly notificationGateway: NotificationGateway,
   ) {}
 
+
+  private getAuthParams() {
+    return {
+      apikey: process.env.CINETPAY_API_KEY, // Remplacez par votre clé API
+        site_id: process.env.CINETPAY_SITE_ID
+    };
+  }
+
   /**
    * Crée un nouveau paiement.
    * @param createPaymentDto - Données pour créer le paiement.
@@ -134,5 +142,36 @@ export class PaymentService {
   ) {
     await this.paymentRepository.update(paymentId, updateData);
     return this.getPaymentById(paymentId);
+  }
+
+
+
+  async handlePaymentNotification(notificationData: any) {
+    // Vérifiez la signature
+    const signature = this.generateSignature(
+      notificationData.cpm_trans_id,
+      notificationData.cpm_amount,
+      notificationData.cpm_trans_date,
+    );
+
+    if (signature !== notificationData.signature) {
+      throw new Error('Invalid signature');
+    }
+
+    // Traitez le statut du paiement
+    switch (notificationData.cpm_result) {
+      case '00': // SUCCÈS
+        return { status: 'SUCCESS', data: notificationData };
+      case '05': // ÉCHEC
+        return { status: 'FAILED', data: notificationData };
+      default: // EN ATTENTE
+        return { status: 'PENDING', data: notificationData };
+    }
+  }
+
+  private generateSignature(transId: string, amount: string, transDate: string): string {
+    const { apikey, site_id } = this.getAuthParams();
+    const data = `${transId}${amount}${transDate}${apikey}${site_id}`;
+    return require('crypto').createHash('sha256').update(data).digest('hex');
   }
 }
