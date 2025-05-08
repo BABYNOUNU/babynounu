@@ -7,7 +7,7 @@ export declare class PaymentController {
     createPayment(createPaymentDto: CreatePaymentDto): Promise<any>;
     handleNotification(notificationData: any, req: Request): Promise<{
         status: string;
-        message?: undefined;
+        data: any;
     } | {
         status: string;
         message: any;

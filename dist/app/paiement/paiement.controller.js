@@ -31,7 +31,7 @@ let PaymentController = class PaymentController {
         try {
             const result = await this.paymentService.handlePaymentNotification(notificationData);
             console.log('Résultat du traitement:', result);
-            return { status: 'OK' };
+            return result;
         }
         catch (error) {
             console.error('Erreur de traitement:', error);

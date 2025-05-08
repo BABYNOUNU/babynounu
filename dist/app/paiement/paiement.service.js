@@ -34,11 +34,6 @@ let PaymentService = class PaymentService {
         if (hasUserPaid) {
             await this.paymentRepository.softDelete(hasUserPaid.id);
         }
-        const payment = this.paymentRepository.create({
-            ...createPaymentDto,
-            user: { id: createPaymentDto.userId },
-        });
-        const paymentSave = await this.paymentRepository.save(payment);
         var config = {
             method: 'post',
             url: 'https://api-checkout.cinetpay.com/v2/payment',
@@ -48,16 +43,15 @@ let PaymentService = class PaymentService {
             data: {
                 apikey: process.env.CINETPAY_API_KEY,
                 site_id: process.env.CINETPAY_SITE_ID,
-                transaction_id: Math.floor(Math.random() * 100000000).toString(),
+                mode: 'PRODUCTION',
+                transaction_id: createPaymentDto.transaction_id,
                 amount: createPaymentDto.amount,
                 currency: createPaymentDto.currency,
-                alternative_currency: '',
                 description: createPaymentDto.description,
-                customer_id: Math.floor(Math.random() * 100000000).toString(),
                 notify_url: createPaymentDto.notify_url,
                 return_url: createPaymentDto.return_url,
                 channels: 'ALL',
-                metadata: paymentSave.id,
+                metadata: new Date().getTime().toString(),
                 lang: 'FR',
             },
         };
@@ -67,7 +61,12 @@ let PaymentService = class PaymentService {
                 message: "Erreur lors de l'initiation du paiement",
             });
         }
-        await this.paymentRepository.update({ id: paymentSave.id }, { payment_token: paymentData.data.payment_token });
+        const payment = this.paymentRepository.create({
+            ...createPaymentDto,
+            payment_token: paymentData.data.payment_token,
+            user: { id: createPaymentDto.userId },
+        });
+        const paymentSave = await this.paymentRepository.save(payment);
         return paymentData;
     }
     async getPaymentsByUser(userId) {

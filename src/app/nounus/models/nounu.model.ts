@@ -27,7 +27,7 @@ export class ProfilNounus {
   @Column()
   age: string;
 
-  @Column()
+  @Column({unique: true})
   phone: string;
 
   @Column()

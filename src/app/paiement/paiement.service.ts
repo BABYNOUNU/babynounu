@@ -35,12 +35,6 @@ export class PaymentService {
       await this.paymentRepository.softDelete(hasUserPaid.id);
     }
 
-    const payment = this.paymentRepository.create({
-      ...createPaymentDto,
-      user: { id: createPaymentDto.userId },
-    });
-    const paymentSave = await this.paymentRepository.save(payment);
-
     var config = {
       method: 'post',
       url: 'https://api-checkout.cinetpay.com/v2/payment',
@@ -50,17 +44,15 @@ export class PaymentService {
       data: {
         apikey: process.env.CINETPAY_API_KEY, // Remplacez par votre clé API
         site_id: process.env.CINETPAY_SITE_ID, // Remplacez par votre site ID
-        // mode: 'PRODUCTION', // Mode PRODUCTION ou TEST
-        transaction_id: Math.floor(Math.random() * 100000000).toString(), //
+        mode: 'PRODUCTION', // Mode PRODUCTION ou TEST
+        transaction_id: createPaymentDto.transaction_id, //
         amount: createPaymentDto.amount,
         currency: createPaymentDto.currency,
-        alternative_currency: '',
         description: createPaymentDto.description,
-        customer_id: Math.floor(Math.random() * 100000000).toString(),
         notify_url: createPaymentDto.notify_url,
         return_url: createPaymentDto.return_url,
         channels: 'ALL',
-        metadata: paymentSave.id,
+        metadata: new Date().getTime().toString(),
         lang: 'FR',
       },
     };
@@ -72,10 +64,12 @@ export class PaymentService {
       });
     }
 
-    await this.paymentRepository.update(
-      { id: paymentSave.id },
-      { payment_token: paymentData.data.payment_token },
-    );
+    const payment = this.paymentRepository.create({
+      ...createPaymentDto,
+      payment_token: paymentData.data.payment_token,
+      user: { id: createPaymentDto.userId },
+    });
+    const paymentSave = await this.paymentRepository.save(payment);
 
     return paymentData;
   }

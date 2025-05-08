@@ -51,7 +51,7 @@ __decorate([
     __metadata("design:type", String)
 ], ProfilNounus.prototype, "age", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ unique: true }),
     __metadata("design:type", String)
 ], ProfilNounus.prototype, "phone", void 0);
 __decorate([

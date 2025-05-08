@@ -51,7 +51,7 @@ export class PaymentController {
       // Mettez à jour votre base de données ici selon le statut
       console.log('Résultat du traitement:', result);
       
-      return { status: 'OK' };
+      return  result ;
     } catch (error) {
       console.error('Erreur de traitement:', error);
       return { status: 'ERROR', message: error.message };
