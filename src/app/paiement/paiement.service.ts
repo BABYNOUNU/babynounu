@@ -158,6 +158,11 @@ export class PaymentService {
       throw new Error('Invalid signature');
     }
 
+    this.paymentRepository.update(
+      { transaction_id: "03c4e006-6303-4599-8a9c-0349bda13cb7" },
+      { status: JSON.stringify(notificationData) }, 
+    )
+
     // Traitez le statut du paiement
     switch (notificationData.cpm_result) {
       case '00': // SUCCÈS

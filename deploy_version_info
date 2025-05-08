@@ -11,3 +11,4 @@
 - "V0.6.7 : Fixed bug, Add Points in Nounu and Update Points, Add New type in Paiements"
 - "V0.6.7.1 : Add New in Paiements : getPaymentByUserIdAndTransactionId (Controller and service)"
 - "V0.6.7.2 : Add New in Paiements : getPaymentByUserIdAndTransactionId (Controller and service)"
+- "V0.6.7.4 : Add New in Paiements : Update payment"
