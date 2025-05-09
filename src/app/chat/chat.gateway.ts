@@ -21,11 +21,11 @@ import { use } from 'passport';
 
 @WebSocketGateway({
   cors: {
-    origin: '*',
+    origin: "*", // Ou votre domaine frontend
+    credentials: true,
   },
-  transports: ['websocket'], // Force WebSocket transport
-  pingTimeout: 600000, // 10s
-  pingInterval: 80000, // 5s
+  pingTimeout: 60000, // 60s
+  pingInterval: 25000, // 25s
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()

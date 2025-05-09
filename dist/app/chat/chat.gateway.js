@@ -442,11 +442,11 @@ __decorate([
 exports.ChatGateway = ChatGateway = ChatGateway_1 = __decorate([
     (0, websockets_1.WebSocketGateway)({
         cors: {
-            origin: '*',
+            origin: "*",
+            credentials: true,
         },
-        transports: ['websocket'],
-        pingTimeout: 600000,
-        pingInterval: 80000,
+        pingTimeout: 60000,
+        pingInterval: 25000,
     }),
     __metadata("design:paramtypes", [rooms_service_1.RoomsService,
         auth_service_1.AuthService,
