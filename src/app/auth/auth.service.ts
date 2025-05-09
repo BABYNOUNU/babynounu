@@ -138,7 +138,6 @@ export class AuthService {
       id: user.id,
       profileType: user.type_profil.slug,
     };
-    console.log(payload);
     return {
       access_token: this.jwtService.sign(payload, {
         secret: process.env.JWT_SECRET,

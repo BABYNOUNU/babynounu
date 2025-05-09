@@ -60,8 +60,7 @@ export class AbonnementService {
 
     // Validation du paiement avec CinetPay
     const isPaymentValid = await this.validateCinetPayPayment(
-      payment.transaction_id,
-      payment.user.id,
+      payment.transaction_id
     );
 
     if (isPaymentValid && iSAcceptedPayment) {
@@ -106,9 +105,10 @@ export class AbonnementService {
     }
     // Validation du paiement avec CinetPay
     const isPaymentValid = await this.validateCinetPayPayment(
-      createAbonnementDto.transactionId,
-      createAbonnementDto.userId,
+      createAbonnementDto.transactionId
     );
+
+    console.log(isPaymentValid);
 
     if (!isPaymentValid) {
       return this.buildResponse(
@@ -162,38 +162,34 @@ export class AbonnementService {
    */
   private async validateCinetPayPayment(
     transaction_id: string,
-    userId: string,
   ): Promise<boolean> {
     try {
-      const response = await axios.post(
+      const { data } = await axios.post(
         'https://api-checkout.cinetpay.com/v2/payment/check',
         {
           apikey: process.env.CINETPAY_API_KEY,
           site_id: process.env.CINETPAY_SITE_ID,
           transaction_id: transaction_id,
-          return_url: `${process.env.CINETPAY_RETURN_URL}?userId=${userId}&transactionId=${transaction_id}`,
         },
         {
           headers: { 'Content-Type': 'application/json' },
         },
       );
 
-      console.log(response)
+      console.log(data);
 
-      if (response.data.data) {
-        const payment = await this.paymentRepository.update(transaction_id, {
-          status: response.data.data.status,
-          paymentMethod: response.data.data.payment_method,
-          operator_id: response.data.data.operator_id,
-          payment_date: response.data.data.payment_date,
-          amount: response.data.data.amount,
-          currency: response.data.data.currency,
-          payment_token: response.data.data.payment_token,
+      if (data.data) {
+        await this.paymentRepository.update(transaction_id, {
+          status: data.data.status,
+          paymentMethod: data.data.payment_method,
+          operator_id: data.data.operator_id,
+          payment_date: data.data.payment_date,
+          amount: data.data.amount,
+          currency: data.data.currency,
+          payment_token: data.data.payment_token,
         });
 
-        if (payment.affected === 1) {
-          return true;
-        }
+        return true;
       }
 
       return false;

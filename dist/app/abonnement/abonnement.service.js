@@ -49,7 +49,7 @@ let AbonnementService = class AbonnementService {
             },
             relations: ['user'],
         });
-        const isPaymentValid = await this.validateCinetPayPayment(payment.transaction_id, payment.user.id);
+        const isPaymentValid = await this.validateCinetPayPayment(payment.transaction_id);
         if (isPaymentValid && iSAcceptedPayment) {
             await this.nounuService.updatePoints(payment.user.id, points);
             await this.notificationService.createNotification({
@@ -71,7 +71,8 @@ let AbonnementService = class AbonnementService {
         if (existingAbonnement) {
             return this.buildResponse(true, await this.hasActiveAbonnement(createAbonnementDto.userId), existingAbonnement);
         }
-        const isPaymentValid = await this.validateCinetPayPayment(createAbonnementDto.transactionId, createAbonnementDto.userId);
+        const isPaymentValid = await this.validateCinetPayPayment(createAbonnementDto.transactionId);
+        console.log(isPaymentValid);
         if (!isPaymentValid) {
             return this.buildResponse(true, await this.hasActiveAbonnement(createAbonnementDto.userId));
         }
@@ -94,30 +95,27 @@ let AbonnementService = class AbonnementService {
             relations: ['user', 'paiement'],
         });
     }
-    async validateCinetPayPayment(transaction_id, userId) {
+    async validateCinetPayPayment(transaction_id) {
         try {
-            const response = await axios_1.default.post('https://api-checkout.cinetpay.com/v2/payment/check', {
+            const { data } = await axios_1.default.post('https://api-checkout.cinetpay.com/v2/payment/check', {
                 apikey: process.env.CINETPAY_API_KEY,
                 site_id: process.env.CINETPAY_SITE_ID,
                 transaction_id: transaction_id,
-                return_url: `${process.env.CINETPAY_RETURN_URL}?userId=${userId}&transactionId=${transaction_id}`,
             }, {
                 headers: { 'Content-Type': 'application/json' },
             });
-            console.log(response);
-            if (response.data.data) {
-                const payment = await this.paymentRepository.update(transaction_id, {
-                    status: response.data.data.status,
-                    paymentMethod: response.data.data.payment_method,
-                    operator_id: response.data.data.operator_id,
-                    payment_date: response.data.data.payment_date,
-                    amount: response.data.data.amount,
-                    currency: response.data.data.currency,
-                    payment_token: response.data.data.payment_token,
+            console.log(data);
+            if (data.data) {
+                await this.paymentRepository.update(transaction_id, {
+                    status: data.data.status,
+                    paymentMethod: data.data.payment_method,
+                    operator_id: data.data.operator_id,
+                    payment_date: data.data.payment_date,
+                    amount: data.data.amount,
+                    currency: data.data.currency,
+                    payment_token: data.data.payment_token,
                 });
-                if (payment.affected === 1) {
-                    return true;
-                }
+                return true;
             }
             return false;
         }
