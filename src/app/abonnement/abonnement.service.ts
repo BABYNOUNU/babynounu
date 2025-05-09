@@ -105,10 +105,9 @@ export class AbonnementService {
     }
     // Validation du paiement avec CinetPay
     const isPaymentValid = await this.validateCinetPayPayment(
-      createAbonnementDto.transactionId
+      createAbonnementDto.transactionId,
     );
 
-    console.log(isPaymentValid);
 
     if (!isPaymentValid) {
       return this.buildResponse(
@@ -161,7 +160,7 @@ export class AbonnementService {
    * Valide le paiement avec CinetPay
    */
   private async validateCinetPayPayment(
-    transaction_id: string,
+    transaction_id: string
   ): Promise<boolean> {
     try {
       const { data } = await axios.post(
@@ -176,10 +175,10 @@ export class AbonnementService {
         },
       );
 
-      console.log(data);
+   
 
       if (data.data) {
-        await this.paymentRepository.update(transaction_id, {
+        const payment = await this.paymentRepository.update({ transaction_id }, { 
           status: data.data.status,
           paymentMethod: data.data.payment_method,
           operator_id: data.data.operator_id,
@@ -189,7 +188,9 @@ export class AbonnementService {
           payment_token: data.data.payment_token,
         });
 
-        return true;
+        if (payment.affected == 1) {
+          return true;
+        }
       }
 
       return false;

@@ -72,7 +72,6 @@ let AbonnementService = class AbonnementService {
             return this.buildResponse(true, await this.hasActiveAbonnement(createAbonnementDto.userId), existingAbonnement);
         }
         const isPaymentValid = await this.validateCinetPayPayment(createAbonnementDto.transactionId);
-        console.log(isPaymentValid);
         if (!isPaymentValid) {
             return this.buildResponse(true, await this.hasActiveAbonnement(createAbonnementDto.userId));
         }
@@ -104,9 +103,8 @@ let AbonnementService = class AbonnementService {
             }, {
                 headers: { 'Content-Type': 'application/json' },
             });
-            console.log(data);
             if (data.data) {
-                await this.paymentRepository.update(transaction_id, {
+                const payment = await this.paymentRepository.update({ transaction_id }, {
                     status: data.data.status,
                     paymentMethod: data.data.payment_method,
                     operator_id: data.data.operator_id,
@@ -115,7 +113,9 @@ let AbonnementService = class AbonnementService {
                     currency: data.data.currency,
                     payment_token: data.data.payment_token,
                 });
-                return true;
+                if (payment.affected == 1) {
+                    return true;
+                }
             }
             return false;
         }
