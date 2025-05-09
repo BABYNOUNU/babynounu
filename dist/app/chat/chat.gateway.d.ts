@@ -12,7 +12,6 @@ export declare class ChatGateway implements OnGatewayConnection, OnGatewayDiscon
     private readonly abonnementService;
     private readonly notificationService;
     server: Server;
-    private readonly logger;
     private connectedUsers;
     private readonly connectionLock;
     constructor(roomService: RoomsService, authService: AuthService, messageService: MessageService, abonnementService: AbonnementService, notificationService: NotificationService);

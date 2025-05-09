@@ -11,7 +11,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var ChatGateway_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatGateway = void 0;
 const websockets_1 = require("@nestjs/websockets");
@@ -23,14 +22,13 @@ const ws_auth_guard_1 = require("../auth/ws-auth.guard");
 const messages_service_1 = require("../messages/messages.service");
 const abonnement_service_1 = require("../abonnement/abonnement.service");
 const notification_service_1 = require("../notification/notification.service");
-let ChatGateway = ChatGateway_1 = class ChatGateway {
+let ChatGateway = class ChatGateway {
     roomService;
     authService;
     messageService;
     abonnementService;
     notificationService;
     server;
-    logger = new common_1.Logger(ChatGateway_1.name);
     connectedUsers = new Map();
     connectionLock = new Map();
     constructor(roomService, authService, messageService, abonnementService, notificationService) {
@@ -42,7 +40,6 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
     }
     afterInit(server) {
         server.sockets.setMaxListeners(200);
-        this.logger.log('WebSocket Gateway initialized');
     }
     async handleConnection(client) {
         const userId = await this.authService.getUserFromSocket(client);
@@ -69,7 +66,6 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
         const disconnectHandler = () => this.handleUserDisconnect(userId, client.id);
         client.on('disconnect', disconnectHandler);
         client.data.disconnectHandler = disconnectHandler;
-        this.logger.log(`User ${userId} connected (Socket ${client.id})`);
     }
     cleanupSocket(socket) {
         if (socket.data?.disconnectHandler) {
@@ -90,7 +86,6 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
         if (currentSocket?.id === socketId) {
             this.removeAllListeners(currentSocket);
             this.connectedUsers.delete(userId);
-            this.logger.log(`User ${userId} disconnected (Socket ${socketId})`);
         }
     }
     handleDisconnect(client) {
@@ -109,11 +104,9 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
                 throw new websockets_1.WsException('Not a member of this room');
             }
             client.join(`room_${roomId}`);
-            this.logger.log(`User ${user.id} joined room ${roomId}`);
             return { success: true, roomId };
         }
         catch (error) {
-            this.logger.error(`JoinRoom error: ${error.message}`);
             throw new websockets_1.WsException(error.message);
         }
     }
@@ -152,7 +145,6 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
             return { success: true, message: newMessage };
         }
         catch (error) {
-            this.logger.error(`SendMessage error: ${error.message}`);
             throw new websockets_1.WsException(error.message);
         }
     }
@@ -164,7 +156,6 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
                 .emit('conversationsUpdated', conversations);
         }
         catch (error) {
-            this.logger.error(`UpdateConversationList error for user ${userId}: ${error.message}`);
         }
     }
     async handleSeenMessage(client, roomId) {
@@ -227,7 +218,6 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
             });
         }
         catch (error) {
-            this.logger.error(`NotifyNewMessage error: ${error.message}`);
         }
     }
     async GetNotifications(data, client) {
@@ -240,7 +230,6 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
             this.server.to(`user_${user.id}`).emit('notifications', notifications);
         }
         catch (error) {
-            this.logger.error(`GetNotifications error: ${error.message}`);
             throw new websockets_1.WsException(error.message);
         }
     }
@@ -257,7 +246,6 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
             });
         }
         catch (error) {
-            this.logger.error(`MarkAsReadNotification error: ${error.message}`);
             client.emit('notificationMarkedAsRead', {
                 userId: data.userId,
                 success: false,
@@ -274,7 +262,6 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
             client.emit('unreadCountsNotification', unreadCountsNotification);
         }
         catch (error) {
-            this.logger.error(`GetUnreadCountsNotification error: ${error.message}`);
             throw new websockets_1.WsException(error.message);
         }
     }
@@ -290,7 +277,6 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
                 .emit('isAbonnement', hasActiveAbonnement);
         }
         catch (error) {
-            this.logger.error(`IsAbonnement error: ${error.message}`);
             throw new websockets_1.WsException(error.message);
         }
     }
@@ -306,7 +292,6 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
                 .emit('checkPaymentPoint', hasActiveAbonnement);
         }
         catch (error) {
-            this.logger.error(`checkPaymentPoint error: ${error.message}`);
             throw new websockets_1.WsException(error.message);
         }
     }
@@ -439,10 +424,10 @@ __decorate([
     __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
     __metadata("design:returntype", Promise)
 ], ChatGateway.prototype, "checkPaymentPoint", null);
-exports.ChatGateway = ChatGateway = ChatGateway_1 = __decorate([
+exports.ChatGateway = ChatGateway = __decorate([
     (0, websockets_1.WebSocketGateway)({
         cors: {
-            origin: "*",
+            origin: '*',
             credentials: true,
         },
         pingTimeout: 60000,

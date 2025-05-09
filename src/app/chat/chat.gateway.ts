@@ -21,7 +21,7 @@ import { use } from 'passport';
 
 @WebSocketGateway({
   cors: {
-    origin: "*", // Ou votre domaine frontend
+    origin: '*', // Ou votre domaine frontend
     credentials: true,
   },
   pingTimeout: 60000, // 60s
@@ -31,7 +31,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
-  private readonly logger = new Logger(ChatGateway.name);
+  // private readonly logger = new Logger(ChatGateway.name);
   private connectedUsers: Map<string, Socket> = new Map();
   private readonly connectionLock = new Map<string, Promise<void>>();
 
@@ -45,7 +45,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   afterInit(server: Server) {
     server.sockets.setMaxListeners(200); // Reasonable limit
-    this.logger.log('WebSocket Gateway initialized');
+    // this.logger.log('WebSocket Gateway initialized');
   }
 
   async handleConnection(client: Socket) {
@@ -90,7 +90,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client.on('disconnect', disconnectHandler);
     client.data.disconnectHandler = disconnectHandler;
 
-    this.logger.log(`User ${userId} connected (Socket ${client.id})`);
+    // this.logger.log(`User ${userId} connected (Socket ${client.id})`);
   }
 
   private cleanupSocket(socket: Socket) {
@@ -114,7 +114,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (currentSocket?.id === socketId) {
       this.removeAllListeners(currentSocket);
       this.connectedUsers.delete(userId);
-      this.logger.log(`User ${userId} disconnected (Socket ${socketId})`);
+      // this.logger.log(`User ${userId} disconnected (Socket ${socketId})`);
     }
   }
 
@@ -146,11 +146,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
 
       client.join(`room_${roomId}`);
-      this.logger.log(`User ${user.id} joined room ${roomId}`);
+      // this.logger.log(`User ${user.id} joined room ${roomId}`);
 
       return { success: true, roomId };
     } catch (error) {
-      this.logger.error(`JoinRoom error: ${error.message}`);
+      // this.logger.error(`JoinRoom error: ${error.message}`);
       throw new WsException(error.message);
     }
   }
@@ -221,7 +221,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       return { success: true, message: newMessage };
     } catch (error) {
-      this.logger.error(`SendMessage error: ${error.message}`);
+      // this.logger.error(`SendMessage error: ${error.message}`);
       throw new WsException(error.message);
     }
   }
@@ -233,9 +233,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         .to(`user_${userId}`)
         .emit('conversationsUpdated', conversations);
     } catch (error) {
-      this.logger.error(
-        `UpdateConversationList error for user ${userId}: ${error.message}`,
-      );
+      // this.logger.error(
+      //   `UpdateConversationList error for user ${userId}: ${error.message}`,
+      // );
     }
   }
 
@@ -337,7 +337,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         totalUnread,
       });
     } catch (error) {
-      this.logger.error(`NotifyNewMessage error: ${error.message}`);
+      // this.logger.error(`NotifyNewMessage error: ${error.message}`);
     }
   }
 
@@ -360,7 +360,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       );
       this.server.to(`user_${user.id}`).emit('notifications', notifications);
     } catch (error) {
-      this.logger.error(`GetNotifications error: ${error.message}`);
+      // this.logger.error(`GetNotifications error: ${error.message}`);
       throw new WsException(error.message);
     }
   }
@@ -383,7 +383,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         success: true,
       });
     } catch (error) {
-      this.logger.error(`MarkAsReadNotification error: ${error.message}`);
+      // this.logger.error(`MarkAsReadNotification error: ${error.message}`);
       client.emit('notificationMarkedAsRead', {
         userId: data.userId,
         success: false,
@@ -408,7 +408,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       client.emit('unreadCountsNotification', unreadCountsNotification);
     } catch (error) {
-      this.logger.error(`GetUnreadCountsNotification error: ${error.message}`);
+      // this.logger.error(`GetUnreadCountsNotification error: ${error.message}`);
       throw new WsException(error.message);
     }
   }
@@ -434,7 +434,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         .to(`user_${user.id}`)
         .emit('isAbonnement', hasActiveAbonnement);
     } catch (error) {
-      this.logger.error(`IsAbonnement error: ${error.message}`);
+      // this.logger.error(`IsAbonnement error: ${error.message}`);
       throw new WsException(error.message);
     }
   }
@@ -442,7 +442,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('checkPaymentPoint')
   @UseGuards(WsJwtGuard)
   async checkPaymentPoint(
-    @MessageBody() data: { userId: string; transactionId: string, points: number },
+    @MessageBody()
+    data: { userId: string; transactionId: string; points: number },
     @ConnectedSocket() client: Socket,
   ) {
     try {
@@ -458,7 +459,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         .to(`user_${user.id}`)
         .emit('checkPaymentPoint', hasActiveAbonnement);
     } catch (error) {
-      this.logger.error(`checkPaymentPoint error: ${error.message}`);
+      // this.logger.error(`checkPaymentPoint error: ${error.message}`);
       throw new WsException(error.message);
     }
   }
