@@ -428,7 +428,6 @@ exports.ChatGateway = ChatGateway = __decorate([
     (0, websockets_1.WebSocketGateway)({
         cors: {
             origin: '*',
-            credentials: true,
         },
         pingTimeout: 60000,
         pingInterval: 25000,

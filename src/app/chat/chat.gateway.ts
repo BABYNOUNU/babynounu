@@ -22,7 +22,7 @@ import { use } from 'passport';
 @WebSocketGateway({
   cors: {
     origin: '*', // Ou votre domaine frontend
-    credentials: true,
+    // credentials: true,
   },
   pingTimeout: 60000, // 60s
   pingInterval: 25000, // 25s
