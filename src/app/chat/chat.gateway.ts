@@ -27,7 +27,7 @@ import { use } from 'passport';
   pingTimeout: 60000, // 60s
   pingInterval: 25000, // 25s
 })
-export class ChatGateway  {
+export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
@@ -43,80 +43,80 @@ export class ChatGateway  {
     private readonly notificationService: NotificationService,
   ) {}
 
-  // afterInit(server: Server) {
-  //   // server.sockets.setMaxListeners(200); // Reasonable limit
-  //   // this.logger.log('WebSocket Gateway initialized');
-  // }
+  afterInit(server: Server) {
+    server.sockets.setMaxListeners(200); // Reasonable limit
+    // this.logger.log('WebSocket Gateway initialized');
+  }
 
-  // async handleConnection(client: Socket) {
-  //   const userId = await this.authService.getUserFromSocket(client);
-  //   if (!userId) {
-  //     client.disconnect(true);
-  //     return;
-  //   }
+  async handleConnection(client: Socket) {
+    const userId = await this.authService.getUserFromSocket(client);
+    if (!userId) {
+      client.disconnect(true);
+      return;
+    }
 
-  //   // Verrou pour éviter les connexions parallèles
-  //   if (!this.connectionLock.has(userId.id)) {
-  //     const connectionPromise = (async () => {
-  //       try {
-  //         await this.handleNewConnection(userId.id, client);
-  //       } finally {
-  //         this.connectionLock.delete(userId.id);
-  //       }
-  //     })();
+    // Verrou pour éviter les connexions parallèles
+    if (!this.connectionLock.has(userId.id)) {
+      const connectionPromise = (async () => {
+        try {
+          await this.handleNewConnection(userId.id, client);
+        } finally {
+          this.connectionLock.delete(userId.id);
+        }
+      })();
 
-  //     this.connectionLock.set(userId.id, connectionPromise);
-  //   }
+      this.connectionLock.set(userId.id, connectionPromise);
+    }
 
-  //   await this.connectionLock.get(userId.id);
-  // }
+    await this.connectionLock.get(userId.id);
+  }
 
-  // private async handleNewConnection(userId: string, client: Socket) {
-  //   // Nettoyer les anciennes connexions
-  //   // const existingSocket = this.connectedUsers.get(userId);
-  //   // if (existingSocket && existingSocket.id !== client.id) {
-  //   //   this.logger.log(`Cleaning old connection for user ${userId}`);
-  //   //   this.cleanupSocket(existingSocket);
-  //   //   this.connectedUsers.delete(userId);
-  //   // }
+  private async handleNewConnection(userId: string, client: Socket) {
+    // Nettoyer les anciennes connexions
+    // const existingSocket = this.connectedUsers.get(userId);
+    // if (existingSocket && existingSocket.id !== client.id) {
+    //   this.logger.log(`Cleaning old connection for user ${userId}`);
+    //   this.cleanupSocket(existingSocket);
+    //   this.connectedUsers.delete(userId);
+    // }
 
-  //   // Enregistrer la nouvelle connexion
-  //   this.connectedUsers.set(userId, client);
-  //   client.join(`user_${userId}`);
+    // Enregistrer la nouvelle connexion
+    this.connectedUsers.set(userId, client);
+    client.join(`user_${userId}`);
 
-  //   // Configurer le handler de déconnexion
-  //   const disconnectHandler = () =>
-  //     this.handleUserDisconnect(userId, client.id);
-  //   client.on('disconnect', disconnectHandler);
-  //   client.data.disconnectHandler = disconnectHandler;
+    // Configurer le handler de déconnexion
+    const disconnectHandler = () =>
+      this.handleUserDisconnect(userId, client.id);
+    client.on('disconnect', disconnectHandler);
+    client.data.disconnectHandler = disconnectHandler;
 
-  //   // this.logger.log(`User ${userId} connected (Socket ${client.id})`);
-  // }
+    // this.logger.log(`User ${userId} connected (Socket ${client.id})`);
+  }
 
-  // private cleanupSocket(socket: Socket) {
-  //   if (socket.data?.disconnectHandler) {
-  //     socket.off('disconnect', socket.data.disconnectHandler);
-  //   }
-  //   socket.disconnect(true);
-  // }
+  private cleanupSocket(socket: Socket) {
+    if (socket.data?.disconnectHandler) {
+      socket.off('disconnect', socket.data.disconnectHandler);
+    }
+    socket.disconnect(true);
+  }
 
-  // private removeAllListeners(socket: Socket) {
-  //   if (socket.data?.listeners) {
-  //     Object.entries(socket.data.listeners).forEach(([event, handler]) => {
-  //       socket.off(event, handler as (...args: any[]) => void);
-  //     });
-  //     delete socket.data.listeners;
-  //   }
-  // }
+  private removeAllListeners(socket: Socket) {
+    if (socket.data?.listeners) {
+      Object.entries(socket.data.listeners).forEach(([event, handler]) => {
+        socket.off(event, handler as (...args: any[]) => void);
+      });
+      delete socket.data.listeners;
+    }
+  }
 
-  // private handleUserDisconnect(userId: string, socketId: string) {
-  //   const currentSocket = this.connectedUsers.get(userId);
-  //   if (currentSocket?.id === socketId) {
-  //     this.removeAllListeners(currentSocket);
-  //     this.connectedUsers.delete(userId);
-  //     // this.logger.log(`User ${userId} disconnected (Socket ${socketId})`);
-  //   }
-  // }
+  private handleUserDisconnect(userId: string, socketId: string) {
+    const currentSocket = this.connectedUsers.get(userId);
+    if (currentSocket?.id === socketId) {
+      this.removeAllListeners(currentSocket);
+      this.connectedUsers.delete(userId);
+      // this.logger.log(`User ${userId} disconnected (Socket ${socketId})`);
+    }
+  }
 
   handleDisconnect(client: Socket) {
     // Additional cleanup if needed
