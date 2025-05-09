@@ -38,56 +38,6 @@ let ChatGateway = class ChatGateway {
         this.abonnementService = abonnementService;
         this.notificationService = notificationService;
     }
-    afterInit(server) {
-        server.sockets.setMaxListeners(200);
-    }
-    async handleConnection(client) {
-        const userId = await this.authService.getUserFromSocket(client);
-        if (!userId) {
-            client.disconnect(true);
-            return;
-        }
-        if (!this.connectionLock.has(userId.id)) {
-            const connectionPromise = (async () => {
-                try {
-                    await this.handleNewConnection(userId.id, client);
-                }
-                finally {
-                    this.connectionLock.delete(userId.id);
-                }
-            })();
-            this.connectionLock.set(userId.id, connectionPromise);
-        }
-        await this.connectionLock.get(userId.id);
-    }
-    async handleNewConnection(userId, client) {
-        this.connectedUsers.set(userId, client);
-        client.join(`user_${userId}`);
-        const disconnectHandler = () => this.handleUserDisconnect(userId, client.id);
-        client.on('disconnect', disconnectHandler);
-        client.data.disconnectHandler = disconnectHandler;
-    }
-    cleanupSocket(socket) {
-        if (socket.data?.disconnectHandler) {
-            socket.off('disconnect', socket.data.disconnectHandler);
-        }
-        socket.disconnect(true);
-    }
-    removeAllListeners(socket) {
-        if (socket.data?.listeners) {
-            Object.entries(socket.data.listeners).forEach(([event, handler]) => {
-                socket.off(event, handler);
-            });
-            delete socket.data.listeners;
-        }
-    }
-    handleUserDisconnect(userId, socketId) {
-        const currentSocket = this.connectedUsers.get(userId);
-        if (currentSocket?.id === socketId) {
-            this.removeAllListeners(currentSocket);
-            this.connectedUsers.delete(userId);
-        }
-    }
     handleDisconnect(client) {
     }
     async handleJoinRoom(client, roomId) {

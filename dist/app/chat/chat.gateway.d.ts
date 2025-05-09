@@ -1,11 +1,10 @@
-import { OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { RoomsService } from '../rooms/rooms.service';
 import { AuthService } from '../auth/auth.service';
 import { MessageService } from '../messages/messages.service';
 import { AbonnementService } from '../abonnement/abonnement.service';
 import { NotificationService } from '../notification/notification.service';
-export declare class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export declare class ChatGateway {
     private readonly roomService;
     private readonly authService;
     private readonly messageService;
@@ -15,12 +14,6 @@ export declare class ChatGateway implements OnGatewayConnection, OnGatewayDiscon
     private connectedUsers;
     private readonly connectionLock;
     constructor(roomService: RoomsService, authService: AuthService, messageService: MessageService, abonnementService: AbonnementService, notificationService: NotificationService);
-    afterInit(server: Server): void;
-    handleConnection(client: Socket): Promise<void>;
-    private handleNewConnection;
-    private cleanupSocket;
-    private removeAllListeners;
-    private handleUserDisconnect;
     handleDisconnect(client: Socket): void;
     handleJoinRoom(client: Socket, roomId: number): Promise<{
         success: boolean;
