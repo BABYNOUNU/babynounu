@@ -24,8 +24,8 @@ import { use } from 'passport';
     origin: '*',
   },
   transports: ['websocket'], // Force WebSocket transport
-  pingTimeout: 60000, // 10s
-  pingInterval: 8000, // 5s
+  pingTimeout: 600000, // 10s
+  pingInterval: 80000, // 5s
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
