@@ -469,6 +469,7 @@ exports.ChatGateway = ChatGateway = __decorate([
         },
         pingTimeout: 30000,
         pingInterval: 10000,
+        transports: ['websocket']
     }),
     __metadata("design:paramtypes", [rooms_service_1.RoomsService,
         auth_service_1.AuthService,

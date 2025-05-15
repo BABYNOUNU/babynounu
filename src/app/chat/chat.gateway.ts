@@ -24,6 +24,7 @@ import { NotificationService } from '../notification/notification.service';
   },
   pingTimeout: 30000, // Réduire à 30s
   pingInterval: 10000, // Réduire à 10s
+  transports: ['websocket']
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
