@@ -165,8 +165,41 @@ export class NounusController {
   @ApiResponse({ status: 404, description: 'ProfilNounus not found' })
   async approveCertification(
     @Param('id') id: string,
-  ): Promise<{ certif: boolean }> {
+  ): Promise<{ certif: 'Approved' | 'Pending' | 'Rejected' }> {
     return await this.nounuService.approveCertification(id);
+  }
+
+  @Post('reject-certification/:id')
+  @ApiOperation({ summary: 'Reject certification of a ProfilNounus by ID' })
+  @ApiParam({ name: 'id', description: 'ProfilNounus ID', type: Number })
+  @ApiResponse({
+    status: 200,
+    description: 'ProfilNounus certification rejected successfully',
+    type: ProfilNounus,
+  })
+  @ApiResponse({ status: 404, description: 'ProfilNounus not found' })
+  async rejectCertification(
+    @Param('id') id: string,
+  ): Promise<{ certif: 'Approved' | 'Pending' | 'Rejected' }> {
+    return await this.nounuService.rejectCertification(id);
+  }
+
+  @Post('pending-certification/:id')
+  @ApiOperation({
+    summary: 'Set certification status to pending for a ProfilNounus',
+  })
+  @ApiParam({ name: 'id', description: 'ProfilNounus ID', type: Number })
+  @ApiResponse({
+    status: 200,
+    description: 'ProfilNounus certification set to pending successfully',
+    type: ProfilNounus,
+  })
+  @ApiResponse({ status: 404, description: 'ProfilNounus not found' })
+  async pendingCertification(
+    @Param('id') id: string,
+  ): Promise<{ certif: 'Approved' | 'Pending' | 'Rejected' }> {
+    console.log(id)
+    return await this.nounuService.pendingCertification(id);
   }
 
   @Delete(':id')

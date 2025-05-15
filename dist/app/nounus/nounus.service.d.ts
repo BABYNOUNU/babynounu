@@ -1,3 +1,4 @@
+import { NotificationService } from './../notification/notification.service';
 import { Repository } from 'typeorm';
 import { ProfilNounus } from './models/nounu.model';
 import { CreateNounuDto } from './dtos/create-nounu.dto';
@@ -7,8 +8,9 @@ import { Preference } from '../Preference/models/preference.model';
 export declare class NounusService {
     private readonly nounuRepository;
     private readonly preferenceRepository;
+    private readonly notificationService;
     private readonly mediaService;
-    constructor(nounuRepository: Repository<ProfilNounus>, preferenceRepository: Repository<Preference>, mediaService: MediaService);
+    constructor(nounuRepository: Repository<ProfilNounus>, preferenceRepository: Repository<Preference>, notificationService: NotificationService, mediaService: MediaService);
     create(createNounuDto: CreateNounuDto, files: {
         imageNounu: Express.Multer.File[];
         documents: Express.Multer.File[];
@@ -27,7 +29,13 @@ export declare class NounusService {
     search(searchCriteria: any): Promise<any[]>;
     getNonCertifiedNounus(): Promise<any[]>;
     approveCertification(nounuId: string): Promise<{
-        certif: boolean;
+        certif: 'Approved' | 'Pending' | 'Rejected';
+    }>;
+    rejectCertification(nounuId: string): Promise<{
+        certif: 'Approved' | 'Pending' | 'Rejected';
+    }>;
+    pendingCertification(nounuId: string): Promise<{
+        certif: 'Approved' | 'Pending' | 'Rejected';
     }>;
     updateStatus(nounuId: string, status: string): Promise<{
         status: string;

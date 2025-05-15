@@ -13,6 +13,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NounusService = void 0;
+const notification_service_1 = require("./../notification/notification.service");
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("typeorm");
 const media_service_1 = require("../media/media.service");
@@ -20,10 +21,12 @@ const database_providers_1 = require("../../database/database.providers");
 let NounusService = class NounusService {
     nounuRepository;
     preferenceRepository;
+    notificationService;
     mediaService;
-    constructor(nounuRepository, preferenceRepository, mediaService) {
+    constructor(nounuRepository, preferenceRepository, notificationService, mediaService) {
         this.nounuRepository = nounuRepository;
         this.preferenceRepository = preferenceRepository;
+        this.notificationService = notificationService;
         this.mediaService = mediaService;
     }
     async create(createNounuDto, files) {
@@ -341,7 +344,7 @@ let NounusService = class NounusService {
     }
     async getNonCertifiedNounus() {
         const _nounus = await this.nounuRepository.find({
-            where: { certif: false },
+            where: { certif: 'Pending' },
             relations: [
                 'user',
                 'user.medias',
@@ -362,12 +365,65 @@ let NounusService = class NounusService {
     async approveCertification(nounuId) {
         const nounu = await this.nounuRepository.findOne({
             where: { id: nounuId },
+            relations: ['user'],
         });
         if (!nounu) {
             throw new common_1.NotFoundException(`Nounu with id ${nounuId} not found`);
         }
-        nounu.certif = true;
+        nounu.certif = 'Approved';
         await this.nounuRepository.save(nounu);
+        this.notificationService.createNotification({
+            type: 'PROFIL_DETAIL',
+            userId: nounu.user.id,
+            message: `Félicitations! Votre profil a été approuvé avec succès. Vous pouvez maintenant commencer à recevoir des demandes de garde d'enfants.`,
+            is_read: false,
+            senderUserId: nounu.user.id,
+            tolinkId: nounuId.toString(),
+        });
+        return {
+            certif: nounu.certif,
+        };
+    }
+    async rejectCertification(nounuId) {
+        const nounu = await this.nounuRepository.findOne({
+            where: { id: nounuId },
+            relations: ['user'],
+        });
+        if (!nounu) {
+            throw new common_1.NotFoundException(`Nounu with id ${nounuId} not found`);
+        }
+        nounu.certif = 'Rejected';
+        await this.nounuRepository.save(nounu);
+        this.notificationService.createNotification({
+            type: 'PROFIL_DETAIL',
+            userId: nounu.user.id,
+            message: `Désolé, votre profil a été rejeté. Veuillez vérifier vos documents et les informations fournies avant de soumettre à nouveau votre profil.`,
+            is_read: false,
+            senderUserId: nounu.user.id,
+            tolinkId: nounuId.toString(),
+        });
+        return {
+            certif: nounu.certif,
+        };
+    }
+    async pendingCertification(nounuId) {
+        const nounu = await this.nounuRepository.findOne({
+            where: { id: nounuId },
+            relations: ['user'],
+        });
+        if (!nounu) {
+            throw new common_1.NotFoundException(`Nounu with id ${nounuId} not found`);
+        }
+        nounu.certif = 'Pending';
+        await this.nounuRepository.save(nounu);
+        this.notificationService.createNotification({
+            type: 'PROFIL_DETAIL',
+            userId: nounu.user.id,
+            message: `Documents Modifier : Votre profil est en cours d'examen. Nous vous notifierons une fois la vérification terminée.`,
+            is_read: false,
+            senderUserId: nounu.user.id,
+            tolinkId: nounuId,
+        });
         return {
             certif: nounu.certif,
         };
@@ -378,6 +434,9 @@ let NounusService = class NounusService {
         });
         if (!nounu) {
             throw new common_1.NotFoundException(`Nounu with id ${nounuId} not found`);
+        }
+        if (nounu.points == 0) {
+            throw new common_1.BadRequestException('Cannot change status when points are 0');
         }
         nounu.status = status;
         await this.nounuRepository.save(nounu);
@@ -432,5 +491,6 @@ exports.NounusService = NounusService = __decorate([
     __param(1, (0, common_1.Inject)('PREFERENCE_REPOSITORY')),
     __metadata("design:paramtypes", [typeorm_1.Repository,
         typeorm_1.Repository,
+        notification_service_1.NotificationService,
         media_service_1.MediaService])
 ], NounusService);

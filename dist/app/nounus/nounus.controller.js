@@ -53,6 +53,13 @@ let NounusController = class NounusController {
     async approveCertification(id) {
         return await this.nounuService.approveCertification(id);
     }
+    async rejectCertification(id) {
+        return await this.nounuService.rejectCertification(id);
+    }
+    async pendingCertification(id) {
+        console.log(id);
+        return await this.nounuService.pendingCertification(id);
+    }
     async remove(id) {
         return await this.nounuService.remove(id);
     }
@@ -194,6 +201,38 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], NounusController.prototype, "approveCertification", null);
+__decorate([
+    (0, common_1.Post)('reject-certification/:id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Reject certification of a ProfilNounus by ID' }),
+    (0, swagger_1.ApiParam)({ name: 'id', description: 'ProfilNounus ID', type: Number }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'ProfilNounus certification rejected successfully',
+        type: nounu_model_1.ProfilNounus,
+    }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'ProfilNounus not found' }),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], NounusController.prototype, "rejectCertification", null);
+__decorate([
+    (0, common_1.Post)('pending-certification/:id'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Set certification status to pending for a ProfilNounus',
+    }),
+    (0, swagger_1.ApiParam)({ name: 'id', description: 'ProfilNounus ID', type: Number }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'ProfilNounus certification set to pending successfully',
+        type: nounu_model_1.ProfilNounus,
+    }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'ProfilNounus not found' }),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], NounusController.prototype, "pendingCertification", null);
 __decorate([
     (0, common_1.Delete)(':id'),
     (0, swagger_1.ApiOperation)({ summary: 'Delete a ProfilNounus by ID' }),

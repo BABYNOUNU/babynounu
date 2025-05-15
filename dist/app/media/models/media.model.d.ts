@@ -10,4 +10,7 @@ export declare class Medias {
     user: User;
     job: Job;
     type_media: Parameter;
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt: Date | null;
 }

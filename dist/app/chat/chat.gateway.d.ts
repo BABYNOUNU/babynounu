@@ -17,6 +17,7 @@ export declare class ChatGateway implements OnGatewayConnection, OnGatewayDiscon
     constructor(roomService: RoomsService, authService: AuthService, messageService: MessageService, abonnementService: AbonnementService, notificationService: NotificationService);
     afterInit(server: Server): void;
     handleConnection(client: Socket): Promise<void>;
+    private userConnections;
     private handleNewConnection;
     private cleanupSocket;
     private removeAllListeners;

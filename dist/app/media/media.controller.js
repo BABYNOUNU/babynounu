@@ -28,6 +28,12 @@ let MediaController = class MediaController {
     }
     create(createMediaDto, files) {
     }
+    createDocumentByNounu(userId, files) {
+        return this.mediaService.createDocumentByNounu(userId, files);
+    }
+    findDocumentByUserId(userId) {
+        return this.mediaService.findDocumentByUserId(userId);
+    }
     findAll() {
         return this.mediaService.findAll();
     }
@@ -35,6 +41,9 @@ let MediaController = class MediaController {
         return this.mediaService.findOne(+id);
     }
     getGalleryNounus(userId) {
+        return this.mediaService.getGalleryNounus(userId);
+    }
+    getDocumentNounus(userId) {
         return this.mediaService.getGalleryNounus(userId);
     }
     update(id, typeMedia, updateMediaDto) {
@@ -52,10 +61,11 @@ __decorate([
         { name: 'image_2', maxCount: 1 },
         { name: 'image_3', maxCount: 1 },
         { name: 'image_4', maxCount: 1 },
+        { name: 'documents', maxCount: 5 },
     ], {
         storage: media_config_1.storageMedia,
         fileFilter: media_config_1.fileFilterMedia,
-        limits: media_config_1.LimiterMedia
+        limits: media_config_1.LimiterMedia,
     })),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.UploadedFiles)()),
@@ -63,6 +73,31 @@ __decorate([
     __metadata("design:paramtypes", [create_media_dto_1.CreateMediaDto, Object]),
     __metadata("design:returntype", void 0)
 ], MediaController.prototype, "create", null);
+__decorate([
+    (0, common_1.Post)('document/:userId'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileFieldsInterceptor)([{ name: 'documents', maxCount: 5 }], {
+        storage: media_config_1.storageMedia,
+        fileFilter: media_config_1.fileFilterMedia,
+        limits: media_config_1.LimiterMedia,
+    })),
+    (0, swagger_1.ApiOkResponse)({ description: 'Document created for nounu', type: media_model_1.Medias }),
+    __param(0, (0, common_1.Param)('userId')),
+    __param(1, (0, common_1.UploadedFiles)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", void 0)
+], MediaController.prototype, "createDocumentByNounu", null);
+__decorate([
+    (0, common_1.Get)('document/:userId'),
+    (0, swagger_1.ApiOkResponse)({
+        description: 'Get document by user ID',
+        type: media_model_1.Medias
+    }),
+    __param(0, (0, common_1.Param)('userId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], MediaController.prototype, "findDocumentByUserId", null);
 __decorate([
     (0, common_1.Get)(),
     (0, swagger_1.ApiOkResponse)({ description: 'List of media', type: [media_model_1.Medias] }),
@@ -80,12 +115,26 @@ __decorate([
 ], MediaController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Get)('gallery/:userId'),
-    (0, swagger_1.ApiOkResponse)({ description: 'List of gallery media by user ID', type: [media_model_1.Medias] }),
+    (0, swagger_1.ApiOkResponse)({
+        description: 'List of gallery media by user ID',
+        type: [media_model_1.Medias],
+    }),
     __param(0, (0, common_1.Param)('userId')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], MediaController.prototype, "getGalleryNounus", null);
+__decorate([
+    (0, common_1.Get)('documents/:userId'),
+    (0, swagger_1.ApiOkResponse)({
+        description: 'List of gallery media by user ID',
+        type: [media_model_1.Medias],
+    }),
+    __param(0, (0, common_1.Param)('userId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], MediaController.prototype, "getDocumentNounus", null);
 __decorate([
     (0, common_1.Patch)(':id'),
     (0, swagger_1.ApiOkResponse)({ description: 'Media updated', type: media_model_1.Medias }),

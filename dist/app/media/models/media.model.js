@@ -23,6 +23,9 @@ let Medias = class Medias {
     user;
     job;
     type_media;
+    createdAt;
+    updatedAt;
+    deletedAt;
 };
 exports.Medias = Medias;
 __decorate([
@@ -57,6 +60,18 @@ __decorate([
     (0, typeorm_1.ManyToOne)(() => parameter_model_1.Parameter, (parameter) => parameter.type_media),
     __metadata("design:type", parameter_model_1.Parameter)
 ], Medias.prototype, "type_media", void 0);
+__decorate([
+    (0, typeorm_1.CreateDateColumn)({ name: 'created_at', type: 'timestamp' }),
+    __metadata("design:type", Date)
+], Medias.prototype, "createdAt", void 0);
+__decorate([
+    (0, typeorm_1.UpdateDateColumn)({ name: 'updated_at', type: 'timestamp' }),
+    __metadata("design:type", Date)
+], Medias.prototype, "updatedAt", void 0);
+__decorate([
+    (0, typeorm_1.DeleteDateColumn)({ name: 'deleted_at', type: 'timestamp', nullable: true }),
+    __metadata("design:type", Date)
+], Medias.prototype, "deletedAt", void 0);
 exports.Medias = Medias = __decorate([
     (0, typeorm_1.Entity)()
 ], Medias);

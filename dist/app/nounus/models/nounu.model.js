@@ -83,8 +83,8 @@ __decorate([
     __metadata("design:type", Boolean)
 ], ProfilNounus.prototype, "urgences", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'boolean', default: false }),
-    __metadata("design:type", Boolean)
+    (0, typeorm_1.Column)({ type: 'enum', enum: ['Approved', 'Pending', 'Rejected'], default: 'Pending' }),
+    __metadata("design:type", String)
 ], ProfilNounus.prototype, "certif", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: 'text' }),

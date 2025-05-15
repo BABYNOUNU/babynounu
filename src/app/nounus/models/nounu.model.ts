@@ -51,8 +51,8 @@ export class ProfilNounus {
   @Column({ type: 'boolean', default: false })
   urgences: boolean;
 
-  @Column({ type: 'boolean', default: false })
-  certif: boolean;
+  @Column({ type: 'enum', enum: ['Approved', 'Pending', 'Rejected'], default: 'Pending'})
+  certif: 'Approved' | 'Pending' | 'Rejected';
 
   @Column({ type: 'text' })
   evaluation_precedentes: string;

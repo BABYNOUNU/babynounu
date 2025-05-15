@@ -19,6 +19,8 @@ const preference_1 = require("../Preference/preference");
 const parent_provider_1 = require("../parent/parent.provider");
 const media_1 = require("../media/media");
 const parameter_1 = require("../parameter/parameter");
+const notification_service_1 = require("../notification/notification.service");
+const notification_1 = require("../notification/notification");
 let NounusModule = class NounusModule {
 };
 exports.NounusModule = NounusModule;
@@ -31,6 +33,8 @@ exports.NounusModule = NounusModule = __decorate([
             parent_service_1.ParentsService,
             parameter_service_1.ParameterService,
             media_service_1.MediaService,
+            notification_service_1.NotificationService,
+            ...notification_1.NotificationProviders,
             ...parent_provider_1.ParentProviders,
             ...parameter_1.ParameterProviders,
             ...preference_1.PreferenceProvider,

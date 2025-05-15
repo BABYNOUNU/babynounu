@@ -16,6 +16,7 @@ exports.MediaService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("typeorm");
 const parameter_service_1 = require("../parameter/parameter.service");
+const database_providers_1 = require("../../database/database.providers");
 let MediaService = class MediaService {
     mediaRepository;
     parameterService;
@@ -27,10 +28,43 @@ let MediaService = class MediaService {
         const newMedia = this.mediaRepository.create({
             ...createMediaDto,
             type_media: await this.parameterService.findOneBySlug(createMediaDto.typeMedia),
-            [createMediaDto.userId ? 'user' : 'job']: { id: createMediaDto.userId ? createMediaDto.userId : createMediaDto.JobId },
+            [createMediaDto.userId ? 'user' : 'job']: {
+                id: createMediaDto.userId
+                    ? createMediaDto.userId
+                    : createMediaDto.JobId,
+            },
         });
         const savedMedia = await this.mediaRepository.save(newMedia);
         return savedMedia;
+    }
+    async createDocumentByNounu(userId, files) {
+        try {
+            let Media;
+            if (files.documents?.length > 0) {
+                for (const file of files.documents) {
+                    Media = await this.create({
+                        originalName: file.originalname,
+                        filename: file.filename,
+                        path: file.path,
+                        originalUrl: `${database_providers_1.HOST}/uploads/${file.filename}`,
+                        typeMedia: 'document-verification',
+                        userId: userId,
+                    });
+                }
+                if (!Media) {
+                    throw new Error('Failed to create media document');
+                }
+                return {
+                    success: true,
+                    message: 'Document created for nounu',
+                    data: Media,
+                };
+            }
+            return { success: false, message: 'No documents uploaded' };
+        }
+        catch (error) {
+            throw new Error(`Failed to create document for nounu: ${error.message}`);
+        }
     }
     async findOne(id) {
         return this.mediaRepository.findOne({ where: { id: id.toString() } });
@@ -38,12 +72,30 @@ let MediaService = class MediaService {
     async findAll() {
         return this.mediaRepository.find();
     }
+    async findDocumentByUserId(userId) {
+        try {
+            const documents = await this.mediaRepository.find({
+                where: {
+                    type_media: { slug: 'document-verification' },
+                    user: { id: userId },
+                },
+            });
+            return documents;
+        }
+        catch (error) {
+            throw new Error(`Failed to find documents for user: ${error.message}`);
+        }
+    }
     async getGalleryNounus(userId) {
         try {
             const NounuMedias = await this.mediaRepository.find({
                 where: {
                     type_media: { slug: 'gallery-image' },
-                    user: { id: userId }
+                    user: {
+                        nounu: {
+                            id: userId,
+                        },
+                    },
                 },
             });
             return NounuMedias;
@@ -54,7 +106,9 @@ let MediaService = class MediaService {
         }
     }
     async update({ id, typeMedia }, updateMediaDto) {
-        const media = await this.mediaRepository.find({ where: { user: { id }, type_media: { slug: typeMedia } } });
+        const media = await this.mediaRepository.find({
+            where: { user: { id }, type_media: { slug: typeMedia } },
+        });
         if (!media) {
             throw new Error('Media not found');
         }
@@ -64,14 +118,22 @@ let MediaService = class MediaService {
         }
         return this.findOne(+id);
     }
-    async deleteMany({ userId, typeMedia }) {
-        await this.mediaRepository.delete({ user: { id: userId }, type_media: { slug: typeMedia } });
+    async deleteMany({ userId, typeMedia, }) {
+        await this.mediaRepository.delete({
+            user: { id: userId },
+            type_media: { slug: typeMedia },
+        });
     }
-    async deleteManyJob({ JobId, typeMedia }) {
-        await this.mediaRepository.delete({ job: { id: +JobId }, type_media: { slug: typeMedia } });
+    async deleteManyJob({ JobId, typeMedia, }) {
+        await this.mediaRepository.delete({
+            job: { id: +JobId },
+            type_media: { slug: typeMedia },
+        });
     }
     async remove(id) {
-        const media = await this.mediaRepository.findOne({ where: { id: id.toString() } });
+        const media = await this.mediaRepository.findOne({
+            where: { id: id.toString() },
+        });
         if (!media) {
             throw new Error('Media not found');
         }

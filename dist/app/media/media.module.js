@@ -21,6 +21,11 @@ exports.MediaModule = MediaModule = __decorate([
     (0, common_1.Module)({
         imports: [database_module_1.DatabaseModule],
         controllers: [media_controller_1.MediaController],
-        providers: [media_service_1.MediaService, parameter_service_1.ParameterService, ...parameter_1.ParameterProviders, ...media_1.MediaProviders,]
+        providers: [
+            media_service_1.MediaService,
+            parameter_service_1.ParameterService,
+            ...parameter_1.ParameterProviders,
+            ...media_1.MediaProviders,
+        ],
     })
 ], MediaModule);

@@ -18,7 +18,13 @@ export declare class NounusController {
     }>;
     update(id: string, updateNounuDto: UpdateNounuDto, files: any): Promise<ProfilNounus>;
     approveCertification(id: string): Promise<{
-        certif: boolean;
+        certif: 'Approved' | 'Pending' | 'Rejected';
+    }>;
+    rejectCertification(id: string): Promise<{
+        certif: 'Approved' | 'Pending' | 'Rejected';
+    }>;
+    pendingCertification(id: string): Promise<{
+        certif: 'Approved' | 'Pending' | 'Rejected';
     }>;
     remove(id: string): Promise<void>;
     searchNounu(searchCriteria: SearchNounuCriteriaDto): Promise<any[]>;

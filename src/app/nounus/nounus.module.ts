@@ -11,6 +11,8 @@ import { PreferenceProvider } from '../Preference/preference';
 import { ParentProviders } from '../parent/parent.provider';
 import { MediaProviders } from '../media/media';
 import { ParameterProviders } from '../parameter/parameter';
+import { NotificationService } from '../notification/notification.service';
+import { NotificationProviders } from '../notification/notification';
 
 @Module({
   imports: [DatabaseModule],
@@ -20,6 +22,8 @@ import { ParameterProviders } from '../parameter/parameter';
     ParentsService,
     ParameterService,
     MediaService,
+    NotificationService,
+    ...NotificationProviders,
     ...ParentProviders,
     ...ParameterProviders,
     ...PreferenceProvider,

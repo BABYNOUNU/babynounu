@@ -8,18 +8,20 @@ export declare class MediaService {
     private readonly parameterService;
     constructor(mediaRepository: Repository<Medias>, parameterService: ParameterService);
     create(createMediaDto: CreateMediaDto): Promise<Medias>;
+    createDocumentByNounu(userId: string, files: any): Promise<any>;
     findOne(id: number): Promise<Medias | undefined>;
     findAll(): Promise<Medias[]>;
+    findDocumentByUserId(userId: string): Promise<Medias[]>;
     getGalleryNounus(userId: any): Promise<Medias[]>;
     update({ id, typeMedia }: {
         id: string;
         typeMedia: string;
     }, updateMediaDto: UpdateMediaDto): Promise<Medias | undefined>;
-    deleteMany({ userId, typeMedia }: {
+    deleteMany({ userId, typeMedia, }: {
         userId: string;
         typeMedia: string;
     }): Promise<void>;
-    deleteManyJob({ JobId, typeMedia }: {
+    deleteManyJob({ JobId, typeMedia, }: {
         JobId: string;
         typeMedia: string;
     }): Promise<void>;

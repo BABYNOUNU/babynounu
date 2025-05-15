@@ -11,6 +11,8 @@ import { PreferenceProvider } from '../Preference/preference';
 import { MediaProviders } from '../media/media';
 import { ParameterProviders } from '../parameter/parameter';
 import { NounusProviders } from '../nounus/nounus';
+import { NotificationProviders } from '../notification/notification';
+import { NotificationService } from '../notification/notification.service';
 
 @Module({
   imports: [DatabaseModule],
@@ -20,6 +22,8 @@ import { NounusProviders } from '../nounus/nounus';
     MediaService,
     ParameterService,
     NounusService,
+    NotificationService,
+    ...NotificationProviders,
     ...ParentProviders,
     ...MediaProviders,
     ...PreferenceProvider,

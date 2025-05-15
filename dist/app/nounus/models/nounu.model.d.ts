@@ -13,7 +13,7 @@ export declare class ProfilNounus {
     tarif_mensuel: string;
     flexibilite_tarifaire: boolean;
     urgences: boolean;
-    certif: boolean;
+    certif: 'Approved' | 'Pending' | 'Rejected';
     evaluation_precedentes: string;
     references: string;
     courte_biographie: string;

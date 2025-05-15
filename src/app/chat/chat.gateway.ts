@@ -15,9 +15,7 @@ import { Logger, UseGuards } from '@nestjs/common';
 import { WsJwtGuard } from '../auth/ws-auth.guard';
 import { MessageService } from '../messages/messages.service';
 import { AbonnementService } from '../abonnement/abonnement.service';
-import { CreateAbonnementDto } from '../abonnement/dtos/create-abonnement.dto';
 import { NotificationService } from '../notification/notification.service';
-import { use } from 'passport';
 
 @WebSocketGateway({
   cors: {
@@ -49,55 +47,88 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   async handleConnection(client: Socket) {
-    const userId = await this.authService.getUserFromSocket(client);
-    if (!userId) {
+    try {
+      const userId = await this.authService.getUserFromSocket(client);
+      if (!userId) {
+        client.disconnect(true);
+        return;
+      }
+  
+      if (!this.connectionLock.has(userId.id)) {
+        const connectionPromise = (async () => {
+          try {
+            await this.handleNewConnection(userId.id, client);
+          } catch (error) {
+            client.disconnect(true);
+          } finally {
+            this.connectionLock.delete(userId.id);
+          }
+        })();
+  
+        this.connectionLock.set(userId.id, connectionPromise);
+      }
+  
+      await this.connectionLock.get(userId.id);
+    } catch (error) {
       client.disconnect(true);
-      return;
     }
-
-    // Verrou pour éviter les connexions parallèles
-    if (!this.connectionLock.has(userId.id)) {
-      const connectionPromise = (async () => {
-        try {
-          await this.handleNewConnection(userId.id, client);
-        } finally {
-          this.connectionLock.delete(userId.id);
-        }
-      })();
-
-      this.connectionLock.set(userId.id, connectionPromise);
-    }
-
-    await this.connectionLock.get(userId.id);
   }
 
+  // Créer une structure pour stocker plusieurs connexions par utilisateur
+  private userConnections: Map<string, Set<Socket>> = new Map();
+
   private async handleNewConnection(userId: string, client: Socket) {
-    // Nettoyer les anciennes connexions
-    // const existingSocket = this.connectedUsers.get(userId);
-    // if (existingSocket && existingSocket.id !== client.id) {
-    //   this.logger.log(`Cleaning old connection for user ${userId}`);
-    //   this.cleanupSocket(existingSocket);
-    //   this.connectedUsers.delete(userId);
-    // }
-
-    // Enregistrer la nouvelle connexion
+    // Ajouter cette connexion aux connexions de l'utilisateur
+    if (!this.userConnections.has(userId)) {
+      this.userConnections.set(userId, new Set());
+    }
+    this.userConnections.get(userId).add(client);
+    
+    // Conserver également la connexion la plus récente pour la compatibilité
     this.connectedUsers.set(userId, client);
+    
     client.join(`user_${userId}`);
-
+    
     // Configurer le handler de déconnexion
-    const disconnectHandler = () =>
-      this.handleUserDisconnect(userId, client.id);
+    const disconnectHandler = () => {
+      // Supprimer uniquement cette connexion spécifique
+      if (this.userConnections.has(userId)) {
+        this.userConnections.get(userId).delete(client);
+        if (this.userConnections.get(userId).size === 0) {
+          this.userConnections.delete(userId);
+        }
+      }
+      
+      // Si c'était la connexion principale, mettre à jour
+      if (this.connectedUsers.get(userId)?.id === client.id) {
+        const remainingConnections = this.userConnections.get(userId);
+        if (remainingConnections && remainingConnections.size > 0) {
+          // Prendre la première connexion restante comme principale
+          this.connectedUsers.set(userId, Array.from(remainingConnections)[0]);
+        } else {
+          this.connectedUsers.delete(userId);
+        }
+      }
+    };
+    
     client.on('disconnect', disconnectHandler);
     client.data.disconnectHandler = disconnectHandler;
-
-    // this.logger.log(`User ${userId} connected (Socket ${client.id})`);
   }
 
   private cleanupSocket(socket: Socket) {
     if (socket.data?.disconnectHandler) {
       socket.off('disconnect', socket.data.disconnectHandler);
     }
-    socket.disconnect(true);
+    // Nettoyer les autres écouteurs d'événements
+    this.removeAllListeners(socket);
+    
+    // Informer le client qu'il a été remplacé par une nouvelle connexion
+    socket.emit('connectionReplaced', {
+      message: 'Votre session a été remplacée par une nouvelle connexion'
+    });
+    
+    // Déconnecter en douceur (sans forcer)
+    socket.disconnect(false);
   }
 
   private removeAllListeners(socket: Socket) {
@@ -119,7 +150,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   handleDisconnect(client: Socket) {
-    // Additional cleanup if needed
+      this.removeAllListeners(client);
+      if (client.data?.disconnectHandler) {
+          client.off('disconnect', client.data.disconnectHandler);
+      }
   }
 
   @SubscribeMessage('joinRoom')
