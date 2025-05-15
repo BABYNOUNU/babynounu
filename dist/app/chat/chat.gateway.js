@@ -39,7 +39,7 @@ let ChatGateway = class ChatGateway {
         this.notificationService = notificationService;
     }
     afterInit(server) {
-        server.sockets.setMaxListeners(2000);
+        server.sockets.setMaxListeners(50);
     }
     async handleConnection(client) {
         try {
@@ -467,8 +467,8 @@ exports.ChatGateway = ChatGateway = __decorate([
             origin: '*',
             credentials: true,
         },
-        pingTimeout: 60000,
-        pingInterval: 25000,
+        pingTimeout: 30000,
+        pingInterval: 10000,
     }),
     __metadata("design:paramtypes", [rooms_service_1.RoomsService,
         auth_service_1.AuthService,

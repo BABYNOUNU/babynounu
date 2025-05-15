@@ -22,8 +22,8 @@ import { NotificationService } from '../notification/notification.service';
     origin: '*', // Ou votre domaine frontend
     credentials: true,
   },
-  pingTimeout: 60000, // 60s
-  pingInterval: 25000, // 25s
+  pingTimeout: 30000, // Réduire à 30s
+  pingInterval: 10000, // Réduire à 10s
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
@@ -42,8 +42,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {}
 
   afterInit(server: Server) {
-    server.sockets.setMaxListeners(2000); // Reasonable limit
-    // this.logger.log('WebSocket Gateway initialized');
+    server.sockets.setMaxListeners(50); // Réduire à 50
   }
 
   async handleConnection(client: Socket) {
