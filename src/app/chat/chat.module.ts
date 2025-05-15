@@ -33,7 +33,7 @@ import { PreferenceProvider } from '../Preference/preference';
   controllers: [ChatController],
   providers: [
     ChatService,
-    ChatGateway,
+    // ChatGateway,
     RoomsService,
     MessageService,
     UserService,

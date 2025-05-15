@@ -10,7 +10,6 @@ exports.ChatModule = void 0;
 const common_1 = require("@nestjs/common");
 const chat_controller_1 = require("./chat.controller");
 const chat_service_1 = require("./chat.service");
-const chat_gateway_1 = require("./chat.gateway");
 const rooms_service_1 = require("../rooms/rooms.service");
 const user_service_1 = require("../user/user.service");
 const messages_service_1 = require("../messages/messages.service");
@@ -45,7 +44,6 @@ exports.ChatModule = ChatModule = __decorate([
         controllers: [chat_controller_1.ChatController],
         providers: [
             chat_service_1.ChatService,
-            chat_gateway_1.ChatGateway,
             rooms_service_1.RoomsService,
             messages_service_1.MessageService,
             user_service_1.UserService,
