@@ -39,7 +39,93 @@ let ChatGateway = class ChatGateway {
         this.notificationService = notificationService;
     }
     afterInit(server) {
-        server.sockets.setMaxListeners(200);
+        server.sockets.setMaxListeners(2000);
+    }
+    async handleConnection(client) {
+        try {
+            const userId = await this.authService.getUserFromSocket(client);
+            if (!userId) {
+                client.disconnect(true);
+                return;
+            }
+            if (!this.connectionLock.has(userId.id)) {
+                const connectionPromise = (async () => {
+                    try {
+                        await this.handleNewConnection(userId.id, client);
+                    }
+                    catch (error) {
+                        client.disconnect(true);
+                    }
+                    finally {
+                        this.connectionLock.delete(userId.id);
+                    }
+                })();
+                this.connectionLock.set(userId.id, connectionPromise);
+            }
+            await this.connectionLock.get(userId.id);
+        }
+        catch (error) {
+            client.disconnect(true);
+        }
+    }
+    userConnections = new Map();
+    async handleNewConnection(userId, client) {
+        if (!this.userConnections.has(userId)) {
+            this.userConnections.set(userId, new Set());
+        }
+        this.userConnections.get(userId).add(client);
+        this.connectedUsers.set(userId, client);
+        client.join(`user_${userId}`);
+        const disconnectHandler = () => {
+            if (this.userConnections.has(userId)) {
+                this.userConnections.get(userId).delete(client);
+                if (this.userConnections.get(userId).size === 0) {
+                    this.userConnections.delete(userId);
+                }
+            }
+            if (this.connectedUsers.get(userId)?.id === client.id) {
+                const remainingConnections = this.userConnections.get(userId);
+                if (remainingConnections && remainingConnections.size > 0) {
+                    this.connectedUsers.set(userId, Array.from(remainingConnections)[0]);
+                }
+                else {
+                    this.connectedUsers.delete(userId);
+                }
+            }
+        };
+        client.on('disconnect', disconnectHandler);
+        client.data.disconnectHandler = disconnectHandler;
+    }
+    cleanupSocket(socket) {
+        if (socket.data?.disconnectHandler) {
+            socket.off('disconnect', socket.data.disconnectHandler);
+        }
+        this.removeAllListeners(socket);
+        socket.emit('connectionReplaced', {
+            message: 'Votre session a été remplacée par une nouvelle connexion'
+        });
+        socket.disconnect(false);
+    }
+    removeAllListeners(socket) {
+        if (socket.data?.listeners) {
+            Object.entries(socket.data.listeners).forEach(([event, handler]) => {
+                socket.off(event, handler);
+            });
+            delete socket.data.listeners;
+        }
+    }
+    handleUserDisconnect(userId, socketId) {
+        const currentSocket = this.connectedUsers.get(userId);
+        if (currentSocket?.id === socketId) {
+            this.removeAllListeners(currentSocket);
+            this.connectedUsers.delete(userId);
+        }
+    }
+    handleDisconnect(client) {
+        this.removeAllListeners(client);
+        if (client.data?.disconnectHandler) {
+            client.off('disconnect', client.data.disconnectHandler);
+        }
     }
     async handleJoinRoom(client, roomId) {
         try {
