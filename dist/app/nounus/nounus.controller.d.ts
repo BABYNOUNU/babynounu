@@ -7,7 +7,7 @@ export declare class NounusController {
     private readonly nounuService;
     constructor(nounuService: NounusService);
     create(files: any, createProfilNounusDto: CreateNounuDto): Promise<ProfilNounus>;
-    findAllNotCurrentUser(userId: string): Promise<ProfilNounus[]>;
+    findAllNotCurrentUser(userId: string, page: number, limit: number): Promise<ProfilNounus[]>;
     findAll(): Promise<ProfilNounus[]>;
     getNonCertifiedNounus(): Promise<ProfilNounus[]>;
     findOne(id: string): Promise<ProfilNounus>;
@@ -27,5 +27,8 @@ export declare class NounusController {
         certif: 'Approved' | 'Pending' | 'Rejected';
     }>;
     remove(id: string): Promise<void>;
-    searchNounu(searchCriteria: SearchNounuCriteriaDto): Promise<any[]>;
+    searchNounu(searchCriteria: SearchNounuCriteriaDto, page: number, limit: number): Promise<{
+        data: any[];
+        pagination: any;
+    }>;
 }

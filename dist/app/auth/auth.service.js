@@ -33,7 +33,7 @@ let AuthService = class AuthService {
         this.userService = userService;
     }
     async signUp({ signUpBody }) {
-        signUpBody.slug = await new slug_utils_1.SlugUtils().slug(signUpBody.email, this.userRepository);
+        signUpBody.slug = await new slug_utils_1.SlugUtils().slug(signUpBody.email.substring(0, signUpBody.email.indexOf('@')), this.userRepository);
         const user = await this.userRepository.findOne({
             where: { email: signUpBody.email },
         });

@@ -6,7 +6,7 @@ class SlugUtils {
     constructor() { }
     async slug(text, Repository) {
         let newSlug;
-        const _slug = (0, slugify_1.default)(`${text}-${Math.random().toString().substr(2, 6)}`, {
+        const _slug = (0, slugify_1.default)(`${text}-${Math.random().toString().substr(2, 6)}-baby`, {
             replacement: '-',
             lower: true,
             trim: true,

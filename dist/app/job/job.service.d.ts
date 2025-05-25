@@ -12,7 +12,7 @@ export declare class JobsService {
     private RelationShip;
     private preferenceKeys;
     createJob(createJobDto: CreateJobDto, files: any): Promise<Job>;
-    findAllJobs(): Promise<Job[]>;
+    findAllJobs(searchCriteria: any, page?: number, limit?: number): Promise<any>;
     findJobById(id: number): Promise<Job>;
     findAllJobByUser(userId: string): Promise<Job[]>;
     updateJob(id: string, updateJobDto: UpdateJobDto, files: any): Promise<any>;

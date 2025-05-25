@@ -11,7 +11,7 @@ export declare class ParentsService {
     private readonly mediaService;
     private readonly nounuService;
     constructor(parentsRepository: Repository<ProfilParents>, preferenceRepository: Repository<Preference>, mediaService: MediaService, nounuService: NounusService);
-    findAll(): Promise<ProfilParents[]>;
+    findAll(userId: any, page?: number, limit?: number): Promise<any>;
     findOne(id: string): Promise<any>;
     create(createParentDto: CreateParentDto, files: {
         imageParent: Express.Multer.File[];
@@ -20,5 +20,8 @@ export declare class ParentsService {
         imageParent: Express.Multer.File[];
     }): Promise<ProfilParents>;
     remove(id: string): Promise<void>;
-    search(searchCriteria: any): Promise<any[]>;
+    search(searchCriteria: any, page?: number, limit?: number): Promise<{
+        data: any[];
+        pagination: any;
+    }>;
 }

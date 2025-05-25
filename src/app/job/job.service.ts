@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { Job } from './models/job.model';
 import { CreateJobDto } from './dtos/create-job.dto';
 import { UpdateJobDto } from './dtos/update-job.dto';
@@ -130,12 +130,41 @@ export class JobsService {
     return job;
   }
 
-  async findAllJobs() {
-    const job = await this.jobRepository.find({
+  async findAllJobs(searchCriteria: any, page: number = 1, limit: number = 10): Promise<any> {
+ 
+    // Convertir les paramètres de pagination
+    page = parseInt(page.toString(), 10) || 1;
+    limit = parseInt(limit.toString(), 10) || 10;
+    const skip = (page - 1) * limit;
+    
+    // Construire la requête de recherche
+    const whereConditions: any = {};
+    
+    if (searchCriteria) whereConditions.titre = ILike(`%${searchCriteria}%`);
+    if (searchCriteria) whereConditions.description = ILike(`%${searchCriteria}%`);
+    
+    // Récupérer les jobs avec pagination et filtres
+    const [jobs, total] = await this.jobRepository.findAndCount({
       relations: this.RelationShip,
+      where: whereConditions,
+      skip: skip,
+      take: limit,
+      order: { createdAt: 'DESC' }
     });
-    const DataJobs = await this.ReturnN(job, this.preferenceKeys);
-    return DataJobs;
+    
+    const DataJobs = await this.ReturnN(jobs, this.preferenceKeys);
+    
+    return {
+      data: DataJobs,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+        hasNextPage: page < Math.ceil(total / limit),
+        hasPrevPage: page > 1
+      }
+    };
   }
 
   async findJobById(id: number) {

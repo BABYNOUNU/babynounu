@@ -27,8 +27,8 @@ let ParentController = class ParentController {
     constructor(parentService) {
         this.parentService = parentService;
     }
-    GetParents() {
-        return this.parentService.findAll();
+    GetParents(page, limit, userId) {
+        return this.parentService.findAll(userId, page, limit);
     }
     GetParent(id) {
         return this.parentService.findOne(id);
@@ -42,15 +42,18 @@ let ParentController = class ParentController {
     DeleteParent(id) {
         this.parentService.remove(id.toString());
     }
-    async searchParent(searchCriteria) {
+    async searchParent(searchCriteria, page, limit) {
         return this.parentService.search(searchCriteria);
     }
 };
 exports.ParentController = ParentController;
 __decorate([
     (0, common_1.Get)(''),
+    __param(0, (0, common_1.Query)('page')),
+    __param(1, (0, common_1.Query)('limit')),
+    __param(2, (0, common_1.Query)('userId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [Number, Number, String]),
     __metadata("design:returntype", void 0)
 ], ParentController.prototype, "GetParents", null);
 __decorate([
@@ -96,8 +99,10 @@ __decorate([
 __decorate([
     (0, common_1.Post)('search_parent'),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Query)('page')),
+    __param(2, (0, common_1.Query)('limit')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [search_parent_criteria_dto_1.SearchParentCriteriaDto]),
+    __metadata("design:paramtypes", [search_parent_criteria_dto_1.SearchParentCriteriaDto, Number, Number]),
     __metadata("design:returntype", Promise)
 ], ParentController.prototype, "searchParent", null);
 exports.ParentController = ParentController = __decorate([

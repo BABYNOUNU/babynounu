@@ -29,43 +29,50 @@ let ParentsService = class ParentsService {
         this.mediaService = mediaService;
         this.nounuService = nounuService;
     }
-    async findAll() {
-        const parents = await this.parentsRepository.find({
+    async findAll(userId, page = 1, limit = 10) {
+        page = parseInt(page.toString(), 10) || 1;
+        limit = parseInt(limit.toString(), 10) || 10;
+        const skip = (page - 1) * limit;
+        const [parents, total] = await this.parentsRepository.findAndCount({
             relations: [
                 'user',
                 'user.medias',
                 'user.medias.type_media',
                 'preferences',
-                'preferences.besions_specifiques',
                 'preferences.garde_enfants',
-                'preferences.aide_menagere',
-                'preferences.frequence_des_services',
                 'preferences.horaire_souhaites',
                 'preferences.adress',
-                'preferences.zone_geographique_prestataire',
-                'preferences.competance_specifique',
-                'preferences.langue_parler',
-                'preferences.disponibility_du_prestataire',
-                'preferences.mode_de_paiement',
             ],
+            where: {
+                user: {
+                    id: (0, typeorm_1.Not)(userId),
+                },
+            },
+            skip: skip,
+            take: limit,
+            order: {
+                createdAt: 'DESC',
+            },
         });
         if (!parents) {
             throw new common_1.NotFoundException(`Parent with not found`);
         }
-        const ProfilParents = await this.nounuService.ReturnN(parents, [
-            'besions_specifiques',
-            'garde_enfants',
-            'aide_menagere',
+        const formattedParents = await this.nounuService.ReturnN(parents, [
             'frequence_des_services',
             'horaire_souhaites',
             'adress',
-            'zone_geographique_prestataire',
-            'competance_specifique',
-            'langue_parler',
-            'disponibility_du_prestataire',
-            'mode_de_paiement',
         ]);
-        return ProfilParents;
+        return {
+            data: formattedParents,
+            pagination: {
+                total,
+                page,
+                limit,
+                totalPages: Math.ceil(total / limit),
+                hasNextPage: page < Math.ceil(total / limit),
+                hasPrevPage: page > 1
+            }
+        };
     }
     async findOne(id) {
         const parent = await this.parentsRepository.findOne({
@@ -221,43 +228,31 @@ let ParentsService = class ParentsService {
             throw new common_1.NotFoundException(`Parent with id ${id} not found`);
         }
     }
-    async search(searchCriteria) {
-        const { besions_specifiques, garde_enfants, aide_menagere, frequence_des_services, horaire_souhaites, zone_geographique_prestataire, disponibility_du_prestataire, fullname } = searchCriteria;
+    async search(searchCriteria, page = 1, limit = 10) {
+        const { besions_specifiques, garde_enfants, aide_menagere, frequence_des_services, horaire_souhaites, zone_geographique_prestataire, disponibility_du_prestataire, fullname, } = searchCriteria;
+        const pageNum = parseInt(page.toString(), 10) || 1;
+        const limitNum = parseInt(limit.toString(), 10) || 10;
         const _parents = await this.parentsRepository.find({
             relations: [
                 'user',
                 'user.medias',
                 'user.medias.type_media',
                 'preferences',
-                'preferences.besions_specifiques',
                 'preferences.garde_enfants',
-                'preferences.aide_menagere',
-                'preferences.frequence_des_services',
                 'preferences.horaire_souhaites',
                 'preferences.adress',
-                'preferences.zone_geographique_prestataire',
-                'preferences.competance_specifique',
-                'preferences.langue_parler',
-                'preferences.disponibility_du_prestataire',
-                'preferences.mode_de_paiement',
             ],
         });
         const parents = await this.nounuService.ReturnN(_parents, [
-            'besions_specifiques',
-            'garde_enfants',
-            'aide_menagere',
             'frequence_des_services',
             'horaire_souhaites',
             'adress',
-            'zone_geographique_prestataire',
-            'competance_specifique',
-            'langue_parler',
-            'disponibility_du_prestataire',
-            'mode_de_paiement',
         ]);
         const filteredParents = parents.filter((parent) => {
             if (fullname) {
-                const hasMatchingFullname = parent.fullname.toLowerCase().includes(fullname.toLowerCase());
+                const hasMatchingFullname = parent.fullname
+                    .toLowerCase()
+                    .includes(fullname.toLowerCase());
                 if (!hasMatchingFullname)
                     return false;
             }
@@ -286,19 +281,35 @@ let ParentsService = class ParentsService {
                 if (!hasMatchingHoraire)
                     return false;
             }
-            if (zone_geographique_prestataire && zone_geographique_prestataire.length > 0) {
+            if (zone_geographique_prestataire &&
+                zone_geographique_prestataire.length > 0) {
                 const hasMatchingZone = parent.preferences.zone_geographique_prestataire.some((zone) => zone_geographique_prestataire.includes(zone.id));
                 if (!hasMatchingZone)
                     return false;
             }
-            if (disponibility_du_prestataire && disponibility_du_prestataire.length > 0) {
+            if (disponibility_du_prestataire &&
+                disponibility_du_prestataire.length > 0) {
                 const hasMatchingDisponibility = parent.preferences.disponibility_du_prestataire.some((disponibility) => disponibility_du_prestataire.includes(disponibility.id));
                 if (!hasMatchingDisponibility)
                     return false;
             }
             return true;
         });
-        return filteredParents;
+        const total = filteredParents.length;
+        const startIndex = (pageNum - 1) * limitNum;
+        const endIndex = pageNum * limitNum;
+        const paginatedData = filteredParents.slice(startIndex, endIndex);
+        return {
+            data: paginatedData,
+            pagination: {
+                total,
+                page: pageNum,
+                limit: limitNum,
+                totalPages: Math.ceil(total / limitNum),
+                hasNextPage: pageNum < Math.ceil(total / limitNum),
+                hasPrevPage: pageNum > 1,
+            },
+        };
     }
 };
 exports.ParentsService = ParentsService;

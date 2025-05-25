@@ -13,6 +13,7 @@ import {
     Req,
     UploadedFiles,
     UseInterceptors,
+    Query,
   } from '@nestjs/common';
   import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam } from '@nestjs/swagger';
   import { JobsService } from './job.service';
@@ -50,8 +51,12 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
     @Get()
     @ApiOperation({ summary: 'Get all job postings' })
     @ApiResponse({ status: 200, description: 'Jobs retrieved successfully' })
-    async findAllJobs() {
-      return this.jobsService.findAllJobs();
+    async findAllJobs(
+      @Query('search') searchCriteria: string,
+      @Query('page') page: number,
+      @Query('limit') limit: number
+    ) {
+      return this.jobsService.findAllJobs(searchCriteria, page, limit);
     }
   
     @Get(':id')
@@ -111,5 +116,4 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
 async getJobApplyByUserId(@Param('userId') userId: string) {
   return this.jobsService.getJobApplyByUserId(userId);
 }
-
   }

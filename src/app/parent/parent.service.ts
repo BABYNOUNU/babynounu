@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { In, Not, Repository } from 'typeorm';
 import { ProfilParents } from './models/parent.model';
 import { CreateParentDto } from './dto/create-parent.dto';
 import { UpdateParentDto } from './dto/update-parent.dto';
@@ -27,44 +27,57 @@ export class ParentsService {
     private readonly nounuService: NounusService,
   ) {}
 
-  async findAll(): Promise<ProfilParents[]> {
-    const parents = await this.parentsRepository.find({
+  async findAll(userId: any, page: number = 1, limit: number = 10): Promise<any> {
+    // Convertir les paramètres de pagination en nombres
+    page = parseInt(page.toString(), 10) || 1;
+    limit = parseInt(limit.toString(), 10) || 10;
+    const skip = (page - 1) * limit;
+    
+    // Récupérer les parents avec pagination
+    const [parents, total] = await this.parentsRepository.findAndCount({
       relations: [
         'user',
         'user.medias',
         'user.medias.type_media',
         'preferences',
-        'preferences.besions_specifiques',
         'preferences.garde_enfants',
-        'preferences.aide_menagere',
-        'preferences.frequence_des_services',
         'preferences.horaire_souhaites',
         'preferences.adress',
-        'preferences.zone_geographique_prestataire',
-        'preferences.competance_specifique',
-        'preferences.langue_parler',
-        'preferences.disponibility_du_prestataire',
-        'preferences.mode_de_paiement',
       ],
+      where: {
+        user: {
+          id: Not(userId), // Exclure l'utilisateur connecté
+        },
+      },
+      skip: skip,
+      take: limit,
+      order: {
+        createdAt: 'DESC', // Trier par date de création (du plus récent au plus ancien)
+      },
     });
+    
     if (!parents) {
       throw new NotFoundException(`Parent with not found`);
     }
-    const ProfilParents = await this.nounuService.ReturnN(parents, [
-      'besions_specifiques',
-      'garde_enfants',
-      'aide_menagere',
+    
+    const formattedParents = await this.nounuService.ReturnN(parents, [
       'frequence_des_services',
       'horaire_souhaites',
       'adress',
-      'zone_geographique_prestataire',
-      'competance_specifique',
-      'langue_parler',
-      'disponibility_du_prestataire',
-      'mode_de_paiement',
     ]);
 
-    return ProfilParents;
+    // Retourner les données avec les métadonnées de pagination
+    return {
+      data: formattedParents,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+        hasNextPage: page < Math.ceil(total / limit),
+        hasPrevPage: page > 1
+      }
+    };
   }
 
   async findOne(id: string): Promise<any> {
@@ -261,7 +274,11 @@ export class ParentsService {
     }
   }
 
-  async search(searchCriteria: any): Promise<any[]> {
+  async search(
+    searchCriteria: any,
+    page = 1,
+    limit = 10,
+  ): Promise<{ data: any[]; pagination: any }> {
     const {
       besions_specifiques,
       garde_enfants,
@@ -270,9 +287,13 @@ export class ParentsService {
       horaire_souhaites,
       zone_geographique_prestataire,
       disponibility_du_prestataire,
-      fullname
+      fullname,
     } = searchCriteria;
-  
+
+    // Convertir page et limit en nombres
+    const pageNum = parseInt(page.toString(), 10) || 1;
+    const limitNum = parseInt(limit.toString(), 10) || 10;
+
     // Récupérer tous les parents avec les relations nécessaires
     const _parents = await this.parentsRepository.find({
       relations: [
@@ -280,108 +301,117 @@ export class ParentsService {
         'user.medias',
         'user.medias.type_media',
         'preferences',
-        'preferences.besions_specifiques',
         'preferences.garde_enfants',
-        'preferences.aide_menagere',
-        'preferences.frequence_des_services',
         'preferences.horaire_souhaites',
         'preferences.adress',
-        'preferences.zone_geographique_prestataire',
-        'preferences.competance_specifique',
-        'preferences.langue_parler',
-        'preferences.disponibility_du_prestataire',
-        'preferences.mode_de_paiement',
       ],
     });
 
-    const parents = await this.nounuService.ReturnN(
-      _parents,
-      [
-        'besions_specifiques',
-        'garde_enfants',
-        'aide_menagere',
-        'frequence_des_services',
-        'horaire_souhaites',
-        'adress',
-        'zone_geographique_prestataire',
-        'competance_specifique',
-        'langue_parler',
-        'disponibility_du_prestataire',
-        'mode_de_paiement',
-      ],
-    );
+    const parents = await this.nounuService.ReturnN(_parents, [
+      'frequence_des_services',
+      'horaire_souhaites',
+      'adress',
+    ]);
 
-  
-  
     // Filtrer les parents en fonction des critères de recherche
     const filteredParents = parents.filter((parent: any) => {
-
       // Filtrer par fullname
       if (fullname) {
-        const hasMatchingFullname = parent.fullname.toLowerCase().includes(fullname.toLowerCase());
+        const hasMatchingFullname = parent.fullname
+          .toLowerCase()
+          .includes(fullname.toLowerCase());
         if (!hasMatchingFullname) return false;
       }
 
       // Filtrer par besoins spécifiques
       if (besions_specifiques && besions_specifiques.length > 0) {
-        const hasMatchingBesoin = parent.preferences.besions_specifiques.some((besoin: any) =>
-          besions_specifiques.includes(besoin.id)
+        const hasMatchingBesoin = parent.preferences.besions_specifiques.some(
+          (besoin: any) => besions_specifiques.includes(besoin.id),
         );
         if (!hasMatchingBesoin) return false;
       }
 
       // Filtrer par garde d'enfants
       if (garde_enfants && garde_enfants.length > 0) {
-        const hasMatchingGarde = parent.preferences.garde_enfants.some((garde: any) =>
-          garde_enfants.includes(garde.id)
+        const hasMatchingGarde = parent.preferences.garde_enfants.some(
+          (garde: any) => garde_enfants.includes(garde.id),
         );
         if (!hasMatchingGarde) return false;
       }
 
       // Filtrer par aide ménagère
       if (aide_menagere && aide_menagere.length > 0) {
-        const hasMatchingAide = parent.preferences.aide_menagere.some((aide: any) =>
-          aide_menagere.includes(aide.id)
+        const hasMatchingAide = parent.preferences.aide_menagere.some(
+          (aide: any) => aide_menagere.includes(aide.id),
         );
         if (!hasMatchingAide) return false;
       }
 
       // Filtrer par fréquence des services
       if (frequence_des_services && frequence_des_services.length > 0) {
-        const hasMatchingFrequence = parent.preferences.frequence_des_services.some((frequence: any) =>
-          frequence_des_services.includes(frequence.id)
-        );
+        const hasMatchingFrequence =
+          parent.preferences.frequence_des_services.some((frequence: any) =>
+            frequence_des_services.includes(frequence.id),
+          );
         if (!hasMatchingFrequence) return false;
       }
 
       // Filtrer par horaires souhaités
       if (horaire_souhaites && horaire_souhaites.length > 0) {
-        const hasMatchingHoraire = parent.preferences.horaire_souhaites.some((horaire: any) =>
-          horaire_souhaites.includes(horaire.id)
+        const hasMatchingHoraire = parent.preferences.horaire_souhaites.some(
+          (horaire: any) => horaire_souhaites.includes(horaire.id),
         );
         if (!hasMatchingHoraire) return false;
       }
 
       // Filtrer par zone géographique du prestataire
-      if (zone_geographique_prestataire && zone_geographique_prestataire.length > 0) {
-        const hasMatchingZone = parent.preferences.zone_geographique_prestataire.some((zone: any) =>
-          zone_geographique_prestataire.includes(zone.id)
-        );
+      if (
+        zone_geographique_prestataire &&
+        zone_geographique_prestataire.length > 0
+      ) {
+        const hasMatchingZone =
+          parent.preferences.zone_geographique_prestataire.some((zone: any) =>
+            zone_geographique_prestataire.includes(zone.id),
+          );
         if (!hasMatchingZone) return false;
       }
 
       // Filtrer par disponibilité du prestataire
-      if (disponibility_du_prestataire && disponibility_du_prestataire.length > 0) {
-        const hasMatchingDisponibility = parent.preferences.disponibility_du_prestataire.some((disponibility: any) =>
-          disponibility_du_prestataire.includes(disponibility.id)
-        );
+      if (
+        disponibility_du_prestataire &&
+        disponibility_du_prestataire.length > 0
+      ) {
+        const hasMatchingDisponibility =
+          parent.preferences.disponibility_du_prestataire.some(
+            (disponibility: any) =>
+              disponibility_du_prestataire.includes(disponibility.id),
+          );
         if (!hasMatchingDisponibility) return false;
       }
 
       // Si tous les critères sont satisfaits, inclure le parent dans les résultats
       return true;
     });
-  
-    return filteredParents;
+
+    // Calculer le nombre total d'éléments pour la pagination
+    const total = filteredParents.length;
+
+    // Appliquer la pagination
+    const startIndex = (pageNum - 1) * limitNum;
+    const endIndex = pageNum * limitNum;
+    const paginatedData = filteredParents.slice(startIndex, endIndex);
+
+    // Retourner les données avec les métadonnées de pagination
+    return {
+      data: paginatedData,
+      pagination: {
+        total,
+        page: pageNum,
+        limit: limitNum,
+        totalPages: Math.ceil(total / limitNum),
+        hasNextPage: pageNum < Math.ceil(total / limitNum),
+        hasPrevPage: pageNum > 1,
+      },
+    };
   }
 }

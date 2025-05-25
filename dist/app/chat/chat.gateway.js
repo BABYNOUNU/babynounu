@@ -332,6 +332,39 @@ let ChatGateway = class ChatGateway {
             throw new websockets_1.WsException(error.message);
         }
     }
+    async handleUserOnline(client, data) {
+        try {
+            const user = await this.authService.getUserFromSocket(client);
+            if (!user || user.id !== data.userId) {
+                throw new websockets_1.WsException('Unauthorized');
+            }
+            this.server.emit('userOnlineStatus', {
+                userId: data.userId,
+                isOnline: true
+            });
+            return { success: true };
+        }
+        catch (error) {
+            throw new websockets_1.WsException(error.message);
+        }
+    }
+    async handleCheckMultipleUsersStatus(client, data) {
+        try {
+            const user = await this.authService.getUserFromSocket(client);
+            if (!user) {
+                throw new websockets_1.WsException('Unauthorized');
+            }
+            const onlineStatus = data.userIds.reduce((acc, userId) => {
+                acc[userId] = this.isUserOnline(userId);
+                return acc;
+            }, {});
+            client.emit('multipleUsersStatus', onlineStatus);
+            return { success: true, onlineStatus };
+        }
+        catch (error) {
+            throw new websockets_1.WsException(error.message);
+        }
+    }
     isUserOnline(userId) {
         return this.connectedUsers.has(userId);
     }
@@ -461,6 +494,24 @@ __decorate([
     __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
     __metadata("design:returntype", Promise)
 ], ChatGateway.prototype, "checkPaymentPoint", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('userOnline'),
+    (0, common_1.UseGuards)(ws_auth_guard_1.WsJwtGuard),
+    __param(0, (0, websockets_1.ConnectedSocket)()),
+    __param(1, (0, websockets_1.MessageBody)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [socket_io_1.Socket, Object]),
+    __metadata("design:returntype", Promise)
+], ChatGateway.prototype, "handleUserOnline", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('checkMultipleUsersStatus'),
+    (0, common_1.UseGuards)(ws_auth_guard_1.WsJwtGuard),
+    __param(0, (0, websockets_1.ConnectedSocket)()),
+    __param(1, (0, websockets_1.MessageBody)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [socket_io_1.Socket, Object]),
+    __metadata("design:returntype", Promise)
+], ChatGateway.prototype, "handleCheckMultipleUsersStatus", null);
 exports.ChatGateway = ChatGateway = __decorate([
     (0, websockets_1.WebSocketGateway)({
         cors: {
@@ -469,7 +520,6 @@ exports.ChatGateway = ChatGateway = __decorate([
         },
         pingTimeout: 30000,
         pingInterval: 10000,
-        transports: ['websocket']
     }),
     __metadata("design:paramtypes", [rooms_service_1.RoomsService,
         auth_service_1.AuthService,

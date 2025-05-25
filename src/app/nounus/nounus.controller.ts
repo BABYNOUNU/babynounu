@@ -65,9 +65,11 @@ export class NounusController {
     type: [ProfilNounus],
   })
   async findAllNotCurrentUser(
-    @Query() userId: string,
+    @Query('userId') userId: string,
+    @Query('page') page: number,
+    @Query('limit') limit: number,
   ): Promise<ProfilNounus[]> {
-    return await this.nounuService.findAllNotCurrentUser(userId);
+    return await this.nounuService.findAllNotCurrentUser(userId, page, limit);
   }
 
   @Get('all')
@@ -198,7 +200,7 @@ export class NounusController {
   async pendingCertification(
     @Param('id') id: string,
   ): Promise<{ certif: 'Approved' | 'Pending' | 'Rejected' }> {
-    console.log(id)
+    console.log(id);
     return await this.nounuService.pendingCertification(id);
   }
 
@@ -215,7 +217,11 @@ export class NounusController {
   }
 
   @Post('search')
-  async searchNounu(@Body() searchCriteria: SearchNounuCriteriaDto) {
-    return this.nounuService.search(searchCriteria);
+  async searchNounu(
+    @Body() searchCriteria: SearchNounuCriteriaDto,
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+  ) {
+    return this.nounuService.search(searchCriteria, page, limit);
   }
 }

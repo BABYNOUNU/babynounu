@@ -24,7 +24,7 @@ import { NotificationService } from '../notification/notification.service';
   },
   pingTimeout: 30000, // Réduire à 30s
   pingInterval: 10000, // Réduire à 10s
-  transports: ['websocket']
+  // transports: ['websocket']
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
@@ -497,6 +497,58 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       throw new WsException(error.message);
     }
   }
+
+@SubscribeMessage('userOnline')
+@UseGuards(WsJwtGuard)
+async handleUserOnline(
+  @ConnectedSocket() client: Socket,
+  @MessageBody() data: { userId: string },
+) {
+  try {
+    const user = await this.authService.getUserFromSocket(client);
+    if (!user || user.id !== data.userId) {
+      throw new WsException('Unauthorized');
+    }
+
+    // Emit online status to all connected users
+    this.server.emit('userOnlineStatus', {
+      userId: data.userId,
+      isOnline: true
+    });
+
+    return { success: true };
+  } catch (error) {
+    throw new WsException(error.message);
+  }
+}
+
+@SubscribeMessage('checkMultipleUsersStatus')
+@UseGuards(WsJwtGuard)
+async handleCheckMultipleUsersStatus(
+  @ConnectedSocket() client: Socket,
+  @MessageBody() data: { userIds: string[] },
+) {
+  try {
+    const user = await this.authService.getUserFromSocket(client);
+    if (!user) {
+      throw new WsException('Unauthorized');
+    }
+
+    // Create a map of online status for each requested user
+    const onlineStatus = data.userIds.reduce((acc, userId) => {
+      acc[userId] = this.isUserOnline(userId);
+      return acc;
+    }, {} as Record<string, boolean>);
+
+    // Send status back to requesting client
+    client.emit('multipleUsersStatus', onlineStatus);
+
+    return { success: true, onlineStatus };
+  } catch (error) {
+    throw new WsException(error.message);
+  }
+}
+
 
   // Utility methods
   isUserOnline(userId: string): boolean {

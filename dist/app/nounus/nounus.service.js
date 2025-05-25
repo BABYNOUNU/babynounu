@@ -16,8 +16,10 @@ exports.NounusService = void 0;
 const notification_service_1 = require("./../notification/notification.service");
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("typeorm");
+const nounu_model_1 = require("./models/nounu.model");
 const media_service_1 = require("../media/media.service");
 const database_providers_1 = require("../../database/database.providers");
+const preference_model_1 = require("../Preference/models/preference.model");
 let NounusService = class NounusService {
     nounuRepository;
     preferenceRepository;
@@ -31,50 +33,7 @@ let NounusService = class NounusService {
     }
     async create(createNounuDto, files) {
         const { userId, ...nounuData } = createNounuDto;
-        const savedNounu = await this.nounuRepository.save({
-            ...nounuData,
-            urgences: nounuData.urgences === 'true' ? true : false,
-            flexibilite_tarifaire: nounuData.flexibilite_tarifaire === 'true' ? true : false,
-            user: { id: userId },
-        });
-        if (!savedNounu) {
-            throw new common_1.BadRequestException('Nounu not created');
-        }
-        if (files.imageNounu?.length > 0) {
-            const imageNounu = files.imageNounu[0];
-            await this.mediaService.create({
-                originalName: imageNounu.originalname,
-                filename: imageNounu.filename,
-                path: imageNounu.path,
-                originalUrl: `${database_providers_1.HOST}/uploads/${imageNounu.filename}`,
-                userId: userId,
-                typeMedia: 'image-profil',
-            });
-            if (files.documents?.length > 0) {
-                for (const document of files.documents) {
-                    await this.mediaService.create({
-                        originalName: document.originalname,
-                        filename: document.filename,
-                        path: document.path,
-                        originalUrl: `${database_providers_1.HOST}/uploads/${document.filename}`,
-                        userId: userId,
-                        typeMedia: 'document-verification',
-                    });
-                }
-            }
-            if (files.gallery?.length > 0) {
-                for (const gallery of files.gallery) {
-                    await this.mediaService.create({
-                        originalName: gallery.originalname,
-                        filename: gallery.filename,
-                        path: gallery.path,
-                        originalUrl: `${database_providers_1.HOST}/uploads/${gallery.filename}`,
-                        userId: userId,
-                        typeMedia: 'gallery-image',
-                    });
-                }
-            }
-        }
+        const parsedPreferences = {};
         const preferenceKeys = [
             'zone_de_travail',
             'horaire_disponible',
@@ -85,46 +44,122 @@ let NounusService = class NounusService {
             'certifications_criteres',
         ];
         for (const key of preferenceKeys) {
-            const value = JSON.parse(createNounuDto[key]);
-            if (Array.isArray(value)) {
-                const preferenceEntities = value.map((el) => ({
-                    nounus: savedNounu,
-                    [key]: el.id,
-                }));
-                await this.preferenceRepository.save(preferenceEntities);
-            }
+            parsedPreferences[key] = JSON.parse(createNounuDto[key]);
         }
-        return savedNounu;
+        const queryRunner = this.nounuRepository.manager.connection.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+        try {
+            const savedNounu = await queryRunner.manager.save(nounu_model_1.ProfilNounus, {
+                ...nounuData,
+                urgences: nounuData.urgences === 'true' ? true : false,
+                flexibilite_tarifaire: nounuData.flexibilite_tarifaire === 'true' ? true : false,
+                user: { id: userId },
+            });
+            const mediaToCreate = [];
+            if (files.imageNounu?.length > 0) {
+                const imageNounu = files.imageNounu[0];
+                mediaToCreate.push({
+                    originalName: imageNounu.originalname,
+                    filename: imageNounu.filename,
+                    path: imageNounu.path,
+                    originalUrl: `${database_providers_1.HOST}/uploads/${imageNounu.filename}`,
+                    userId: userId,
+                    typeMedia: 'image-profil',
+                });
+                if (files.documents?.length > 0) {
+                    for (const document of files.documents) {
+                        mediaToCreate.push({
+                            originalName: document.originalname,
+                            filename: document.filename,
+                            path: document.path,
+                            originalUrl: `${database_providers_1.HOST}/uploads/${document.filename}`,
+                            userId: userId,
+                            typeMedia: 'document-verification',
+                        });
+                    }
+                }
+                if (files.gallery?.length > 0) {
+                    for (const gallery of files.gallery) {
+                        mediaToCreate.push({
+                            originalName: gallery.originalname,
+                            filename: gallery.filename,
+                            path: gallery.path,
+                            originalUrl: `${database_providers_1.HOST}/uploads/${gallery.filename}`,
+                            userId: userId,
+                            typeMedia: 'gallery-image',
+                        });
+                    }
+                }
+            }
+            if (mediaToCreate.length > 0) {
+                await Promise.all(mediaToCreate.map(media => this.mediaService.create(media)));
+            }
+            const preferencesToSave = [];
+            for (const key of preferenceKeys) {
+                const value = parsedPreferences[key];
+                if (Array.isArray(value)) {
+                    value.forEach(el => {
+                        preferencesToSave.push({
+                            nounus: savedNounu,
+                            [key]: el.id,
+                        });
+                    });
+                }
+            }
+            if (preferencesToSave.length > 0) {
+                await queryRunner.manager.save(preference_model_1.Preference, preferencesToSave);
+            }
+            await queryRunner.commitTransaction();
+            return savedNounu;
+        }
+        catch (error) {
+            await queryRunner.rollbackTransaction();
+            throw new common_1.BadRequestException('Erreur lors de la création du profil: ' + error.message);
+        }
+        finally {
+            await queryRunner.release();
+        }
     }
-    async findAllNotCurrentUser(userId) {
-        const nounus = await this.nounuRepository.find({
+    async findAllNotCurrentUser(userId, page = 1, limit = 10) {
+        page = parseInt(page.toString(), 10) || 1;
+        limit = parseInt(limit.toString(), 10) || 10;
+        const skip = (page - 1) * limit;
+        const [nounus, total] = await this.nounuRepository.findAndCount({
             relations: [
                 'user',
                 'user.medias',
                 'user.medias.type_media',
                 'preferences',
-                'preferences.zone_de_travail',
                 'preferences.horaire_disponible',
                 'preferences.adress',
-                'preferences.tranche_age_enfants',
-                'preferences.competance_specifique',
-                'preferences.langue_parler',
-                'preferences.certifications_criteres',
             ],
             where: {
                 user: {
-                    id: (0, typeorm_1.Not)(userId.userId),
+                    id: (0, typeorm_1.Not)(userId),
                 },
             },
+            skip: skip,
+            take: limit,
+            order: {
+                createdAt: 'DESC',
+            },
         });
-        return await this.ReturnN(nounus, [
-            'zone_de_travail',
+        const formattedNounus = await this.ReturnN(nounus, [
             'horaire_disponible',
-            'adress',
-            'tranche_age_enfants',
-            'competance_specifique',
-            'langue_parler',
+            'adress'
         ]);
+        return {
+            data: formattedNounus,
+            pagination: {
+                total,
+                page,
+                limit,
+                totalPages: Math.ceil(total / limit),
+                hasNextPage: page < Math.ceil(total / limit),
+                hasPrevPage: page > 1
+            }
+        };
     }
     async findAll() {
         const nounus = await this.nounuRepository.find({
@@ -133,22 +168,13 @@ let NounusService = class NounusService {
                 'user.medias',
                 'user.medias.type_media',
                 'preferences',
-                'preferences.zone_de_travail',
                 'preferences.horaire_disponible',
                 'preferences.adress',
-                'preferences.tranche_age_enfants',
-                'preferences.competance_specifique',
-                'preferences.langue_parler',
-                'preferences.certifications_criteres',
             ],
         });
         return await this.ReturnN(nounus, [
-            'zone_de_travail',
             'horaire_disponible',
             'adress',
-            'tranche_age_enfants',
-            'competance_specifique',
-            'langue_parler',
         ]);
     }
     async findOne(id) {
@@ -184,82 +210,104 @@ let NounusService = class NounusService {
     }
     async update(id, updateNounuDto, files) {
         const { userId, ...nounuData } = updateNounuDto;
-        const existingNounu = await this.nounuRepository.findOne({
-            where: { id: id },
-            relations: ['user'],
-        });
-        if (!existingNounu) {
-            throw new common_1.NotFoundException('Nounu not found');
-        }
-        const updatedNounu = await this.nounuRepository.save({
-            ...existingNounu,
-            ...nounuData,
-            urgences: nounuData.urgences === 'true' ? true : false,
-            flexibilite_tarifaire: nounuData.flexibilite_tarifaire === 'true' ? true : false,
-            user: { id: userId },
-        });
-        if (!updatedNounu) {
-            throw new common_1.BadRequestException('Nounu not updated');
-        }
-        if (files.imageNounu?.length > 0) {
-            const imageNounu = files.imageNounu[0];
-            await this.mediaService.update({ id: existingNounu.user.id, typeMedia: 'image-profil' }, {
-                originalName: imageNounu.originalname,
-                filename: imageNounu.filename,
-                path: imageNounu.path,
-                originalUrl: `${database_providers_1.HOST}/uploads/${imageNounu.filename}`,
+        const queryRunner = this.nounuRepository.manager.connection.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+        try {
+            const existingNounu = await queryRunner.manager.findOne(nounu_model_1.ProfilNounus, {
+                where: { id: id },
+                relations: ['user'],
             });
-        }
-        if (files.documents?.length > 0) {
-            for (const document of files.documents) {
-                await this.mediaService.create({
+            if (!existingNounu) {
+                throw new common_1.NotFoundException('Nounu not found');
+            }
+            const updatedNounu = await queryRunner.manager.save(nounu_model_1.ProfilNounus, {
+                ...existingNounu,
+                ...nounuData,
+                urgences: nounuData.urgences === 'true' ? true : false,
+                flexibilite_tarifaire: nounuData.flexibilite_tarifaire === 'true' ? true : false,
+                user: { id: userId },
+            });
+            const mediaPromises = [];
+            if (files.imageNounu?.length > 0) {
+                const imageNounu = files.imageNounu[0];
+                mediaPromises.push(this.mediaService.update({ id: existingNounu.user.id, typeMedia: 'image-profil' }, {
+                    originalName: imageNounu.originalname,
+                    filename: imageNounu.filename,
+                    path: imageNounu.path,
+                    originalUrl: `${database_providers_1.HOST}/uploads/${imageNounu.filename}`,
+                }));
+            }
+            if (files.documents?.length > 0) {
+                const documentsToCreate = files.documents.map(document => ({
                     originalName: document.originalname,
                     filename: document.filename,
                     path: document.path,
                     originalUrl: `${database_providers_1.HOST}/uploads/${document.filename}`,
                     userId: userId,
                     typeMedia: 'document-verification',
-                });
+                }));
+                mediaPromises.push(Promise.all(documentsToCreate.map(doc => this.mediaService.create(doc))));
             }
-        }
-        if (files.gallery?.length > 0) {
-            for (const gallery of files.gallery) {
-                await this.mediaService.create({
+            if (files.gallery?.length > 0) {
+                const galleryToCreate = files.gallery.map(gallery => ({
                     originalName: gallery.originalname,
                     filename: gallery.filename,
                     path: gallery.path,
                     originalUrl: `${database_providers_1.HOST}/uploads/${gallery.filename}`,
                     userId: userId,
                     typeMedia: 'gallery-image',
-                });
-            }
-        }
-        const preferenceKeys = [
-            'zone_de_travail',
-            'horaire_disponible',
-            'adress',
-            'tranche_age_enfants',
-            'competance_specifique',
-            'langue_parler',
-            'certifications_criteres',
-        ];
-        for (const key of preferenceKeys) {
-            const value = JSON.parse(updateNounuDto[key]);
-            if (Array.isArray(value)) {
-                await this.preferenceRepository.delete({ nounus: updatedNounu });
-            }
-        }
-        for (const key of preferenceKeys) {
-            const value = JSON.parse(updateNounuDto[key]);
-            if (Array.isArray(value)) {
-                const preferenceEntities = value.map((el) => ({
-                    nounus: updatedNounu,
-                    [key]: el.id,
                 }));
-                await this.preferenceRepository.save(preferenceEntities);
+                mediaPromises.push(Promise.all(galleryToCreate.map(img => this.mediaService.create(img))));
             }
+            if (mediaPromises.length > 0) {
+                await Promise.all(mediaPromises);
+            }
+            const preferenceKeys = [
+                'zone_de_travail',
+                'horaire_disponible',
+                'adress',
+                'tranche_age_enfants',
+                'competance_specifique',
+                'langue_parler',
+                'certifications_criteres',
+            ];
+            const parsedPreferences = {};
+            let hasPreferences = false;
+            for (const key of preferenceKeys) {
+                if (updateNounuDto[key]) {
+                    parsedPreferences[key] = JSON.parse(updateNounuDto[key]);
+                    if (Array.isArray(parsedPreferences[key]) && parsedPreferences[key].length > 0) {
+                        hasPreferences = true;
+                    }
+                }
+            }
+            if (hasPreferences) {
+                await queryRunner.manager.delete(preference_model_1.Preference, { nounus: { id: updatedNounu.id } });
+                const allPreferences = [];
+                for (const key of preferenceKeys) {
+                    if (parsedPreferences[key] && Array.isArray(parsedPreferences[key])) {
+                        const prefsForKey = parsedPreferences[key].map(el => ({
+                            nounus: updatedNounu,
+                            [key]: el.id,
+                        }));
+                        allPreferences.push(...prefsForKey);
+                    }
+                }
+                if (allPreferences.length > 0) {
+                    await queryRunner.manager.save(preference_model_1.Preference, allPreferences);
+                }
+            }
+            await queryRunner.commitTransaction();
+            return updatedNounu;
         }
-        return updatedNounu;
+        catch (error) {
+            await queryRunner.rollbackTransaction();
+            throw new common_1.BadRequestException('Erreur lors de la mise à jour du profil: ' + error.message);
+        }
+        finally {
+            await queryRunner.release();
+        }
     }
     async updatePoints(id, points) {
         const nounu = await this.findOne(id);
@@ -269,27 +317,53 @@ let NounusService = class NounusService {
         this.nounuRepository.increment({ id }, 'points', points);
         return nounu;
     }
+    async decrementPoints(id, points) {
+        const nounu = await this.findOne(id);
+        if (!nounu) {
+            throw new common_1.NotFoundException(`ProfilNounus with ID ${id} not found`);
+        }
+        if (nounu.points < points) {
+            throw new common_1.BadRequestException('Not enough points to decrement');
+        }
+        await this.nounuRepository.decrement({ id }, 'points', points);
+        return await this.findOne(id);
+    }
     async remove(id) {
         const nounu = await this.findOne(id);
         await this.nounuRepository.remove(nounu);
     }
-    async search(searchCriteria) {
+    async search(searchCriteria, page = 1, limit = 1) {
+        page = parseInt(page.toString(), 10) || 1;
+        limit = parseInt(limit.toString(), 10) || 1;
         const { fullname, description, zone_de_travail, horaire_disponible, adress, tranche_age_enfants, competance_specifique, langue_parler, } = searchCriteria;
-        const _nounus = await this.nounuRepository.find({
-            relations: [
-                'user',
-                'user.medias',
-                'user.medias.type_media',
-                'preferences',
-                'preferences.zone_de_travail',
-                'preferences.horaire_disponible',
-                'preferences.adress',
-                'preferences.tranche_age_enfants',
-                'preferences.competance_specifique',
-                'preferences.langue_parler',
-                'preferences.certifications_criteres',
-            ],
-        });
+        let queryBuilder = this.nounuRepository.createQueryBuilder('nounu')
+            .leftJoinAndSelect('nounu.user', 'user')
+            .leftJoinAndSelect('user.medias', 'medias')
+            .leftJoinAndSelect('medias.type_media', 'type_media')
+            .leftJoinAndSelect('nounu.preferences', 'preferences')
+            .leftJoinAndSelect('preferences.zone_de_travail', 'zone_de_travail')
+            .leftJoinAndSelect('preferences.horaire_disponible', 'horaire_disponible')
+            .leftJoinAndSelect('preferences.adress', 'adress')
+            .leftJoinAndSelect('preferences.tranche_age_enfants', 'tranche_age_enfants')
+            .leftJoinAndSelect('preferences.competance_specifique', 'competance_specifique')
+            .leftJoinAndSelect('preferences.langue_parler', 'langue_parler')
+            .leftJoinAndSelect('preferences.certifications_criteres', 'certifications_criteres');
+        if (fullname) {
+            queryBuilder = queryBuilder.andWhere('nounu.fullname LIKE :fullname', {
+                fullname: `%${fullname}%`
+            });
+        }
+        if (description) {
+            queryBuilder = queryBuilder.andWhere('nounu.description LIKE :description', {
+                description: `%${description}%`
+            });
+        }
+        const total = await queryBuilder.getCount();
+        queryBuilder = queryBuilder
+            .skip((page - 1) * limit)
+            .take(limit)
+            .orderBy('nounu.createdAt', 'DESC');
+        const _nounus = await queryBuilder.getMany();
         const nounus = await this.ReturnN(_nounus, [
             'zone_de_travail',
             'horaire_disponible',
@@ -300,14 +374,6 @@ let NounusService = class NounusService {
             'certifications_criteres',
         ]);
         const filteredNounus = nounus.filter((nounu) => {
-            if (fullname &&
-                !nounu.fullname?.toLowerCase().includes(fullname?.toLowerCase())) {
-                return false;
-            }
-            if (description &&
-                !nounu.description?.toLowerCase().includes(description?.toLowerCase())) {
-                return false;
-            }
             if (zone_de_travail && zone_de_travail.length > 0) {
                 const hasMatchingZone = nounu.preferences.zone_de_travail.some((zone) => zone_de_travail.includes(zone.id));
                 if (!hasMatchingZone)
@@ -340,7 +406,17 @@ let NounusService = class NounusService {
             }
             return true;
         });
-        return filteredNounus;
+        return {
+            data: filteredNounus,
+            pagination: {
+                total,
+                page,
+                limit,
+                totalPages: Math.ceil(total / limit),
+                hasNextPage: page < Math.ceil(total / limit),
+                hasPrevPage: page > 1
+            }
+        };
     }
     async getNonCertifiedNounus() {
         const _nounus = await this.nounuRepository.find({
@@ -438,6 +514,7 @@ let NounusService = class NounusService {
         if (nounu.points == 0) {
             throw new common_1.BadRequestException('Cannot change status when points are 0');
         }
+        this.decrementPoints(nounuId, 50);
         nounu.status = status;
         await this.nounuRepository.save(nounu);
         return {

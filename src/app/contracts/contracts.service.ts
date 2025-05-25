@@ -80,6 +80,7 @@ export class ContractsService {
         senderUserId: getContract.room.nounou.user.id,
         tolinkId: getContract.id.toString(),
       });
+      this.nounusService.decrementPoints(getContract.room.parent.user.id, 100);
 
     }
 

@@ -34,62 +34,9 @@ export class NounusService {
     },
   ): Promise<ProfilNounus> {
     const { userId, ...nounuData } = createNounuDto;
-    // Create and save the nounu
-    const savedNounu = await this.nounuRepository.save({
-      ...nounuData,
-      urgences: nounuData.urgences === 'true' ? true : false,
-      flexibilite_tarifaire:
-        nounuData.flexibilite_tarifaire === 'true' ? true : false,
-      user: { id: userId },
-    });
-
-    if (!savedNounu) {
-      throw new BadRequestException('Nounu not created');
-    }
-
-    // Upload image if provided
-    if (files.imageNounu?.length > 0) {
-      // Image Nounu
-      const imageNounu = files.imageNounu[0];
-      await this.mediaService.create({
-        originalName: imageNounu.originalname,
-        filename: imageNounu.filename,
-        path: imageNounu.path,
-        originalUrl: `${HOST}/uploads/${imageNounu.filename}`,
-        userId: userId,
-        typeMedia: 'image-profil',
-      });
-
-      // Image Upload Documents
-      if (files.documents?.length > 0) {
-        for (const document of files.documents) {
-          await this.mediaService.create({
-            originalName: document.originalname,
-            filename: document.filename,
-            path: document.path,
-            originalUrl: `${HOST}/uploads/${document.filename}`,
-            userId: userId,
-            typeMedia: 'document-verification',
-          });
-        }
-      }
-
-      // Image Upload Gallery
-      if (files.gallery?.length > 0) {
-        for (const gallery of files.gallery) {
-          await this.mediaService.create({
-            originalName: gallery.originalname,
-            filename: gallery.filename,
-            path: gallery.path,
-            originalUrl: `${HOST}/uploads/${gallery.filename}`,
-            userId: userId,
-            typeMedia: 'gallery-image',
-          });
-        }
-      }
-    }
-
-    // Save preferences
+    
+    // Pré-parser toutes les préférences en une seule fois
+    const parsedPreferences = {};
     const preferenceKeys = [
       'zone_de_travail',
       'horaire_disponible',
@@ -99,52 +46,155 @@ export class NounusService {
       'langue_parler',
       'certifications_criteres',
     ];
-
+    
     for (const key of preferenceKeys) {
-      const value = JSON.parse(createNounuDto[key]);
-      if (Array.isArray(value)) {
-        const preferenceEntities = value.map((el) => ({
-          nounus: savedNounu,
-          [key]: el.id,
-        }));
-        await this.preferenceRepository.save(preferenceEntities);
-      }
+      parsedPreferences[key] = JSON.parse(createNounuDto[key]);
     }
-
-    return savedNounu;
+    
+    // Utiliser une transaction pour toutes les opérations de base de données
+    const queryRunner = this.nounuRepository.manager.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    
+    try {
+      // Créer et sauvegarder le nounu
+      const savedNounu = await queryRunner.manager.save(ProfilNounus, {
+        ...nounuData,
+        urgences: nounuData.urgences === 'true' ? true : false,
+        flexibilite_tarifaire:
+          nounuData.flexibilite_tarifaire === 'true' ? true : false,
+        user: { id: userId },
+      });
+      
+      // Préparer les médias à créer
+      const mediaToCreate = [];
+      
+      // Ajouter l'image principale si fournie
+      if (files.imageNounu?.length > 0) {
+        const imageNounu = files.imageNounu[0];
+        mediaToCreate.push({
+          originalName: imageNounu.originalname,
+          filename: imageNounu.filename,
+          path: imageNounu.path,
+          originalUrl: `${HOST}/uploads/${imageNounu.filename}`,
+          userId: userId,
+          typeMedia: 'image-profil',
+        });
+        
+        // Ajouter les documents
+        if (files.documents?.length > 0) {
+          for (const document of files.documents) {
+            mediaToCreate.push({
+              originalName: document.originalname,
+              filename: document.filename,
+              path: document.path,
+              originalUrl: `${HOST}/uploads/${document.filename}`,
+              userId: userId,
+              typeMedia: 'document-verification',
+            });
+          }
+        }
+        
+        // Ajouter les images de galerie
+        if (files.gallery?.length > 0) {
+          for (const gallery of files.gallery) {
+            mediaToCreate.push({
+              originalName: gallery.originalname,
+              filename: gallery.filename,
+              path: gallery.path,
+              originalUrl: `${HOST}/uploads/${gallery.filename}`,
+              userId: userId,
+              typeMedia: 'gallery-image',
+            });
+          }
+        }
+      }
+      
+      // Créer tous les médias en une seule opération si possible
+      if (mediaToCreate.length > 0) {
+        await Promise.all(mediaToCreate.map(media => 
+          this.mediaService.create(media)
+        ));
+      }
+      
+      // Préparer toutes les préférences à sauvegarder
+      const preferencesToSave = [];
+      for (const key of preferenceKeys) {
+        const value = parsedPreferences[key];
+        if (Array.isArray(value)) {
+          value.forEach(el => {
+            preferencesToSave.push({
+              nounus: savedNounu,
+              [key]: el.id,
+            });
+          });
+        }
+      }
+      
+      // Sauvegarder toutes les préférences en une seule opération
+      if (preferencesToSave.length > 0) {
+        await queryRunner.manager.save(Preference, preferencesToSave);
+      }
+      
+      await queryRunner.commitTransaction();
+      return savedNounu;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw new BadRequestException('Erreur lors de la création du profil: ' + error.message);
+    } finally {
+      await queryRunner.release();
+    }
   }
 
-  async findAllNotCurrentUser(userId: any): Promise<any> {
-    // Récupérer tous les nounous sauf celui connecté
-    const nounus = await this.nounuRepository.find({
+  async findAllNotCurrentUser(
+    userId: any, 
+    page: number = 1, 
+    limit: number = 10
+  ): Promise<any> {
+    // Calculer l'offset pour la pagination
+    page = parseInt(page.toString(), 10) || 1;
+    limit = parseInt(limit.toString(), 10) || 10;
+    const skip = (page - 1) * limit;
+    
+    // Récupérer tous les nounous sauf celui connecté avec pagination
+    const [nounus, total] = await this.nounuRepository.findAndCount({
       relations: [
         'user',
         'user.medias',
         'user.medias.type_media',
         'preferences',
-        'preferences.zone_de_travail',
         'preferences.horaire_disponible',
         'preferences.adress',
-        'preferences.tranche_age_enfants',
-        'preferences.competance_specifique',
-        'preferences.langue_parler',
-        'preferences.certifications_criteres',
       ],
       where: {
         user: {
-          id: Not(userId.userId), // Exclure l'utilisateur connecté
+          id: Not(userId), // Exclure l'utilisateur connecté
         },
+      },
+      skip: skip,
+      take: limit,
+      order: {
+        createdAt: 'DESC', // Trier par date de création (du plus récent au plus ancien)
       },
     });
 
-    return await this.ReturnN(nounus, [
-      'zone_de_travail',
+    const formattedNounus = await this.ReturnN(nounus, [
       'horaire_disponible',
-      'adress',
-      'tranche_age_enfants',
-      'competance_specifique',
-      'langue_parler',
+      'adress'
     ]);
+
+    // Retourner les données avec les métadonnées de pagination
+    return {
+      data: formattedNounus,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+        hasNextPage: page < Math.ceil(total / limit),
+        hasPrevPage: page > 1
+      }
+    };
   }
 
   async findAll(): Promise<any> {
@@ -155,23 +205,14 @@ export class NounusService {
         'user.medias',
         'user.medias.type_media',
         'preferences',
-        'preferences.zone_de_travail',
         'preferences.horaire_disponible',
         'preferences.adress',
-        'preferences.tranche_age_enfants',
-        'preferences.competance_specifique',
-        'preferences.langue_parler',
-        'preferences.certifications_criteres',
       ],
     });
 
     return await this.ReturnN(nounus, [
-      'zone_de_travail',
       'horaire_disponible',
       'adress',
-      'tranche_age_enfants',
-      'competance_specifique',
-      'langue_parler',
     ]);
   }
 
@@ -223,112 +264,143 @@ export class NounusService {
   ): Promise<ProfilNounus> {
     const { userId, ...nounuData } = updateNounuDto;
 
-    // Récupérer le Nounu existant
-    const existingNounu = await this.nounuRepository.findOne({
-      where: { id: id },
-      relations: ['user'],
-    });
+    // Utiliser une transaction pour toutes les opérations
+    const queryRunner = this.nounuRepository.manager.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    if (!existingNounu) {
-      throw new NotFoundException('Nounu not found');
-    }
+    try {
+      // Récupérer le Nounu existant
+      const existingNounu = await queryRunner.manager.findOne(ProfilNounus, {
+        where: { id: id },
+        relations: ['user'],
+      });
 
-    // Mettre à jour les données du Nounu
-    const updatedNounu = await this.nounuRepository.save({
-      ...existingNounu,
-      ...nounuData,
-      urgences: nounuData.urgences === 'true' ? true : false,
-      flexibilite_tarifaire:
-        nounuData.flexibilite_tarifaire === 'true' ? true : false,
-      user: { id: userId },
-    });
+      if (!existingNounu) {
+        throw new NotFoundException('Nounu not found');
+      }
 
-    if (!updatedNounu) {
-      throw new BadRequestException('Nounu not updated');
-    }
+      // Mettre à jour les données du Nounu
+      const updatedNounu = await queryRunner.manager.save(ProfilNounus, {
+        ...existingNounu,
+        ...nounuData,
+        urgences: nounuData.urgences === 'true' ? true : false,
+        flexibilite_tarifaire:
+          nounuData.flexibilite_tarifaire === 'true' ? true : false,
+        user: { id: userId },
+      });
 
-    // Mettre à jour l'image de profil si fournie
-    if (files.imageNounu?.length > 0) {
-      const imageNounu = files.imageNounu[0];
-      await this.mediaService.update(
-        { id: existingNounu.user.id, typeMedia: 'image-profil' }, // Critères de recherche pour trouver l'image existante
-        {
-          originalName: imageNounu.originalname,
-          filename: imageNounu.filename,
-          path: imageNounu.path,
-          originalUrl: `${HOST}/uploads/${imageNounu.filename}`,
-        },
-      );
-    }
+      // Préparer les médias à créer/mettre à jour
+      const mediaPromises = [];
 
-    // Mettre à jour les documents si fournis
-    if (files.documents?.length > 0) {
-      // Supprimer les anciens documents
-      // await this.mediaService.deleteMany({ userId, typeMedia: 'document-verification' });
+      // Mettre à jour l'image de profil si fournie
+      if (files.imageNounu?.length > 0) {
+        const imageNounu = files.imageNounu[0];
+        mediaPromises.push(
+          this.mediaService.update(
+            { id: existingNounu.user.id, typeMedia: 'image-profil' },
+            {
+              originalName: imageNounu.originalname,
+              filename: imageNounu.filename,
+              path: imageNounu.path,
+              originalUrl: `${HOST}/uploads/${imageNounu.filename}`,
+            },
+          )
+        );
+      }
 
-      // Ajouter les nouveaux documents
-      for (const document of files.documents) {
-        await this.mediaService.create({
+      // Préparer les documents à créer
+      if (files.documents?.length > 0) {
+        const documentsToCreate = files.documents.map(document => ({
           originalName: document.originalname,
           filename: document.filename,
           path: document.path,
           originalUrl: `${HOST}/uploads/${document.filename}`,
           userId: userId,
           typeMedia: 'document-verification',
-        });
+        }));
+        
+        mediaPromises.push(
+          Promise.all(documentsToCreate.map(doc => this.mediaService.create(doc)))
+        );
       }
-    }
 
-    // Mettre à jour la galerie si fournie
-    if (files.gallery?.length > 0) {
-      // Supprimer les anciennes images de la galerie
-      // await this.mediaService.deleteMany({ userId, typeMedia: 'gallery-image' });
-
-      // Ajouter les nouvelles images de la galerie
-      for (const gallery of files.gallery) {
-        await this.mediaService.create({
+      // Préparer les images de galerie à créer
+      if (files.gallery?.length > 0) {
+        const galleryToCreate = files.gallery.map(gallery => ({
           originalName: gallery.originalname,
           filename: gallery.filename,
           path: gallery.path,
           originalUrl: `${HOST}/uploads/${gallery.filename}`,
           userId: userId,
           typeMedia: 'gallery-image',
-        });
-      }
-    }
-
-    // Mettre à jour les préférences
-    const preferenceKeys = [
-      'zone_de_travail',
-      'horaire_disponible',
-      'adress',
-      'tranche_age_enfants',
-      'competance_specifique',
-      'langue_parler',
-      'certifications_criteres',
-    ];
-
-    for (const key of preferenceKeys) {
-      const value = JSON.parse(updateNounuDto[key]);
-      if (Array.isArray(value)) {
-        // Supprimer les anciennes préférences
-        await this.preferenceRepository.delete({ nounus: updatedNounu });
-      }
-    }
-
-    for (const key of preferenceKeys) {
-      const value = JSON.parse(updateNounuDto[key]);
-      if (Array.isArray(value)) {
-        // Ajouter les nouvelles préférences
-        const preferenceEntities = value.map((el) => ({
-          nounus: updatedNounu,
-          [key]: el.id,
         }));
-        await this.preferenceRepository.save(preferenceEntities);
+        
+        mediaPromises.push(
+          Promise.all(galleryToCreate.map(img => this.mediaService.create(img)))
+        );
       }
-    }
 
-    return updatedNounu;
+      // Exécuter toutes les opérations de média en parallèle
+      if (mediaPromises.length > 0) {
+        await Promise.all(mediaPromises);
+      }
+
+      // Pré-parser toutes les préférences en une seule fois
+      const preferenceKeys = [
+        'zone_de_travail',
+        'horaire_disponible',
+        'adress',
+        'tranche_age_enfants',
+        'competance_specifique',
+        'langue_parler',
+        'certifications_criteres',
+      ];
+      
+      const parsedPreferences = {};
+      let hasPreferences = false;
+      
+      for (const key of preferenceKeys) {
+        if (updateNounuDto[key]) {
+          parsedPreferences[key] = JSON.parse(updateNounuDto[key]);
+          if (Array.isArray(parsedPreferences[key]) && parsedPreferences[key].length > 0) {
+            hasPreferences = true;
+          }
+        }
+      }
+
+      // Mettre à jour les préférences seulement si nécessaire
+      if (hasPreferences) {
+        // Supprimer toutes les anciennes préférences en une seule opération
+        await queryRunner.manager.delete(Preference, { nounus: { id: updatedNounu.id } });
+        
+        // Préparer toutes les nouvelles préférences
+        const allPreferences = [];
+        
+        for (const key of preferenceKeys) {
+          if (parsedPreferences[key] && Array.isArray(parsedPreferences[key])) {
+            const prefsForKey = parsedPreferences[key].map(el => ({
+              nounus: updatedNounu,
+              [key]: el.id,
+            }));
+            allPreferences.push(...prefsForKey);
+          }
+        }
+        
+        // Sauvegarder toutes les préférences en une seule opération
+        if (allPreferences.length > 0) {
+          await queryRunner.manager.save(Preference, allPreferences);
+        }
+      }
+
+      await queryRunner.commitTransaction();
+      return updatedNounu;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw new BadRequestException('Erreur lors de la mise à jour du profil: ' + error.message);
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async updatePoints(id: string, points: number): Promise<ProfilNounus> {
@@ -340,12 +412,40 @@ export class NounusService {
     return nounu;
   }
 
+async decrementPoints(id: string, points: number): Promise<ProfilNounus> {
+  const nounu = await this.findOne(id);
+  if (!nounu) {
+    throw new NotFoundException(`ProfilNounus with ID ${id} not found`);
+  }
+
+  // Check if nounu has enough points
+  if (nounu.points < points) {
+    throw new BadRequestException('Not enough points to decrement');
+  }
+
+  // Decrement points
+  await this.nounuRepository.decrement({ id }, 'points', points);
+  
+  // Return updated nounu
+  return await this.findOne(id);
+}
+
   async remove(id: string): Promise<void> {
     const nounu = await this.findOne(id);
     await this.nounuRepository.remove(nounu);
   }
 
-  async search(searchCriteria: any): Promise<any[]> {
+  async search(
+    searchCriteria: any,
+    page: number = 1,
+    limit: number = 1
+  ): Promise<{ data: any[], pagination: any }> {
+
+    page = parseInt(page.toString(), 10) || 1;
+    limit = parseInt(limit.toString(), 10) || 1;
+
+
+
     const {
       fullname,
       description,
@@ -357,23 +457,46 @@ export class NounusService {
       langue_parler,
     } = searchCriteria;
 
-    // Récupérer toutes les nounous avec les relations nécessaires
-    const _nounus = await this.nounuRepository.find({
-      relations: [
-        'user',
-        'user.medias',
-        'user.medias.type_media',
-        'preferences',
-        'preferences.zone_de_travail',
-        'preferences.horaire_disponible',
-        'preferences.adress',
-        'preferences.tranche_age_enfants',
-        'preferences.competance_specifique',
-        'preferences.langue_parler',
-        'preferences.certifications_criteres',
-      ],
-    });
+    // Construire une requête optimisée avec QueryBuilder
+    let queryBuilder = this.nounuRepository.createQueryBuilder('nounu')
+      .leftJoinAndSelect('nounu.user', 'user')
+      .leftJoinAndSelect('user.medias', 'medias')
+      .leftJoinAndSelect('medias.type_media', 'type_media')
+      .leftJoinAndSelect('nounu.preferences', 'preferences')
+      .leftJoinAndSelect('preferences.zone_de_travail', 'zone_de_travail')
+      .leftJoinAndSelect('preferences.horaire_disponible', 'horaire_disponible')
+      .leftJoinAndSelect('preferences.adress', 'adress')
+      .leftJoinAndSelect('preferences.tranche_age_enfants', 'tranche_age_enfants')
+      .leftJoinAndSelect('preferences.competance_specifique', 'competance_specifique')
+      .leftJoinAndSelect('preferences.langue_parler', 'langue_parler')
+      .leftJoinAndSelect('preferences.certifications_criteres', 'certifications_criteres');
 
+    // Appliquer les filtres de base directement dans la requête SQL
+    if (fullname) {
+      queryBuilder = queryBuilder.andWhere('nounu.fullname LIKE :fullname', { 
+        fullname: `%${fullname}%` 
+      });
+    }
+
+    if (description) {
+      queryBuilder = queryBuilder.andWhere('nounu.description LIKE :description', { 
+        description: `%${description}%` 
+      });
+    }
+
+    // Obtenir le nombre total avant pagination pour les métadonnées
+    const total = await queryBuilder.getCount();
+
+    // Appliquer la pagination
+    queryBuilder = queryBuilder
+      .skip((page - 1) * limit)
+      .take(limit)
+      .orderBy('nounu.createdAt', 'DESC');
+
+    // Exécuter la requête
+    const _nounus = await queryBuilder.getMany();
+
+    // Transformer les résultats avec ReturnN
     const nounus = await this.ReturnN(_nounus, [
       'zone_de_travail',
       'horaire_disponible',
@@ -384,24 +507,9 @@ export class NounusService {
       'certifications_criteres',
     ]);
 
-    // Filtrer les nounous en fonction des critères de recherche
+    // Filtrer les résultats pour les critères complexes qui ne peuvent pas être
+    // facilement exprimés en SQL
     const filteredNounus = nounus.filter((nounu: any) => {
-      // Filtrer par nom complet (fullname)
-      if (
-        fullname &&
-        !nounu.fullname?.toLowerCase().includes(fullname?.toLowerCase())
-      ) {
-        return false;
-      }
-
-      // Filtrer par description
-      if (
-        description &&
-        !nounu.description?.toLowerCase().includes(description?.toLowerCase())
-      ) {
-        return false;
-      }
-
       // Filtrer par zone de travail
       if (zone_de_travail && zone_de_travail.length > 0) {
         const hasMatchingZone = nounu.preferences.zone_de_travail.some(
@@ -455,7 +563,18 @@ export class NounusService {
       return true;
     });
 
-    return filteredNounus;
+    // Retourner les données avec les métadonnées de pagination
+    return {
+      data: filteredNounus,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+        hasNextPage: page < Math.ceil(total / limit),
+        hasPrevPage: page > 1
+      }
+    };
   }
 
   async getNonCertifiedNounus(): Promise<any[]> {
@@ -589,6 +708,8 @@ export class NounusService {
     if (nounu.points == 0) {
       throw new BadRequestException('Cannot change status when points are 0');
     }
+
+    this.decrementPoints(nounuId, 50);
 
     nounu.status = status;
     await this.nounuRepository.save(nounu);

@@ -60,7 +60,7 @@ export class AbonnementService {
 
     // Validation du paiement avec CinetPay
     const isPaymentValid = await this.validateCinetPayPayment(
-      payment.transaction_id
+      payment.transaction_id,
     );
 
     if (isPaymentValid && iSAcceptedPayment) {
@@ -108,7 +108,6 @@ export class AbonnementService {
       createAbonnementDto.transactionId,
     );
 
-
     if (!isPaymentValid) {
       return this.buildResponse(
         true,
@@ -124,6 +123,9 @@ export class AbonnementService {
 
     // Envoi de notification
     await this.sendSubscriptionNotification(createAbonnementDto.userId);
+    if (payment.user.nounu && payment.user.nounu[0]) {
+      await this.nounuService.updatePoints(payment.user.nounu.length !=0 ? payment.user.nounu[0].id : payment.user.parent[0].id, 500);
+    }
 
     return this.buildResponse(true, true, newAbonnement);
   }
@@ -134,9 +136,17 @@ export class AbonnementService {
   private async findPayment(
     createAbonnementDto: CreateAbonnementDto,
   ): Promise<Paiements | null> {
-    return this.paymentRepository.findOneBy({
-      user: { id: createAbonnementDto.userId },
-      transaction_id: createAbonnementDto.transactionId,
+    return this.paymentRepository.findOne({
+      where: {
+        user: { id: createAbonnementDto.userId },
+        transaction_id: createAbonnementDto.transactionId,
+      },
+      relations: {
+        user: {
+          nounu: true,
+          parent: true,
+        },
+      },
     });
   }
 
@@ -160,7 +170,7 @@ export class AbonnementService {
    * Valide le paiement avec CinetPay
    */
   private async validateCinetPayPayment(
-    transaction_id: string
+    transaction_id: string,
   ): Promise<boolean> {
     try {
       const { data } = await axios.post(
@@ -175,18 +185,19 @@ export class AbonnementService {
         },
       );
 
-   
-
       if (data.data) {
-        const payment = await this.paymentRepository.update({ transaction_id }, { 
-          status: data.data.status,
-          paymentMethod: data.data.payment_method,
-          operator_id: data.data.operator_id,
-          payment_date: data.data.payment_date,
-          amount: data.data.amount,
-          currency: data.data.currency,
-          payment_token: data.data.payment_token,
-        });
+        const payment = await this.paymentRepository.update(
+          { transaction_id },
+          {
+            status: data.data.status,
+            paymentMethod: data.data.payment_method,
+            operator_id: data.data.operator_id,
+            payment_date: data.data.payment_date,
+            amount: data.data.amount,
+            currency: data.data.currency,
+            payment_token: data.data.payment_token,
+          },
+        );
 
         if (payment.affected == 1) {
           return true;

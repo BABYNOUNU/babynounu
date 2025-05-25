@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
@@ -21,6 +22,8 @@ import {
 } from 'src/config/media.config';
 import { SearchParentCriteriaDto } from './dto/search-parent-criteria.dto';
 import { SharpTransform } from 'src/utils/sharpTransform';
+import { GetUser } from '../auth/getUser';
+import { User } from '../user/user.model';
 
 @ApiTags('ProfilParents')
 @Controller('parent')
@@ -29,8 +32,8 @@ export class ParentController {
 
   // Get All ProfilParents
   @Get('')
-  GetParents() {
-    return this.parentService.findAll();
+  GetParents(@Query('page') page: number, @Query('limit') limit: number, @Query('userId') userId: string) {
+    return this.parentService.findAll(userId, page, limit);
   }
 
   // Get Signle Parent
@@ -80,7 +83,7 @@ export class ParentController {
   }
 
   @Post('search_parent')
-  async searchParent(@Body() searchCriteria: SearchParentCriteriaDto) {
+  async searchParent(@Body() searchCriteria: SearchParentCriteriaDto, @Query('page') page: number, @Query('limit') limit: number) {
     return this.parentService.search(searchCriteria);
   }
 }

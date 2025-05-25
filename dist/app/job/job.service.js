@@ -117,12 +117,34 @@ let JobsService = class JobsService {
         }
         return job;
     }
-    async findAllJobs() {
-        const job = await this.jobRepository.find({
+    async findAllJobs(searchCriteria, page = 1, limit = 10) {
+        page = parseInt(page.toString(), 10) || 1;
+        limit = parseInt(limit.toString(), 10) || 10;
+        const skip = (page - 1) * limit;
+        const whereConditions = {};
+        if (searchCriteria)
+            whereConditions.titre = (0, typeorm_1.ILike)(`%${searchCriteria}%`);
+        if (searchCriteria)
+            whereConditions.description = (0, typeorm_1.ILike)(`%${searchCriteria}%`);
+        const [jobs, total] = await this.jobRepository.findAndCount({
             relations: this.RelationShip,
+            where: whereConditions,
+            skip: skip,
+            take: limit,
+            order: { createdAt: 'DESC' }
         });
-        const DataJobs = await this.ReturnN(job, this.preferenceKeys);
-        return DataJobs;
+        const DataJobs = await this.ReturnN(jobs, this.preferenceKeys);
+        return {
+            data: DataJobs,
+            pagination: {
+                total,
+                page,
+                limit,
+                totalPages: Math.ceil(total / limit),
+                hasNextPage: page < Math.ceil(total / limit),
+                hasPrevPage: page > 1
+            }
+        };
     }
     async findJobById(id) {
         const job = await this.jobRepository.findOne({

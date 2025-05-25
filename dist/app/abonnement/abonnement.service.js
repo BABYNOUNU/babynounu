@@ -77,12 +77,23 @@ let AbonnementService = class AbonnementService {
         }
         const newAbonnement = await this.createNewAbonnement(createAbonnementDto.userId, payment.id);
         await this.sendSubscriptionNotification(createAbonnementDto.userId);
+        if (payment.user.nounu && payment.user.nounu[0]) {
+            await this.nounuService.updatePoints(payment.user.nounu.length != 0 ? payment.user.nounu[0].id : payment.user.parent[0].id, 500);
+        }
         return this.buildResponse(true, true, newAbonnement);
     }
     async findPayment(createAbonnementDto) {
-        return this.paymentRepository.findOneBy({
-            user: { id: createAbonnementDto.userId },
-            transaction_id: createAbonnementDto.transactionId,
+        return this.paymentRepository.findOne({
+            where: {
+                user: { id: createAbonnementDto.userId },
+                transaction_id: createAbonnementDto.transactionId,
+            },
+            relations: {
+                user: {
+                    nounu: true,
+                    parent: true,
+                },
+            },
         });
     }
     async findExistingAbonnement(userId, paymentId) {

@@ -31,8 +31,8 @@ let NounusController = class NounusController {
     async create(files, createProfilNounusDto) {
         return await this.nounuService.create(createProfilNounusDto, files);
     }
-    async findAllNotCurrentUser(userId) {
-        return await this.nounuService.findAllNotCurrentUser(userId);
+    async findAllNotCurrentUser(userId, page, limit) {
+        return await this.nounuService.findAllNotCurrentUser(userId, page, limit);
     }
     async findAll() {
         return await this.nounuService.findAll();
@@ -63,8 +63,8 @@ let NounusController = class NounusController {
     async remove(id) {
         return await this.nounuService.remove(id);
     }
-    async searchNounu(searchCriteria) {
-        return this.nounuService.search(searchCriteria);
+    async searchNounu(searchCriteria, page, limit) {
+        return this.nounuService.search(searchCriteria, page, limit);
     }
 };
 exports.NounusController = NounusController;
@@ -100,9 +100,11 @@ __decorate([
         description: 'List of ProfilNounus',
         type: [nounu_model_1.ProfilNounus],
     }),
-    __param(0, (0, common_1.Query)()),
+    __param(0, (0, common_1.Query)('userId')),
+    __param(1, (0, common_1.Query)('page')),
+    __param(2, (0, common_1.Query)('limit')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, Number, Number]),
     __metadata("design:returntype", Promise)
 ], NounusController.prototype, "findAllNotCurrentUser", null);
 __decorate([
@@ -250,8 +252,10 @@ __decorate([
 __decorate([
     (0, common_1.Post)('search'),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Query)('page')),
+    __param(2, (0, common_1.Query)('limit')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [search_nounu_criteria_dto_1.SearchNounuCriteriaDto]),
+    __metadata("design:paramtypes", [search_nounu_criteria_dto_1.SearchNounuCriteriaDto, Number, Number]),
     __metadata("design:returntype", Promise)
 ], NounusController.prototype, "searchNounu", null);
 exports.NounusController = NounusController = __decorate([
