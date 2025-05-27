@@ -7,7 +7,6 @@ export const GetUser = createParamDecorator(
     if (!user) {
       return null;
     }
-
     return data ? user[data] : user; // extract a specific property only if specified or get a user object
   },
 );

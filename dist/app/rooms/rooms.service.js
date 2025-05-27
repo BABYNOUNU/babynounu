@@ -139,7 +139,7 @@ let RoomsService = class RoomsService {
         });
         return {
             ...room,
-            photo: senderId == room.parent.user.id
+            photo: senderId.id != room.parent.user.id
                 ? room.parent.user.medias?.find((media) => media.type_media.slug === 'image-profil')
                 : room.nounou.user.medias?.find((media) => media.type_media.slug === 'image-profil'),
         };

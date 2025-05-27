@@ -33,7 +33,7 @@ export declare class RoomsService {
         userId: string;
         count: number;
     }>;
-    getRoom(roomId: number, senderId?: string): Promise<{
+    getRoom(roomId: number, senderId?: any): Promise<{
         photo: import("../media/models/media.model").Medias;
         id: number;
         nounou: import("../nounus/models/nounu.model").ProfilNounus;

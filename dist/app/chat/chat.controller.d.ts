@@ -25,7 +25,7 @@ export declare class ChatController {
         messages: import("../messages/models/message.model").Message[];
     }>;
     getTotalUnreadCount(user: User): Promise<number>;
-    getRoom(user: User, roomId: number): Promise<{
+    getRoom(user: any, roomId: number): Promise<{
         photo: import("../media/models/media.model").Medias;
         id: number;
         nounou: import("../nounus/models/nounu.model").ProfilNounus;

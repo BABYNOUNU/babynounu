@@ -40,7 +40,7 @@ let ChatController = class ChatController {
         return this.roomService.getTotalUnreadCount(user.id);
     }
     async getRoom(user, roomId) {
-        return this.roomService.getRoom(roomId, user.id);
+        return this.roomService.getRoom(roomId, user);
     }
     async getRoomUnreadCount(roomId, user) {
         return this.roomService.getRoomUnreadCount(roomId, user.id);
@@ -85,7 +85,7 @@ __decorate([
     __param(0, (0, getUser_1.GetUser)()),
     __param(1, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [user_model_1.User, Number]),
+    __metadata("design:paramtypes", [Object, Number]),
     __metadata("design:returntype", Promise)
 ], ChatController.prototype, "getRoom", null);
 __decorate([

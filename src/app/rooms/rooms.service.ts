@@ -160,7 +160,7 @@ export class RoomsService {
   }
 
   // Get room by ID
-  async getRoom(roomId: number, senderId?: string) {
+  async getRoom(roomId: number, senderId?: any) {
     const room = await this.roomRepository.findOne({
       where: { id: roomId },
       relations: [
@@ -175,7 +175,7 @@ export class RoomsService {
     return {
       ...room,
       photo:
-        senderId == room.parent.user.id
+        senderId.id != room.parent.user.id
           ? room.parent.user.medias?.find(
               (media) => media.type_media.slug === 'image-profil',
             )

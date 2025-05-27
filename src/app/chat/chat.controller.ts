@@ -50,9 +50,9 @@ export class ChatController {
   }
 
   @Get('room/:id')
-  async getRoom(@GetUser() user: User,
+  async getRoom(@GetUser() user: any,
   @Param('id') roomId: number) {
-    return this.roomService.getRoom(roomId, user.id);
+    return this.roomService.getRoom(roomId, user);
   }
 
   @Get(':id/unread')

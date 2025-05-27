@@ -124,7 +124,21 @@ export class AbonnementService {
     // Envoi de notification
     await this.sendSubscriptionNotification(createAbonnementDto.userId);
     if (payment.user.nounu && payment.user.nounu[0]) {
-      await this.nounuService.updatePoints(payment.user.nounu.length !=0 ? payment.user.nounu[0].id : payment.user.parent[0].id, 500);
+      await this.nounuService.updatePoints(
+        payment.user.nounu.length != 0
+          ? payment.user.nounu[0].id
+          : payment.user.parent[0].id,
+        100,
+      );
+    }
+
+    if (payment.user.parent && payment.user.parent[0]) {
+      await this.nounuService.updatePoints(
+        payment.user.parent.length != 0
+          ? payment.user.parent[0].id
+          : payment.user.parent[0].id,
+        500,
+      );
     }
 
     return this.buildResponse(true, true, newAbonnement);
@@ -185,7 +199,7 @@ export class AbonnementService {
         },
       );
 
-      if (data.data) {
+      if (data.data?.operator_id != null) {
         const payment = await this.paymentRepository.update(
           { transaction_id },
           {
@@ -332,23 +346,32 @@ export class AbonnementService {
   async hasActiveAbonnement(userId: string): Promise<boolean> {
     const abonnement = await this.abonnementRepository.findOne({
       where: { user: { id: userId } },
+      relations: ['paiement', 'type', 'user'],
       order: { createdAt: 'DESC' },
     });
 
     if (!abonnement) return false;
+    abonnement.user.nounu;
 
-    return this.isSubscriptionActive(abonnement.createdAt);
+    return this.isSubscriptionActive(
+      abonnement.paiement.payment_date,
+      abonnement.user.nounu.length > 0 ? true : false,
+    );
   }
 
   /**
    * Vérifie si une date de création d'abonnement est toujours active
    */
-  private isSubscriptionActive(createdAt: Date): boolean {
+  private isSubscriptionActive(createdAt: Date, nounuProfil: any): boolean {
     const subscriptionDate = new Date(createdAt);
     const currentDate = new Date();
     const daysSinceSubscription = Math.floor(
-      (currentDate.getTime() - subscriptionDate.getTime()) /
-        (1000 * 60 * 60 * 24),
+      ((parseInt(`${!nounuProfil ? 1 : ''}${currentDate.getTime()}`) -
+        subscriptionDate.getTime()) /
+        1000) *
+        60 *
+        60 *
+        24,
     );
 
     return daysSinceSubscription <= this.SUBSCRIPTION_DURATION_DAYS;
