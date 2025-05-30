@@ -80,7 +80,7 @@ let AbonnementService = class AbonnementService {
         if (payment.user.nounu && payment.user.nounu[0]) {
             await this.nounuService.updatePoints(payment.user.nounu.length != 0
                 ? payment.user.nounu[0].id
-                : payment.user.parent[0].id, 100);
+                : payment.user.parent[0].id, 300);
         }
         if (payment.user.parent && payment.user.parent[0]) {
             await this.nounuService.updatePoints(payment.user.parent.length != 0

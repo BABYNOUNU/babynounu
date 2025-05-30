@@ -128,7 +128,7 @@ export class AbonnementService {
         payment.user.nounu.length != 0
           ? payment.user.nounu[0].id
           : payment.user.parent[0].id,
-        100,
+        300,
       );
     }
 
