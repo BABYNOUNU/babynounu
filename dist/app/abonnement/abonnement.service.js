@@ -218,12 +218,12 @@ let AbonnementService = class AbonnementService {
         if (!abonnement)
             return false;
         abonnement.user.nounu;
-        return this.isSubscriptionActive(abonnement.paiement.payment_date, abonnement.user.nounu.length > 0 ? true : false);
+        return true;
     }
     isSubscriptionActive(createdAt, nounuProfil) {
         const subscriptionDate = new Date(createdAt);
         const currentDate = new Date();
-        const daysSinceSubscription = Math.floor(((parseInt(`${!nounuProfil ? 1 : ''}${currentDate.getTime()}`) -
+        const daysSinceSubscription = Math.floor(((parseInt(`${'1'}${currentDate.getTime()}`) -
             subscriptionDate.getTime()) /
             1000) *
             60 *
@@ -246,6 +246,48 @@ let AbonnementService = class AbonnementService {
             is_read: false,
             senderUserId: abonnement.user.id,
         });
+    }
+    async checkPaymentPoints({ transactionId, userId, }) {
+        try {
+            const payment = await this.paymentRepository.findOne({
+                where: { transaction_id: transactionId, user: { id: userId } },
+                relations: ['user'],
+            });
+            if (!payment) {
+                throw new common_1.NotFoundException(`Paiement avec l'ID de transaction ${transactionId} introuvable pour l'utilisateur ${userId}`);
+            }
+            const isAcceptedPayment = await this.paymentRepository.findOne({
+                where: {
+                    transaction_id: transactionId,
+                    user: { id: userId },
+                    status: 'ACCEPTED',
+                },
+                relations: ['user'],
+            });
+            const isPaymentValid = await this.validateCinetPayPayment(payment.transaction_id);
+            return {
+                payment: {
+                    id: payment.id,
+                    transaction_id: payment.transaction_id,
+                    amount: payment.amount,
+                    status: payment.status,
+                    payment_date: payment.payment_date,
+                    currency: payment.currency,
+                },
+                isValid: isPaymentValid,
+                isAccepted: !!isAcceptedPayment,
+                canProcessPoints: isPaymentValid && !!isAcceptedPayment,
+                user: {
+                    id: payment.user.id,
+                },
+            };
+        }
+        catch (error) {
+            if (error instanceof common_1.NotFoundException) {
+                throw error;
+            }
+            throw new common_1.BadRequestException(`Erreur lors de la vérification des points de paiement: ${error.message}`);
+        }
     }
 };
 exports.AbonnementService = AbonnementService;

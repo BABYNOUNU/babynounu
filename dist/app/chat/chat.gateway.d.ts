@@ -12,16 +12,16 @@ export declare class ChatGateway implements OnGatewayConnection, OnGatewayDiscon
     private readonly abonnementService;
     private readonly notificationService;
     server: Server;
+    private readonly logger;
     private connectedUsers;
+    private userConnections;
     private readonly connectionLock;
     constructor(roomService: RoomsService, authService: AuthService, messageService: MessageService, abonnementService: AbonnementService, notificationService: NotificationService);
     afterInit(server: Server): void;
     handleConnection(client: Socket): Promise<void>;
-    private userConnections;
     private handleNewConnection;
     private cleanupSocket;
     private removeAllListeners;
-    private handleUserDisconnect;
     handleDisconnect(client: Socket): void;
     handleJoinRoom(client: Socket, roomId: number): Promise<{
         success: boolean;

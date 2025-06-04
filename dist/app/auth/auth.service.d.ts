@@ -69,5 +69,5 @@ export declare class AuthService {
         access_token: string;
     }>;
     isUserAuthentificateExist(email: any): Promise<User>;
-    getUserFromSocket(socket: Socket): Promise<User | null>;
+    getUserFromSocket(socket: Socket): Promise<any | null>;
 }

@@ -36,8 +36,14 @@ let NotificationService = class NotificationService {
         }
         return saveNotification;
     }
-    async getNotifications(userId) {
-        let notifications = await this.notificationRepository.find({
+    async findAllByUser(userId, page = 1, limit = 10) {
+        const pageNumber = parseInt(page.toString(), 10) || 1;
+        const limitNumber = parseInt(limit.toString(), 10) || 10;
+        const skip = (pageNumber - 1) * limitNumber;
+        const validPage = Math.max(1, pageNumber);
+        const validLimit = Math.max(1, Math.min(100, limitNumber));
+        const validSkip = (validPage - 1) * validLimit;
+        const [notifications, totalCount] = await this.notificationRepository.findAndCount({
             where: { sender: { id: userId } },
             relations: {
                 user: {
@@ -49,20 +55,39 @@ let NotificationService = class NotificationService {
                 },
                 job: true,
             },
+            order: { createdAt: 'DESC' },
+            skip: validSkip,
+            take: validLimit,
         });
-        notifications = notifications.map((notify) => {
+        const transformedNotifications = notifications.map((notify) => {
             return {
                 ...notify,
-                photo: notify.user.medias.length > 0 ? notify.user.medias.find((media) => media.type_media.slug === 'image-profil') : null,
+                photo: notify.user.medias.length > 0
+                    ? notify.user.medias.find((media) => media.type_media.slug === 'image-profil')
+                    : null,
                 profil: notify.user.nounu.length > 0
                     ? notify.user.nounu[0]
                     : notify.user.parent[0],
             };
-        })?.reverse();
-        const count = await this.notificationRepository.count({
+        });
+        const unreadCount = await this.notificationRepository.count({
             where: { sender: { id: userId }, isRead: false },
         });
-        return { notifications, count };
+        const totalPages = Math.ceil(totalCount / validLimit);
+        const hasNextPage = validPage < totalPages;
+        const hasPreviousPage = validPage > 1;
+        return {
+            data: transformedNotifications,
+            pagination: {
+                total: totalCount,
+                page: validPage,
+                limit: validLimit,
+                totalPages,
+                hasNextPage,
+                hasPrevPage: hasPreviousPage,
+            },
+            unreadCount,
+        };
     }
     async markAsRead(notificationId) {
         await this.notificationRepository.update({ id: notificationId }, { isRead: true });
@@ -72,7 +97,7 @@ let NotificationService = class NotificationService {
     }
     async updateViewByUserId(senderUserId) {
         await this.notificationRepository.update({ sender: { id: senderUserId } }, { isRead: true });
-        return this.getNotifications(senderUserId);
+        return this.findAllByUser(senderUserId);
     }
     async getAllCountByReceiverId(receiverId) {
         return await this.notificationRepository.count({

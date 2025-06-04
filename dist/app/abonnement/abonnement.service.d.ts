@@ -30,4 +30,8 @@ export declare class AbonnementService {
     hasActiveAbonnement(userId: string): Promise<boolean>;
     private isSubscriptionActive;
     cancelAbonnement(abonnementId: string): Promise<void>;
+    checkPaymentPoints({ transactionId, userId, }: {
+        transactionId: string;
+        userId: string;
+    }): Promise<any>;
 }

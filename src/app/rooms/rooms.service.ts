@@ -172,6 +172,8 @@ export class RoomsService {
       ],
     });
 
+   
+
     return {
       ...room,
       photo:

@@ -11,12 +11,14 @@ const common_1 = require("@nestjs/common");
 const administrateur_controller_1 = require("./administrateur.controller");
 const administrateur_service_1 = require("./administrateur.service");
 const administrateur_1 = require("./administrateur");
+const database_module_1 = require("../../database/database.module");
 let AdministrateurModule = class AdministrateurModule {
 };
 exports.AdministrateurModule = AdministrateurModule;
 exports.AdministrateurModule = AdministrateurModule = __decorate([
     (0, common_1.Module)({
+        imports: [database_module_1.DatabaseModule],
         controllers: [administrateur_controller_1.AdministrateurController],
-        providers: [administrateur_service_1.AdministrateurService, administrateur_1.Administrateur]
+        providers: [administrateur_service_1.AdministrateurService, ...administrateur_1.AdministrateurProviders]
     })
 ], AdministrateurModule);

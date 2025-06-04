@@ -25,8 +25,8 @@ let NotificationController = class NotificationController {
     async createNotification(createNotificationDto) {
         return this.notificationsService.createNotification(createNotificationDto);
     }
-    async getNotifications(userId) {
-        return this.notificationsService.getNotifications(userId);
+    async getNotifications(userId, page = 1, limit = 20) {
+        return this.notificationsService.findAllByUser(userId, page, limit);
     }
     async markAsRead(id) {
         return this.notificationsService.markAsRead(id);
@@ -58,8 +58,10 @@ __decorate([
     }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'User not found' }),
     __param(0, (0, common_1.Param)('userId')),
+    __param(1, (0, common_1.Query)('page')),
+    __param(2, (0, common_1.Query)('limit')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, Number, Number]),
     __metadata("design:returntype", Promise)
 ], NotificationController.prototype, "getNotifications", null);
 __decorate([

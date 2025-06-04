@@ -43,12 +43,25 @@ export class NotificationService {
   }
 
   /**
-   * Get all notifications for a specific user.
+   * Get all notifications for a specific user with pagination.
    * @param userId - ID of the user.
-   * @returns A list of notifications.
+   * @param page - Page number (default: 1).
+   * @param limit - Number of items per page (default: 10).
+   * @returns A paginated list of notifications with metadata.
    */
-  async getNotifications(userId: string) {
-    let notifications = await this.notificationRepository.find({
+  async findAllByUser(userId: string, page: number = 1, limit: number = 10) {
+    // Convert page and limit to integers and validate
+    const pageNumber = parseInt(page.toString(), 10) || 1;
+    const limitNumber = parseInt(limit.toString(), 10) || 10;
+    const skip = (pageNumber - 1) * limitNumber;
+
+    // Ensure minimum values
+    const validPage = Math.max(1, pageNumber);
+    const validLimit = Math.max(1, Math.min(100, limitNumber)); // Max 100 items per page
+    const validSkip = (validPage - 1) * validLimit;
+
+    // Get paginated notifications
+    const [notifications, totalCount] = await this.notificationRepository.findAndCount({
       where: { sender: { id: userId } },
       relations: {
         user: {
@@ -60,23 +73,46 @@ export class NotificationService {
         },
         job: true,
       },
+      order: { createdAt: 'DESC' }, // Order by creation date (most recent first)
+      skip: validSkip,
+      take: validLimit,
     });
 
-    notifications = notifications.map((notify) => {
+    // Transform notifications data
+    const transformedNotifications = notifications.map((notify) => {
       return {
         ...notify,
-        photo: notify.user.medias.length > 0 ? notify.user.medias.find((media) => media.type_media.slug === 'image-profil') : null,
-        profil:
-          notify.user.nounu.length > 0
-            ? notify.user.nounu[0]
-            : notify.user.parent[0],
+        photo: notify.user.medias.length > 0 
+          ? notify.user.medias.find((media) => media.type_media.slug === 'image-profil') 
+          : null,
+        profil: notify.user.nounu.length > 0
+          ? notify.user.nounu[0]
+          : notify.user.parent[0],
       };
-    })?.reverse()
+    });
 
-    const count = await this.notificationRepository.count({
+    // Get unread count
+    const unreadCount = await this.notificationRepository.count({
       where: { sender: { id: userId }, isRead: false },
     });
-    return { notifications, count };
+
+    // Calculate pagination metadata
+    const totalPages = Math.ceil(totalCount / validLimit);
+    const hasNextPage = validPage < totalPages;
+    const hasPreviousPage = validPage > 1;
+
+    return {
+      data: transformedNotifications,
+      pagination: {
+        total: totalCount,
+        page: validPage,
+        limit: validLimit,
+        totalPages,
+        hasNextPage,
+        hasPrevPage: hasPreviousPage,
+      },
+      unreadCount,
+    };
   }
 
   /**
@@ -108,7 +144,7 @@ export class NotificationService {
       { isRead: true },
     );
 
-    return this.getNotifications(senderUserId);
+    return this.findAllByUser(senderUserId);
   }
 
 

@@ -7,6 +7,7 @@ import {
   Patch,
   UsePipes,
   ValidationPipe,
+  Query,
 } from '@nestjs/common';
 import { NotificationService } from './notification.service';
 import { CreateNotificationDto } from './dtos/create-notification.dto';
@@ -44,8 +45,8 @@ export class NotificationController {
     description: 'Notifications retrieved successfully',
   })
   @ApiResponse({ status: 404, description: 'User not found' })
-  async getNotifications(@Param('userId') userId: string) {
-    return this.notificationsService.getNotifications(userId);
+  async getNotifications(@Param('userId') userId: string, @Query('page') page: number = 1, @Query('limit') limit: number = 20) {
+    return this.notificationsService.findAllByUser(userId, page, limit);
   }
 
   @Patch(':id/mark-as-read')

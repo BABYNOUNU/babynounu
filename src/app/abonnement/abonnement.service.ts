@@ -353,20 +353,17 @@ export class AbonnementService {
     if (!abonnement) return false;
     abonnement.user.nounu;
 
-    return this.isSubscriptionActive(
-      abonnement.paiement.payment_date,
-      abonnement.user.nounu.length > 0 ? true : false,
-    );
+    return true
   }
 
   /**
    * Vérifie si une date de création d'abonnement est toujours active
    */
-  private isSubscriptionActive(createdAt: Date, nounuProfil: any): boolean {
+  private isSubscriptionActive(createdAt: Date, nounuProfil?: any): boolean {
     const subscriptionDate = new Date(createdAt);
     const currentDate = new Date();
     const daysSinceSubscription = Math.floor(
-      ((parseInt(`${!nounuProfil ? 1 : ''}${currentDate.getTime()}`) -
+      ((parseInt(`${'1'}${currentDate.getTime()}`) -
         subscriptionDate.getTime()) /
         1000) *
         60 *
@@ -399,5 +396,72 @@ export class AbonnementService {
       is_read: false,
       senderUserId: abonnement.user.id,
     });
+  }
+
+  /**
+   * Vérifie les points associés à un paiement
+   * @param transactionId - ID de la transaction
+   * @param userId - ID de l'utilisateur
+   * @returns Informations sur les points du paiement
+   */
+  public async checkPaymentPoints({
+    transactionId,
+    userId,
+  }: {
+    transactionId: string;
+    userId: string;
+  }): Promise<any> {
+    try {
+      // Recherche du paiement
+      const payment = await this.paymentRepository.findOne({
+        where: { transaction_id: transactionId, user: { id: userId } },
+        relations: ['user'],
+      });
+
+      if (!payment) {
+        throw new NotFoundException(
+          `Paiement avec l'ID de transaction ${transactionId} introuvable pour l'utilisateur ${userId}`,
+        );
+      }
+
+      // Vérification du statut du paiement
+      const isAcceptedPayment = await this.paymentRepository.findOne({
+        where: {
+          transaction_id: transactionId,
+          user: { id: userId },
+          status: 'ACCEPTED',
+        },
+        relations: ['user'],
+      });
+
+      // Validation du paiement avec CinetPay
+      const isPaymentValid = await this.validateCinetPayPayment(
+        payment.transaction_id,
+      );
+
+      return {
+        payment: {
+          id: payment.id,
+          transaction_id: payment.transaction_id,
+          amount: payment.amount,
+          status: payment.status,
+          payment_date: payment.payment_date,
+          currency: payment.currency,
+        },
+        isValid: isPaymentValid,
+        isAccepted: !!isAcceptedPayment,
+        canProcessPoints: isPaymentValid && !!isAcceptedPayment,
+        user: {
+          id: payment.user.id,
+        },
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new BadRequestException(
+        `Erreur lors de la vérification des points de paiement: ${error.message}`,
+      );
+    }
   }
 }

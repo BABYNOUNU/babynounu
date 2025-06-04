@@ -19,19 +19,22 @@ import { NotificationService } from '../notification/notification.service';
 
 @WebSocketGateway({
   cors: {
-    origin: '*', // Ou votre domaine frontend
+    origin: process.env.FRONTEND_URL || '*',
     credentials: true,
   },
-  pingTimeout: 30000, // Réduire à 30s
-  pingInterval: 10000, // Réduire à 10s
-  // transports: ['websocket']
+  pingTimeout: 60000,
+  pingInterval: 25000,
+  maxHttpBufferSize: 1e6,
+  connectTimeout: 45000,
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
-  // private readonly logger = new Logger(ChatGateway.name);
+  private readonly logger = new Logger(ChatGateway.name);
   private connectedUsers: Map<string, Socket> = new Map();
+  private userConnections: Map<string, Set<Socket>> = new Map();
+
   private readonly connectionLock = new Map<string, Promise<void>>();
 
   constructor(
@@ -43,7 +46,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {}
 
   afterInit(server: Server) {
-    server.sockets.setMaxListeners(50); // Réduire à 50
+    server.sockets.setMaxListeners(50); // Correction: réduire à 50 comme indiqué dans le commentaire
   }
 
   async handleConnection(client: Socket) {
@@ -53,52 +56,51 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         client.disconnect(true);
         return;
       }
-  
+
       if (!this.connectionLock.has(userId.id)) {
         const connectionPromise = (async () => {
           try {
             await this.handleNewConnection(userId.id, client);
           } catch (error) {
+            this.logger.error(`Connection error for user ${userId.id}: ${error.message}`);
             client.disconnect(true);
           } finally {
             this.connectionLock.delete(userId.id);
           }
         })();
-  
+
         this.connectionLock.set(userId.id, connectionPromise);
       }
-  
+
       await this.connectionLock.get(userId.id);
     } catch (error) {
+      this.logger.error(`HandleConnection error: ${error.message}`);
       client.disconnect(true);
     }
   }
-
-  // Créer une structure pour stocker plusieurs connexions par utilisateur
-  private userConnections: Map<string, Set<Socket>> = new Map();
 
   private async handleNewConnection(userId: string, client: Socket) {
     // Ajouter cette connexion aux connexions de l'utilisateur
     if (!this.userConnections.has(userId)) {
       this.userConnections.set(userId, new Set());
     }
-    this.userConnections.get(userId).add(client);
-    
+    this.userConnections.get(userId)!.add(client);
+
     // Conserver également la connexion la plus récente pour la compatibilité
     this.connectedUsers.set(userId, client);
-    
+
     client.join(`user_${userId}`);
-    
+
     // Configurer le handler de déconnexion
     const disconnectHandler = () => {
       // Supprimer uniquement cette connexion spécifique
       if (this.userConnections.has(userId)) {
-        this.userConnections.get(userId).delete(client);
-        if (this.userConnections.get(userId).size === 0) {
+        this.userConnections.get(userId)!.delete(client);
+        if (this.userConnections.get(userId)!.size === 0) {
           this.userConnections.delete(userId);
         }
       }
-      
+
       // Si c'était la connexion principale, mettre à jour
       if (this.connectedUsers.get(userId)?.id === client.id) {
         const remainingConnections = this.userConnections.get(userId);
@@ -110,7 +112,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
       }
     };
-    
+
     client.on('disconnect', disconnectHandler);
     client.data.disconnectHandler = disconnectHandler;
   }
@@ -121,12 +123,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
     // Nettoyer les autres écouteurs d'événements
     this.removeAllListeners(socket);
-    
+
     // Informer le client qu'il a été remplacé par une nouvelle connexion
     socket.emit('connectionReplaced', {
-      message: 'Votre session a été remplacée par une nouvelle connexion'
+      message: 'Votre session a été remplacée par une nouvelle connexion',
     });
-    
+
     // Déconnecter en douceur (sans forcer)
     socket.disconnect(false);
   }
@@ -140,20 +142,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  private handleUserDisconnect(userId: string, socketId: string) {
-    const currentSocket = this.connectedUsers.get(userId);
-    if (currentSocket?.id === socketId) {
-      this.removeAllListeners(currentSocket);
-      this.connectedUsers.delete(userId);
-      // this.logger.log(`User ${userId} disconnected (Socket ${socketId})`);
-    }
-  }
-
   handleDisconnect(client: Socket) {
-      this.removeAllListeners(client);
-      if (client.data?.disconnectHandler) {
-          client.off('disconnect', client.data.disconnectHandler);
-      }
+    this.removeAllListeners(client);
+    if (client.data?.disconnectHandler) {
+      client.off('disconnect', client.data.disconnectHandler);
+    }
   }
 
   @SubscribeMessage('joinRoom')
@@ -164,14 +157,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     try {
       const user = await this.authService.getUserFromSocket(client);
-
+      console.log(user)
       if (!user) {
         throw new WsException('Unauthorized');
       }
 
-      const room = await this.roomService.getRoom(roomId);
+      const room = await this.roomService.getRoom(roomId, user.id);
       if (!room) {
-        throw new WsException('Rooms not found');
+        throw new WsException('Room not found'); // Correction: "Room" au lieu de "Rooms"
       }
 
       // Verify user is part of this room
@@ -180,11 +173,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
 
       client.join(`room_${roomId}`);
-      // this.logger.log(`User ${user.id} joined room ${roomId}`);
+      this.logger.log(`User ${user.id} joined room ${roomId}`);
 
       return { success: true, roomId };
     } catch (error) {
-      // this.logger.error(`JoinRoom error: ${error.message}`);
+      this.logger.error(`JoinRoom error: ${error.message}`);
       throw new WsException(error.message);
     }
   }
@@ -195,8 +188,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody() roomId: number,
   ) {
-    client.leave(`room_${roomId}`);
-    return { success: true };
+    try {
+      client.leave(`room_${roomId}`);
+      return { success: true };
+    } catch (error) {
+      this.logger.error(`LeaveRoom error: ${error.message}`);
+      throw new WsException(error.message);
+    }
   }
 
   @SubscribeMessage('sendMessage')
@@ -218,9 +216,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         throw new WsException('Unauthorized');
       }
 
-      const room = await this.roomService.getRoom(data.roomId);
+      const room = await this.roomService.getRoom(data.roomId, sender.id);
       if (!room) {
-        throw new WsException('Rooms not found');
+        throw new WsException('Room not found'); // Correction: "Room" au lieu de "Rooms"
       }
 
       // Verify user is part of this room
@@ -243,19 +241,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       // Emit to room members
       this.server.to(`room_${data.roomId}`).emit('newMessage', newMessage);
-
+      this.server.to(`user_${room.sender.id}`).emit('newMessageNotify', newMessage);
       // Update conversation lists
       this.updateConversationList(sender.id);
       this.updateConversationList(receiverId);
 
       // Handle notifications if receiver is offline
       // if (!isReceiverOnline) {
-      await this.notifyNewMessage(data.roomId, sender.id);
+        await this.notifyNewMessage(data.roomId, sender.id);
       // }
 
       return { success: true, message: newMessage };
     } catch (error) {
-      // this.logger.error(`SendMessage error: ${error.message}`);
+      this.logger.error(`SendMessage error: ${error.message}`);
       throw new WsException(error.message);
     }
   }
@@ -267,9 +265,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         .to(`user_${userId}`)
         .emit('conversationsUpdated', conversations);
     } catch (error) {
-      // this.logger.error(
-      //   `UpdateConversationList error for user ${userId}: ${error.message}`,
-      // );
+      this.logger.error(
+        `UpdateConversationList error for user ${userId}: ${error.message}`,
+      );
     }
   }
 
@@ -279,9 +277,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody() roomId: number,
   ) {
-    const user = await this.authService.getUserFromSocket(client);
-    if (user) {
-      this.updateConversationList(user.id);
+    try {
+      const user = await this.authService.getUserFromSocket(client);
+      if (user) {
+        this.updateConversationList(user.id);
+      }
+    } catch (error) {
+      this.logger.error(`HandleSeenMessage error: ${error.message}`);
     }
   }
 
@@ -291,12 +293,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody() data: { roomId: number; isTyping: boolean },
   ) {
-    const user = await this.authService.getUserFromSocket(client);
-    if (user) {
-      client.to(`room_${data.roomId}`).emit('userTyping', {
-        userId: user.id,
-        isTyping: data.isTyping,
-      });
+    try {
+      const user = await this.authService.getUserFromSocket(client);
+      if (user) {
+        client.to(`room_${data.roomId}`).emit('userTyping', {
+          userId: user.id,
+          isTyping: data.isTyping,
+        });
+      }
+    } catch (error) {
+      this.logger.error(`HandleTyping error: ${error.message}`);
     }
   }
 
@@ -306,11 +312,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody() data: { roomId: number },
   ) {
-    const user = await this.authService.getUserFromSocket(client);
-    if (user) {
-      client.to(`room_${data.roomId}`).emit('userStoppedTyping', {
-        userId: user.id,
-      });
+    try {
+      const user = await this.authService.getUserFromSocket(client);
+      if (user) {
+        client.to(`room_${data.roomId}`).emit('userStoppedTyping', {
+          userId: user.id,
+        });
+      }
+    } catch (error) {
+      this.logger.error(`HandleTypingStop error: ${error.message}`);
     }
   }
 
@@ -320,21 +330,25 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody() roomId: number,
   ) {
-    const user = await this.authService.getUserFromSocket(client);
-    if (user) {
-      // this.updateConversationList(user.id);
-      const result = await this.roomService.resetUnreadCount(roomId, user.id);
-      const totalUnread = await this.roomService.getTotalUnreadCount(user.id);
+    try {
+      const user = await this.authService.getUserFromSocket(client);
+      if (user) {
+        const result = await this.roomService.resetUnreadCount(roomId, user.id);
+        const totalUnread = await this.roomService.getTotalUnreadCount(user.id);
 
-      this.server.to(`user_${user.id}`).emit('unreadUpdated', {
-        roomId,
-        count: result.count,
-        totalUnread,
-      });
+        this.server.to(`user_${user.id}`).emit('unreadUpdated', {
+          roomId,
+          count: result.count,
+          totalUnread,
+        });
 
-      return { success: true };
+        return { success: true };
+      }
+      return { success: false };
+    } catch (error) {
+      this.logger.error(`HandleMarkAsRead error: ${error.message}`);
+      return { success: false };
     }
-    return { success: false };
   }
 
   @SubscribeMessage('getUnreadCounts')
@@ -343,17 +357,22 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody() userId: string,
   ) {
-    const user = await this.authService.getUserFromSocket(client);
-    if (user && user.id === userId) {
-      this.server.to(`user_${user.id}`).emit('unreadCounts', {
-        totalUnread: await this.roomService.getTotalUnreadCount(userId),
-      });
+    try {
+      const user = await this.authService.getUserFromSocket(client);
+      if (user && user.id === userId) {
+        const totalUnread = await this.roomService.getTotalUnreadCount(userId);
+        this.server.to(`user_${user.id}`).emit('unreadCounts', {
+          totalUnread,
+        });
+      }
+    } catch (error) {
+      this.logger.error(`GetTotalUnreadCount error: ${error.message}`);
     }
   }
 
   async notifyNewMessage(roomId: number, senderId: string) {
     try {
-      const room = await this.roomService.getRoom(roomId);
+      const room = await this.roomService.getRoom(roomId, senderId);
       if (!room) return;
 
       const receiverId =
@@ -371,7 +390,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         totalUnread,
       });
     } catch (error) {
-      // this.logger.error(`NotifyNewMessage error: ${error.message}`);
+      this.logger.error(`NotifyNewMessage error: ${error.message}`);
     }
   }
 
@@ -389,12 +408,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         throw new WsException('Unauthorized');
       }
 
-      const notifications = await this.notificationService.getNotifications(
+      const notifications = await this.notificationService.findAllByUser(
         data.userId,
       );
       this.server.to(`user_${user.id}`).emit('notifications', notifications);
     } catch (error) {
-      // this.logger.error(`GetNotifications error: ${error.message}`);
+      this.logger.error(`GetNotifications error: ${error.message}`);
       throw new WsException(error.message);
     }
   }
@@ -417,7 +436,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         success: true,
       });
     } catch (error) {
-      // this.logger.error(`MarkAsReadNotification error: ${error.message}`);
+      this.logger.error(`MarkAsReadNotification error: ${error.message}`);
       client.emit('notificationMarkedAsRead', {
         userId: data.userId,
         success: false,
@@ -442,7 +461,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       client.emit('unreadCountsNotification', unreadCountsNotification);
     } catch (error) {
-      // this.logger.error(`GetUnreadCountsNotification error: ${error.message}`);
+      this.logger.error(`GetUnreadCountsNotification error: ${error.message}`);
       throw new WsException(error.message);
     }
   }
@@ -468,7 +487,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         .to(`user_${user.id}`)
         .emit('isAbonnement', hasActiveAbonnement);
     } catch (error) {
-      // this.logger.error(`IsAbonnement error: ${error.message}`);
+      this.logger.error(`IsAbonnement error: ${error.message}`);
       throw new WsException(error.message);
     }
   }
@@ -493,62 +512,66 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         .to(`user_${user.id}`)
         .emit('checkPaymentPoint', hasActiveAbonnement);
     } catch (error) {
-      // this.logger.error(`checkPaymentPoint error: ${error.message}`);
+      this.logger.error(`checkPaymentPoint error: ${error.message}`);
       throw new WsException(error.message);
     }
   }
 
-@SubscribeMessage('userOnline')
-@UseGuards(WsJwtGuard)
-async handleUserOnline(
-  @ConnectedSocket() client: Socket,
-  @MessageBody() data: { userId: string },
-) {
-  try {
-    const user = await this.authService.getUserFromSocket(client);
-    if (!user || user.id !== data.userId) {
-      throw new WsException('Unauthorized');
+  @SubscribeMessage('userOnline')
+  @UseGuards(WsJwtGuard)
+  async handleUserOnline(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: { userId: string },
+  ) {
+    try {
+      const user = await this.authService.getUserFromSocket(client);
+      if (!user) {
+        throw new WsException('Unauthorized');
+      }
+
+      // Emit online status to all connected users
+      this.server.emit('userOnlineStatus', {
+        userId: data.userId,
+        isOnline: this.isUserOnline(data.userId),
+      });
+
+      return { success: true };
+    } catch (error) {
+      this.logger.error(`HandleUserOnline error: ${error.message}`);
+      throw new WsException(error.message);
     }
-
-    // Emit online status to all connected users
-    this.server.emit('userOnlineStatus', {
-      userId: data.userId,
-      isOnline: true
-    });
-
-    return { success: true };
-  } catch (error) {
-    throw new WsException(error.message);
   }
-}
 
-@SubscribeMessage('checkMultipleUsersStatus')
-@UseGuards(WsJwtGuard)
-async handleCheckMultipleUsersStatus(
-  @ConnectedSocket() client: Socket,
-  @MessageBody() data: { userIds: string[] },
-) {
-  try {
-    const user = await this.authService.getUserFromSocket(client);
-    if (!user) {
-      throw new WsException('Unauthorized');
+  @SubscribeMessage('checkMultipleUsersStatus')
+  @UseGuards(WsJwtGuard)
+  async handleCheckMultipleUsersStatus(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: { userIds: string[] },
+  ) {
+    try {
+      const user = await this.authService.getUserFromSocket(client);
+      if (!user) {
+        throw new WsException('Unauthorized');
+      }
+
+      // Create a map of online status for each requested user
+      const onlineStatus = data.userIds.reduce(
+        (acc, userId) => {
+          acc[userId] = this.isUserOnline(userId);
+          return acc;
+        },
+        {} as Record<string, boolean>,
+      );
+
+      // Send status back to requesting client
+      client.emit('multipleUsersStatus', onlineStatus);
+
+      return { success: true, onlineStatus };
+    } catch (error) {
+      this.logger.error(`HandleCheckMultipleUsersStatus error: ${error.message}`);
+      throw new WsException(error.message);
     }
-
-    // Create a map of online status for each requested user
-    const onlineStatus = data.userIds.reduce((acc, userId) => {
-      acc[userId] = this.isUserOnline(userId);
-      return acc;
-    }, {} as Record<string, boolean>);
-
-    // Send status back to requesting client
-    client.emit('multipleUsersStatus', onlineStatus);
-
-    return { success: true, onlineStatus };
-  } catch (error) {
-    throw new WsException(error.message);
   }
-}
-
 
   // Utility methods
   isUserOnline(userId: string): boolean {

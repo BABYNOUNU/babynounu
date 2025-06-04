@@ -17,3 +17,5 @@
 -  "V0.6.7.7: Update ping to Gateway, Media Update Documents"
 - "V0.6.8.0: Update Nounu, parent, jobs add pagination"
 - "V0.6.8.1: Update Abonnement return data"
+- "V0.6.8.2: Update Point to abonnement"
+- "V0.6.8.3: Update abonnement, add controlleur and update service administartion, update gateway"

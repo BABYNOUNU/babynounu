@@ -151,7 +151,7 @@ export class AuthService {
     return isExist;
   }
 
-  async getUserFromSocket(socket: Socket): Promise<User | null> {
+  async getUserFromSocket(socket: Socket): Promise<any | null> {
     try {
       // Get the token from the socket handshake or query parameters
       const token = socket.handshake.auth?.token;
