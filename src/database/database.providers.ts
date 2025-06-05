@@ -3,6 +3,9 @@ import { DataSource } from 'typeorm';
 
 export const isProd:boolean = true;
 export const HOST = isProd ? 'https://api.babynounu.com' : 'http://localhost:3000';
+export const WS_HOST = isProd ? 'https://api.babynounu.com' : process.env.FRONTEND_URL;
+
+// DATABASE PROVIDER
 const ProdDatabase = (dbProd:string, dbTest:string) => {
   return isProd ? dbProd : dbTest;
 }

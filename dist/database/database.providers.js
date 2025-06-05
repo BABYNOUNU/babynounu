@@ -1,9 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.databaseProviders = exports.HOST = exports.isProd = void 0;
+exports.databaseProviders = exports.WS_HOST = exports.HOST = exports.isProd = void 0;
 const typeorm_1 = require("typeorm");
 exports.isProd = true;
 exports.HOST = exports.isProd ? 'https://api.babynounu.com' : 'http://localhost:3000';
+exports.WS_HOST = exports.isProd ? 'https://api.babynounu.com' : process.env.FRONTEND_URL;
 const ProdDatabase = (dbProd, dbTest) => {
     return exports.isProd ? dbProd : dbTest;
 };
