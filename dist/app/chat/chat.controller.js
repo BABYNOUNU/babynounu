@@ -33,9 +33,8 @@ let ChatController = class ChatController {
         console.log(user);
         return this.roomService.getUserConversations(user.id);
     }
-    async createOrGetRoom(user, nounouId, parentId) {
-        console.log(user);
-        return this.roomService.createOrGetRoom(user.id, parentId, nounouId);
+    async createOrGetRoom(nounouId, parentId, userId) {
+        return this.roomService.createOrGetRoom(userId, parentId, nounouId);
     }
     async getTotalUnreadCount(user) {
         return this.roomService.getTotalUnreadCount(user.id);
@@ -67,11 +66,11 @@ __decorate([
 ], ChatController.prototype, "getUserConversations", null);
 __decorate([
     (0, common_1.Get)('find-or-create-room'),
-    __param(0, (0, getUser_1.GetUser)()),
-    __param(1, (0, common_1.Query)('nounouId')),
-    __param(2, (0, common_1.Query)('parentId')),
+    __param(0, (0, common_1.Query)('nounouId')),
+    __param(1, (0, common_1.Query)('parentId')),
+    __param(2, (0, common_1.Query)('userId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [user_model_1.User, String, String]),
+    __metadata("design:paramtypes", [String, String, String]),
     __metadata("design:returntype", Promise)
 ], ChatController.prototype, "createOrGetRoom", null);
 __decorate([

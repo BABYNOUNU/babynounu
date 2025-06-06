@@ -37,12 +37,11 @@ export class ChatController {
 
   @Get('find-or-create-room')
   async createOrGetRoom(
-    @GetUser() user: User,
     @Query('nounouId') nounouId: string,
     @Query('parentId') parentId: string,
+    @Query('userId') userId: string,
   ) {
-    console.log(user)
-    return this.roomService.createOrGetRoom(user.id, parentId, nounouId);
+    return this.roomService.createOrGetRoom(userId, parentId, nounouId);
   }
 
   @Get('unread-total')

@@ -13,7 +13,7 @@ export declare class ChatController {
         lastMessage: import("../messages/models/message.model").Message;
         unreadCount: number;
     }[]>;
-    createOrGetRoom(user: User, nounouId: string, parentId: string): Promise<{
+    createOrGetRoom(nounouId: string, parentId: string, userId: string): Promise<{
         photo: import("../media/models/media.model").Medias;
         id: number;
         nounou: import("../nounus/models/nounu.model").ProfilNounus;
