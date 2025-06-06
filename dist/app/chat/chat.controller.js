@@ -34,6 +34,7 @@ let ChatController = class ChatController {
         return this.roomService.getUserConversations(user.id);
     }
     async createOrGetRoom(user, nounouId, parentId) {
+        console.log(user);
         return this.roomService.createOrGetRoom(user.id, parentId, nounouId);
     }
     async getTotalUnreadCount(user) {

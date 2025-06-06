@@ -25,6 +25,7 @@ export declare class AbonnementService {
     private createNewAbonnement;
     private sendSubscriptionNotification;
     private buildResponse;
+    isAbonnement(userId: string): Promise<any>;
     getAbonnementById(abonnementId: string): Promise<Abonnements>;
     getAbonnementByUserId(userId: string): Promise<any>;
     hasActiveAbonnement(userId: string): Promise<boolean>;

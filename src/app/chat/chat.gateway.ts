@@ -492,6 +492,30 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
+@SubscribeMessage('isAbonnement') 
+@UseGuards(WsJwtGuard)
+async checkIsAbonnementStatus(
+  @MessageBody() data: { userId: string },
+  @ConnectedSocket() client: Socket,
+) {
+  try {
+    const user = await this.authService.getUserFromSocket(client);
+    if (!user || user.id !== data.userId) {
+      throw new WsException('Unauthorized');
+    }
+
+    const hasActiveAbonnement = await this.abonnementService.isAbonnement(data.userId);
+
+    this.server
+      .to(`user_${user.id}`)
+      .emit('isAbonnementStatus', hasActiveAbonnement);
+
+  } catch (error) {
+    this.logger.error(`CheckIsAbonnementStatus error: ${error.message}`);
+    throw new WsException(error.message);
+  }
+}
+
   @SubscribeMessage('checkPaymentPoint')
   @UseGuards(WsJwtGuard)
   async checkPaymentPoint(

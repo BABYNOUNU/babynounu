@@ -358,6 +358,22 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
             throw new websockets_1.WsException(error.message);
         }
     }
+    async checkIsAbonnementStatus(data, client) {
+        try {
+            const user = await this.authService.getUserFromSocket(client);
+            if (!user || user.id !== data.userId) {
+                throw new websockets_1.WsException('Unauthorized');
+            }
+            const hasActiveAbonnement = await this.abonnementService.isAbonnement(data.userId);
+            this.server
+                .to(`user_${user.id}`)
+                .emit('isAbonnementStatus', hasActiveAbonnement);
+        }
+        catch (error) {
+            this.logger.error(`CheckIsAbonnementStatus error: ${error.message}`);
+            throw new websockets_1.WsException(error.message);
+        }
+    }
     async checkPaymentPoint(data, client) {
         try {
             const user = await this.authService.getUserFromSocket(client);
@@ -529,6 +545,15 @@ __decorate([
     __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
     __metadata("design:returntype", Promise)
 ], ChatGateway.prototype, "IsAbonnement", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('isAbonnement'),
+    (0, common_1.UseGuards)(ws_auth_guard_1.WsJwtGuard),
+    __param(0, (0, websockets_1.MessageBody)()),
+    __param(1, (0, websockets_1.ConnectedSocket)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
+    __metadata("design:returntype", Promise)
+], ChatGateway.prototype, "checkIsAbonnementStatus", null);
 __decorate([
     (0, websockets_1.SubscribeMessage)('checkPaymentPoint'),
     (0, common_1.UseGuards)(ws_auth_guard_1.WsJwtGuard),

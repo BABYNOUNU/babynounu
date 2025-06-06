@@ -300,6 +300,24 @@ export class AbonnementService {
     };
   }
 
+/**
+ * Checks if a user has an active subscription
+ */
+async isAbonnement(userId: string): Promise<any> {
+  const abonnement = await this.abonnementRepository.findOne({
+    where: { user: { id: userId } },
+    relations: ['paiement', 'type', 'user'],
+    order: { createdAt: 'DESC' },
+  });
+
+  if (!abonnement) {
+    return this.buildResponse(false, false);
+  }
+
+  const isActive = await this.hasActiveAbonnement(userId);
+  return this.buildResponse(true, isActive, abonnement);
+}
+
   /**
    * Récupère un abonnement par son ID
    */

@@ -185,6 +185,18 @@ let AbonnementService = class AbonnementService {
             hasActiveSubscription,
         };
     }
+    async isAbonnement(userId) {
+        const abonnement = await this.abonnementRepository.findOne({
+            where: { user: { id: userId } },
+            relations: ['paiement', 'type', 'user'],
+            order: { createdAt: 'DESC' },
+        });
+        if (!abonnement) {
+            return this.buildResponse(false, false);
+        }
+        const isActive = await this.hasActiveAbonnement(userId);
+        return this.buildResponse(true, isActive, abonnement);
+    }
     async getAbonnementById(abonnementId) {
         const abonnement = await this.abonnementRepository.findOne({
             where: { id: abonnementId },

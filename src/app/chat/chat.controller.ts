@@ -41,6 +41,7 @@ export class ChatController {
     @Query('nounouId') nounouId: string,
     @Query('parentId') parentId: string,
   ) {
+    console.log(user)
     return this.roomService.createOrGetRoom(user.id, parentId, nounouId);
   }
 
