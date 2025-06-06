@@ -546,7 +546,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ChatGateway.prototype, "IsAbonnement", null);
 __decorate([
-    (0, websockets_1.SubscribeMessage)('isAbonnement'),
+    (0, websockets_1.SubscribeMessage)('isAbonnementUser'),
     (0, common_1.UseGuards)(ws_auth_guard_1.WsJwtGuard),
     __param(0, (0, websockets_1.MessageBody)()),
     __param(1, (0, websockets_1.ConnectedSocket)()),

@@ -492,7 +492,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-@SubscribeMessage('isAbonnement') 
+@SubscribeMessage('isAbonnementUser') 
 @UseGuards(WsJwtGuard)
 async checkIsAbonnementStatus(
   @MessageBody() data: { userId: string },
