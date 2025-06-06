@@ -367,7 +367,7 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
             const hasActiveAbonnement = await this.abonnementService.isAbonnement(data.userId);
             this.server
                 .to(`user_${user.id}`)
-                .emit('isAbonnementStatus', hasActiveAbonnement);
+                .emit('isAbonnement', hasActiveAbonnement);
         }
         catch (error) {
             this.logger.error(`CheckIsAbonnementStatus error: ${error.message}`);

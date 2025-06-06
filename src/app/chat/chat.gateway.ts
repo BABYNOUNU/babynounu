@@ -508,7 +508,7 @@ async checkIsAbonnementStatus(
 
     this.server
       .to(`user_${user.id}`)
-      .emit('isAbonnementStatus', hasActiveAbonnement);
+      .emit('isAbonnement', hasActiveAbonnement);
 
   } catch (error) {
     this.logger.error(`CheckIsAbonnementStatus error: ${error.message}`);
