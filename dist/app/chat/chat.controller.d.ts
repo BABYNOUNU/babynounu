@@ -8,13 +8,13 @@ export declare class ChatController {
     getMessages(roomId: number): Promise<import("../messages/models/message.model").Message[]>;
     getUserConversations(user: User): Promise<{
         room: import("../rooms/models/room.model").Rooms;
-        nounuPhoto: import("../media/models/media.model").Medias;
-        parentPhoto: import("../media/models/media.model").Medias;
+        nounuPhoto: any;
+        parentPhoto: any;
         lastMessage: import("../messages/models/message.model").Message;
         unreadCount: number;
     }[]>;
     createOrGetRoom(nounouId: string, parentId: string, userId: string): Promise<{
-        photo: import("../media/models/media.model").Medias;
+        photo: any;
         id: number;
         nounou: import("../nounus/models/nounu.model").ProfilNounus;
         parent: import("../parent/models/parent.model").ProfilParents;
@@ -26,7 +26,7 @@ export declare class ChatController {
     }>;
     getTotalUnreadCount(user: User): Promise<number>;
     getRoom(user: any, roomId: number): Promise<{
-        photo: import("../media/models/media.model").Medias;
+        photo: any;
         id: number;
         nounou: import("../nounus/models/nounu.model").ProfilNounus;
         parent: import("../parent/models/parent.model").ProfilParents;

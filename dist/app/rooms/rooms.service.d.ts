@@ -9,13 +9,14 @@ export declare class RoomsService {
     constructor(roomRepository: Repository<Rooms>, messageRepository: Repository<Message>, unreadCountRepository: Repository<RoomMessageCount>);
     getUserConversations(userId: string): Promise<{
         room: Rooms;
-        nounuPhoto: import("../media/models/media.model").Medias;
-        parentPhoto: import("../media/models/media.model").Medias;
+        nounuPhoto: any;
+        parentPhoto: any;
         lastMessage: Message;
         unreadCount: number;
     }[]>;
+    private extractProfilePhoto;
     createOrGetRoom(senderId: string, parentId: string, nounouId: string): Promise<{
-        photo: import("../media/models/media.model").Medias;
+        photo: any;
         id: number;
         nounou: import("../nounus/models/nounu.model").ProfilNounus;
         parent: import("../parent/models/parent.model").ProfilParents;
@@ -25,6 +26,7 @@ export declare class RoomsService {
         unreadCounts: RoomMessageCount[];
         messages: Message[];
     }>;
+    private getConversationPhoto;
     private initializeUnreadCounts;
     getTotalUnreadCount(userId: string): Promise<number>;
     incrementUnreadCount(roomId: number, userId: string): Promise<number>;
@@ -34,7 +36,7 @@ export declare class RoomsService {
         count: number;
     }>;
     getRoom(roomId: number, senderId?: any): Promise<{
-        photo: import("../media/models/media.model").Medias;
+        photo: any;
         id: number;
         nounou: import("../nounus/models/nounu.model").ProfilNounus;
         parent: import("../parent/models/parent.model").ProfilParents;

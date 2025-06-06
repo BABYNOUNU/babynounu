@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, MoreThan } from 'typeorm';
 import { UserService } from '../user/user.service';
@@ -19,89 +19,112 @@ export class RoomsService {
 
   // Get all conversations for a user with last message and unread count
   async getUserConversations(userId: string) {
-    const rooms = await this.roomRepository.find({
-      where: [{ receiver: { id: userId } }, { sender: { id: userId } }],
-      relations: [
-        'receiver',
-        'sender',
-        'nounou.user.medias.type_media',
-        'parent.user.medias.type_media',
-      ],
-    });
+    if (!userId) {
+      throw new BadRequestException('User ID is required');
+    }
 
-    const conversations = await Promise.all(
-      rooms.map(async (room) => {
-        const lastMessage = await this.messageRepository.findOne({
-          where: { room: { id: room.id } },
-          order: { createdAt: 'DESC' },
-        });
+    try {
+      const rooms = await this.roomRepository.find({
+        where: [{ receiver: { id: userId } }, { sender: { id: userId } }],
+        relations: [
+          'receiver',
+          'sender',
+          'nounou.user.medias.type_media',
+          'parent.user.medias.type_media',
+        ],
+      });
 
-        const unreadCount = await this.unreadCountRepository.findOne({
-          where: {
-            room: { id: room.id },
-            user: { id: userId },
-            count: MoreThan(0),
-          },
-        });
+      if (!rooms.length) {
+        return [];
+      }
 
-        return {
-          room,
-          nounuPhoto:
-            room.nounou.user.medias.length > 0
-              ? room.nounou.user.medias.find(
-                  (media) => media.type_media.slug === 'image-profil',
-                )
-              : null,
-          parentPhoto:
-            room.parent.user.medias.length > 0
-              ? room.parent.user.medias.find(
-                  (media) => media.type_media.slug === 'image-profil',
-                )
-              : null,
-          lastMessage,
-          unreadCount: unreadCount ? unreadCount.count : 0,
-        };
-      }),
-    );
+      const conversations = await Promise.all(
+        rooms.map(async (room) => {
+          const [lastMessage, unreadCount] = await Promise.all([
+            this.messageRepository.findOne({
+              where: { room: { id: room.id } },
+              order: { createdAt: 'DESC' },
+            }),
+            this.unreadCountRepository.findOne({
+              where: {
+                room: { id: room.id },
+                user: { id: userId },
+                count: MoreThan(0),
+              },
+            })
+          ]);
 
-    return conversations;
+          return {
+            room,
+            nounuPhoto: this.extractProfilePhoto(room.nounou?.user?.medias),
+            parentPhoto: this.extractProfilePhoto(room.parent?.user?.medias),
+            lastMessage,
+            unreadCount: unreadCount?.count || 0,
+          };
+        }),
+      );
+
+      return conversations;
+    } catch (error) {
+      throw new Error(`Failed to get user conversations: ${error.message}`);
+    }
+  }
+
+  // Helper method to extract profile photo
+  private extractProfilePhoto(medias: any[]) {
+    if (!medias || !Array.isArray(medias) || medias.length === 0) {
+      return null;
+    }
+    return medias.find((media) => media?.type_media?.slug === 'image-profil') || null;
   }
 
   // Create or get existing conversation
   async createOrGetRoom(senderId: string, parentId: string, nounouId: string) {
-    let receiverId = process.env.USER_ADMIN_ID;
-    let room = await this.roomRepository.findOne({
-      where: [{ nounou: { id: nounouId }, parent: { id: parentId } }],
-      relations: [
-        'nounou.user.medias.type_media',
-        'parent.user.medias.type_media',
-      ],
-    });
-
-    if (!room) {
-      room = this.roomRepository.create({
-        sender: { id: senderId },
-        receiver: { id: process.env.USER_ADMIN_ID },
-        parent: { id: parentId },
-        nounou: { id: nounouId },
-      });
-      await this.roomRepository.save(room);
-
-      // Initialize unread counts for both users
-      await this.initializeUnreadCounts(room.id, senderId, receiverId);
+    if (!senderId || !parentId || !nounouId) {
+      throw new BadRequestException('Sender ID, Parent ID, and Nounou ID are required');
     }
 
-    return {
-      ...room,
-      photo:
-      senderId == room.parent.user.id
-      ? room.parent.user.medias?.find(
-          (media) => media.type_media.slug === 'image-profil',
-        )
-      : room.nounou.user.medias?.find(
-          (media) => media.type_media.slug === 'image-profil',
-        ),
-    };
+    if (!process.env.USER_ADMIN_ID) {
+      throw new Error('USER_ADMIN_ID environment variable is not configured');
+    }
+
+    try {
+      let room = await this.roomRepository.findOne({
+        where: { nounou: { id: nounouId }, parent: { id: parentId } },
+        relations: [
+          'nounou.user.medias.type_media',
+          'parent.user.medias.type_media',
+        ],
+      });
+
+      if (!room) {
+        room = this.roomRepository.create({
+          sender: { id: senderId },
+          receiver: { id: process.env.USER_ADMIN_ID },
+          parent: { id: parentId },
+          nounou: { id: nounouId },
+        });
+        room = await this.roomRepository.save(room);
+
+        // Initialize unread counts for both users
+        await this.initializeUnreadCounts(room.id, senderId, process.env.USER_ADMIN_ID);
+      }
+
+      return {
+        ...room,
+        photo: this.getConversationPhoto(senderId, room),
+      };
+    } catch (error) {
+      throw new Error(`Failed to create or get room: ${error.message}`);
+    }
+  }
+
+  // Helper method to get conversation photo
+  private getConversationPhoto(senderId: string, room: any) {
+    if (senderId === room.parent?.user?.id) {
+      return this.extractProfilePhoto(room.parent?.user?.medias);
+    }
+    return this.extractProfilePhoto(room.nounou?.user?.medias);
   }
 
   private async initializeUnreadCounts(
@@ -109,93 +132,138 @@ export class RoomsService {
     user1Id: string,
     user2Id: string,
   ) {
-    const count1 = this.unreadCountRepository.create({
-      room: { id: roomId },
-      user: { id: user1Id },
-      count: 0,
-    });
+    try {
+      const counts = [
+        this.unreadCountRepository.create({
+          room: { id: roomId },
+          user: { id: user1Id },
+          count: 0,
+        }),
+        this.unreadCountRepository.create({
+          room: { id: roomId },
+          user: { id: user2Id },
+          count: 0,
+        })
+      ];
 
-    const count2 = this.unreadCountRepository.create({
-      room: { id: roomId },
-      user: { id: user2Id },
-      count: 0,
-    });
-
-    await this.unreadCountRepository.save([count1, count2]);
+      await this.unreadCountRepository.save(counts);
+    } catch (error) {
+      throw new Error(`Failed to initialize unread counts: ${error.message}`);
+    }
   }
 
   // Get total unread messages count for a user
   async getTotalUnreadCount(userId: string) {
-    const result = await this.unreadCountRepository
-      .createQueryBuilder('unread')
-      .select('SUM(unread.count)', 'total')
-      .where('unread.user.id = :userId', { userId })
-      .getRawOne();
+    if (!userId) {
+      throw new BadRequestException('User ID is required');
+    }
 
-    return parseInt(result.total) || 0;
+    try {
+      const result = await this.unreadCountRepository
+        .createQueryBuilder('unread')
+        .select('COALESCE(SUM(unread.count), 0)', 'total')
+        .where('unread.user.id = :userId', { userId })
+        .getRawOne();
+
+      return parseInt(result.total, 10) || 0;
+    } catch (error) {
+      throw new Error(`Failed to get total unread count: ${error.message}`);
+    }
   }
 
   // Increment unread counter for a room (for the receiver)
   async incrementUnreadCount(roomId: number, userId: string) {
-    await this.unreadCountRepository
-      .createQueryBuilder()
-      .update(RoomMessageCount)
-      .set({ count: () => 'count + 1' })
-      .where('room.id = :roomId AND user.id = :userId', { roomId, userId })
-      .execute();
+    if (!roomId || !userId) {
+      throw new BadRequestException('Room ID and User ID are required');
+    }
 
-    return this.getRoomUnreadCount(roomId, userId);
+    try {
+      await this.unreadCountRepository
+        .createQueryBuilder()
+        .update(RoomMessageCount)
+        .set({ count: () => 'count + 1' })
+        .where('room.id = :roomId AND user.id = :userId', { roomId, userId })
+        .execute();
+
+      return this.getRoomUnreadCount(roomId, userId);
+    } catch (error) {
+      throw new Error(`Failed to increment unread count: ${error.message}`);
+    }
   }
 
   // Reset unread counter for a room
   async resetUnreadCount(roomId: number, userId: string) {
-    await this.unreadCountRepository
-      .createQueryBuilder()
-      .update(RoomMessageCount)
-      .set({ count: 0 })
-      .where('room.id = :roomId AND user.id = :userId', { roomId, userId })
-      .execute();
+    if (!roomId || !userId) {
+      throw new BadRequestException('Room ID and User ID are required');
+    }
 
-    return { roomId, userId, count: 0 };
+    try {
+      await this.unreadCountRepository
+        .createQueryBuilder()
+        .update(RoomMessageCount)
+        .set({ count: 0 })
+        .where('room.id = :roomId AND user.id = :userId', { roomId, userId })
+        .execute();
+
+      return { roomId, userId, count: 0 };
+    } catch (error) {
+      throw new Error(`Failed to reset unread count: ${error.message}`);
+    }
   }
 
   // Get room by ID
   async getRoom(roomId: number, senderId?: any) {
-    const room = await this.roomRepository.findOne({
-      where: { id: roomId },
-      relations: [
-        'receiver',
-        'sender',
-        'nounou.user.medias.type_media',
-        'parent.user.medias.type_media',
-        'contract.message',
-      ],
-    });
+    if (!roomId) {
+      throw new BadRequestException('Room ID is required');
+    }
 
-   
+    try {
+      const room = await this.roomRepository.findOne({
+        where: { id: roomId },
+        relations: [
+          'receiver',
+          'sender',
+          'nounou.user.medias.type_media',
+          'parent.user.medias.type_media',
+          'contract.message',
+        ],
+      });
 
-    return {
-      ...room,
-      photo:
-        senderId.id != room.parent.user.id
-          ? room.parent.user.medias?.find(
-              (media) => media.type_media.slug === 'image-profil',
-            )
-          : room.nounou.user.medias?.find(
-              (media) => media.type_media.slug === 'image-profil',
-            ),
-    };
+      if (!room) {
+        throw new NotFoundException(`Room with ID ${roomId} not found`);
+      }
+
+      return {
+        ...room,
+        photo: senderId?.id !== room.parent?.user?.id
+          ? this.extractProfilePhoto(room.parent?.user?.medias)
+          : this.extractProfilePhoto(room.nounou?.user?.medias),
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new Error(`Failed to get room: ${error.message}`);
+    }
   }
 
   // Get unread count for a specific room and user
   async getRoomUnreadCount(roomId: number, userId: string) {
-    const unread = await this.unreadCountRepository.findOne({
-      where: {
-        room: { id: roomId },
-        user: { id: userId },
-      },
-    });
+    if (!roomId || !userId) {
+      throw new BadRequestException('Room ID and User ID are required');
+    }
 
-    return unread ? unread.count : 0;
+    try {
+      const unread = await this.unreadCountRepository.findOne({
+        where: {
+          room: { id: roomId },
+          user: { id: userId },
+        },
+      });
+
+      return unread?.count || 0;
+    } catch (error) {
+      throw new Error(`Failed to get room unread count: ${error.message}`);
+    }
   }
 }
