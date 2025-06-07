@@ -89,6 +89,8 @@ let RoomsService = class RoomsService {
                 relations: [
                     'nounou.user.medias.type_media',
                     'parent.user.medias.type_media',
+                    'sender',
+                    'receiver'
                 ],
             });
             if (!room) {
@@ -99,21 +101,41 @@ let RoomsService = class RoomsService {
                     nounou: { id: nounouId },
                 });
                 room = await this.roomRepository.save(room);
+                room = await this.roomRepository.findOne({
+                    where: { id: room.id },
+                    relations: [
+                        'nounou.user.medias.type_media',
+                        'parent.user.medias.type_media',
+                        'sender',
+                        'receiver'
+                    ],
+                });
+                if (!room) {
+                    throw new Error('Failed to retrieve created room');
+                }
+                await this.initializeUnreadCounts(room.id, senderId, process.env.USER_ADMIN_ID);
             }
             return {
                 ...room,
-                photo: null,
+                photo: this.getConversationPhoto(senderId, room),
             };
         }
         catch (error) {
+            console.error('Error in createOrGetRoom:', error);
             throw new Error(`Failed to create or get room: ${error.message}`);
         }
     }
     getConversationPhoto(senderId, room) {
-        if (senderId === room.parent?.user?.id) {
+        try {
+            if (room.parent?.user?.id && senderId === room.parent.user.id) {
+                return this.extractProfilePhoto(room.nounou?.user?.medias);
+            }
             return this.extractProfilePhoto(room.parent?.user?.medias);
         }
-        return this.extractProfilePhoto(room.nounou?.user?.medias);
+        catch (error) {
+            console.error('Error in getConversationPhoto:', error);
+            return null;
+        }
     }
     async initializeUnreadCounts(roomId, user1Id, user2Id) {
         try {

@@ -83,21 +83,24 @@ export class RoomsService {
     if (!senderId || !parentId || !nounouId) {
       throw new BadRequestException('Sender ID, Parent ID, and Nounou ID are required');
     }
-
+  
     if (!process.env.USER_ADMIN_ID) {
       throw new Error('USER_ADMIN_ID environment variable is not configured');
     }
-
+  
     try {
       let room = await this.roomRepository.findOne({
         where: { nounou: { id: nounouId }, parent: { id: parentId } },
         relations: [
           'nounou.user.medias.type_media',
           'parent.user.medias.type_media',
+          'sender',
+          'receiver'
         ],
       });
-
+  
       if (!room) {
+        // Créer la room d'abord
         room = this.roomRepository.create({
           sender: { id: senderId },
           receiver: { id: process.env.USER_ADMIN_ID },
@@ -105,26 +108,49 @@ export class RoomsService {
           nounou: { id: nounouId },
         });
         room = await this.roomRepository.save(room);
-
+  
+        // Recharger la room avec toutes les relations nécessaires
+        room = await this.roomRepository.findOne({
+          where: { id: room.id },
+          relations: [
+            'nounou.user.medias.type_media',
+            'parent.user.medias.type_media',
+            'sender',
+            'receiver'
+          ],
+        });
+  
+        if (!room) {
+          throw new Error('Failed to retrieve created room');
+        }
+  
         // Initialize unread counts for both users
-        // await this.initializeUnreadCounts(room.id, senderId, process.env.USER_ADMIN_ID);
+        await this.initializeUnreadCounts(room.id, senderId, process.env.USER_ADMIN_ID);
       }
-
+  
       return {
         ...room,
-        photo: null,
+        photo: this.getConversationPhoto(senderId, room),
       };
     } catch (error) {
+      console.error('Error in createOrGetRoom:', error);
       throw new Error(`Failed to create or get room: ${error.message}`);
     }
   }
 
   // Helper method to get conversation photo
   private getConversationPhoto(senderId: string, room: any) {
-    if (senderId === room.parent?.user?.id) {
+    try {
+      // Vérifier si le senderId correspond au parent
+      if (room.parent?.user?.id && senderId === room.parent.user.id) {
+        return this.extractProfilePhoto(room.nounou?.user?.medias);
+      }
+      // Sinon, retourner la photo du parent
       return this.extractProfilePhoto(room.parent?.user?.medias);
+    } catch (error) {
+      console.error('Error in getConversationPhoto:', error);
+      return null;
     }
-    return this.extractProfilePhoto(room.nounou?.user?.medias);
   }
 
   private async initializeUnreadCounts(
