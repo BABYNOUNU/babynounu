@@ -99,11 +99,10 @@ let RoomsService = class RoomsService {
                     nounou: { id: nounouId },
                 });
                 room = await this.roomRepository.save(room);
-                await this.initializeUnreadCounts(room.id, senderId, process.env.USER_ADMIN_ID);
             }
             return {
                 ...room,
-                photo: this.getConversationPhoto(senderId, room),
+                photo: null,
             };
         }
         catch (error) {

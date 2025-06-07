@@ -107,12 +107,12 @@ export class RoomsService {
         room = await this.roomRepository.save(room);
 
         // Initialize unread counts for both users
-        await this.initializeUnreadCounts(room.id, senderId, process.env.USER_ADMIN_ID);
+        // await this.initializeUnreadCounts(room.id, senderId, process.env.USER_ADMIN_ID);
       }
 
       return {
         ...room,
-        photo: this.getConversationPhoto(senderId, room),
+        photo: null,
       };
     } catch (error) {
       throw new Error(`Failed to create or get room: ${error.message}`);
