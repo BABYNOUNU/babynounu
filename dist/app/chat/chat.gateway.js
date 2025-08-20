@@ -31,15 +31,28 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
     notificationService;
     server;
     logger = new common_1.Logger(ChatGateway_1.name);
-    connectedUsers = new Map();
     userConnections = new Map();
     connectionLock = new Map();
+    cleanupInterval;
+    MAX_CONNECTIONS_PER_USER = 5;
     constructor(roomService, authService, messageService, abonnementService, notificationService) {
         this.roomService = roomService;
         this.authService = authService;
         this.messageService = messageService;
         this.abonnementService = abonnementService;
         this.notificationService = notificationService;
+    }
+    onModuleInit() {
+        this.cleanupInterval = setInterval(() => {
+            this.cleanupStaleConnections();
+            this.logMemoryUsage();
+        }, 300000);
+    }
+    onModuleDestroy() {
+        if (this.cleanupInterval) {
+            clearInterval(this.cleanupInterval);
+        }
+        this.cleanupAllConnections();
     }
     afterInit(server) {
         server.sockets.setMaxListeners(50);
@@ -51,83 +64,169 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
                 client.disconnect(true);
                 return;
             }
-            if (!this.connectionLock.has(userId.id)) {
-                const connectionPromise = (async () => {
-                    try {
-                        await this.handleNewConnection(userId.id, client);
-                    }
-                    catch (error) {
-                        this.logger.error(`Connection error for user ${userId.id}: ${error.message}`);
-                        client.disconnect(true);
-                    }
-                    finally {
-                        this.connectionLock.delete(userId.id);
-                    }
-                })();
-                this.connectionLock.set(userId.id, connectionPromise);
+            const lockKey = `connection_${userId.id}`;
+            if (!this.connectionLock.has(lockKey)) {
+                const connectionPromise = this.handleUserConnection(userId.id, client)
+                    .finally(() => {
+                    this.connectionLock.delete(lockKey);
+                });
+                this.connectionLock.set(lockKey, connectionPromise);
             }
-            await this.connectionLock.get(userId.id);
+            await this.connectionLock.get(lockKey);
         }
         catch (error) {
             this.logger.error(`HandleConnection error: ${error.message}`);
             client.disconnect(true);
         }
     }
-    async handleNewConnection(userId, client) {
-        if (!this.userConnections.has(userId)) {
-            this.userConnections.set(userId, new Set());
-        }
-        this.userConnections.get(userId).add(client);
-        this.connectedUsers.set(userId, client);
-        client.join(`user_${userId}`);
-        const disconnectHandler = () => {
-            if (this.userConnections.has(userId)) {
-                this.userConnections.get(userId).delete(client);
-                if (this.userConnections.get(userId).size === 0) {
-                    this.userConnections.delete(userId);
-                }
+    async handleUserConnection(userId, client) {
+        try {
+            const currentConnections = this.userConnections.get(userId) || new Set();
+            if (currentConnections.size >= this.MAX_CONNECTIONS_PER_USER) {
+                const oldestSocket = Array.from(currentConnections)[0];
+                this.cleanupSocket(oldestSocket, 'Too many connections');
             }
-            if (this.connectedUsers.get(userId)?.id === client.id) {
-                const remainingConnections = this.userConnections.get(userId);
-                if (remainingConnections && remainingConnections.size > 0) {
-                    this.connectedUsers.set(userId, Array.from(remainingConnections)[0]);
-                }
-                else {
-                    this.connectedUsers.delete(userId);
-                }
-            }
-        };
-        client.on('disconnect', disconnectHandler);
-        client.data.disconnectHandler = disconnectHandler;
-    }
-    cleanupSocket(socket) {
-        if (socket.data?.disconnectHandler) {
-            socket.off('disconnect', socket.data.disconnectHandler);
-        }
-        this.removeAllListeners(socket);
-        socket.emit('connectionReplaced', {
-            message: 'Votre session a été remplacée par une nouvelle connexion',
-        });
-        socket.disconnect(false);
-    }
-    removeAllListeners(socket) {
-        if (socket.data?.listeners) {
-            Object.entries(socket.data.listeners).forEach(([event, handler]) => {
-                socket.off(event, handler);
+            this.setupSocketListeners(client);
+            currentConnections.add(client);
+            this.userConnections.set(userId, currentConnections);
+            client.join(`user_${userId}`);
+            this.logger.log(`User ${userId} connected. Total connections: ${currentConnections.size}`);
+            this.server.emit('userOnlineStatus', {
+                userId,
+                isOnline: true,
+                connectionCount: currentConnections.size
             });
-            delete socket.data.listeners;
         }
+        catch (error) {
+            this.logger.error(`HandleUserConnection error for user ${userId}: ${error.message}`);
+            throw error;
+        }
+    }
+    setupSocketListeners(socket) {
+        const listeners = {
+            disconnect: (reason) => {
+                this.logger.debug(`Socket ${socket.id} disconnected: ${reason}`);
+            },
+            error: (error) => {
+                this.logger.error(`Socket ${socket.id} error: ${error.message}`);
+            },
+        };
+        Object.entries(listeners).forEach(([event, handler]) => {
+            socket.on(event, handler);
+        });
+        socket.data.listeners = listeners;
     }
     handleDisconnect(client) {
-        this.removeAllListeners(client);
-        if (client.data?.disconnectHandler) {
-            client.off('disconnect', client.data.disconnectHandler);
+        try {
+            this.cleanupSocketListeners(client);
+            for (const [userId, sockets] of this.userConnections.entries()) {
+                if (sockets.has(client)) {
+                    sockets.delete(client);
+                    if (sockets.size === 0) {
+                        this.userConnections.delete(userId);
+                        this.server.emit('userOffline', { userId });
+                    }
+                    else {
+                        this.server.emit('userOnlineStatus', {
+                            userId,
+                            isOnline: true,
+                            connectionCount: sockets.size
+                        });
+                    }
+                    break;
+                }
+            }
+            this.logger.debug(`Client ${client.id} disconnected and cleaned up`);
         }
+        catch (error) {
+            this.logger.error(`Disconnect cleanup error: ${error.message}`);
+        }
+    }
+    cleanupSocketListeners(socket) {
+        try {
+            if (socket.data?.listeners) {
+                Object.entries(socket.data.listeners).forEach(([event, handler]) => {
+                    socket.off(event, handler);
+                });
+                delete socket.data.listeners;
+            }
+            socket.removeAllListeners();
+        }
+        catch (error) {
+            this.logger.error(`CleanupSocketListeners error: ${error.message}`);
+        }
+    }
+    cleanupSocket(socket, reason = 'Connection replaced') {
+        try {
+            this.cleanupSocketListeners(socket);
+            socket.emit('connectionReplaced', {
+                message: reason,
+                timestamp: new Date().toISOString()
+            });
+            socket.disconnect(false);
+            this.logger.log(`Socket ${socket.id} cleaned up: ${reason}`);
+        }
+        catch (error) {
+            this.logger.error(`CleanupSocket error: ${error.message}`);
+        }
+    }
+    cleanupStaleConnections() {
+        let cleanedCount = 0;
+        for (const [userId, sockets] of this.userConnections.entries()) {
+            const activeSockets = new Set();
+            for (const socket of sockets) {
+                if (socket.connected) {
+                    activeSockets.add(socket);
+                }
+                else {
+                    cleanedCount++;
+                }
+            }
+            if (activeSockets.size === 0) {
+                this.userConnections.delete(userId);
+                this.server.emit('userOffline', { userId });
+            }
+            else if (activeSockets.size !== sockets.size) {
+                this.userConnections.set(userId, activeSockets);
+                this.server.emit('userOnlineStatus', {
+                    userId,
+                    isOnline: true,
+                    connectionCount: activeSockets.size
+                });
+            }
+        }
+        if (cleanedCount > 0) {
+            this.logger.debug(`Cleaned up ${cleanedCount} stale connections`);
+        }
+    }
+    cleanupAllConnections() {
+        for (const [userId, sockets] of this.userConnections.entries()) {
+            for (const socket of sockets) {
+                this.cleanupSocket(socket, 'Server shutdown');
+            }
+        }
+        this.userConnections.clear();
+        this.connectionLock.clear();
+    }
+    logMemoryUsage() {
+        const memoryUsage = process.memoryUsage();
+        this.logger.debug(`Memory usage - RSS: ${Math.round(memoryUsage.rss / 1024 / 1024)}MB, ` +
+            `HeapTotal: ${Math.round(memoryUsage.heapTotal / 1024 / 1024)}MB, ` +
+            `HeapUsed: ${Math.round(memoryUsage.heapUsed / 1024 / 1024)}MB, ` +
+            `Connections: ${this.userConnections.size} users, ` +
+            `Total sockets: ${Array.from(this.userConnections.values()).reduce((acc, set) => acc + set.size, 0)}`);
+    }
+    isUserOnline(userId) {
+        return this.userConnections.has(userId) && this.userConnections.get(userId).size > 0;
+    }
+    getUserSockets(userId) {
+        return this.userConnections.has(userId)
+            ? Array.from(this.userConnections.get(userId))
+            : [];
     }
     async handleJoinRoom(client, roomId) {
         try {
             const user = await this.authService.getUserFromSocket(client);
-            console.log(user);
             if (!user) {
                 throw new websockets_1.WsException('Unauthorized');
             }
@@ -171,7 +270,6 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
                 throw new websockets_1.WsException('Not a member of this room');
             }
             const receiverId = room.sender.id === sender.id ? room.receiver.id : room.sender.id;
-            const isReceiverOnline = this.isUserOnline(receiverId);
             const newMessage = await this.messageService.create({
                 content: data.content,
                 roomId: data.roomId,
@@ -349,9 +447,7 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
                 throw new websockets_1.WsException('Unauthorized');
             }
             const hasActiveAbonnement = await this.abonnementService.createAbonnement(data);
-            this.server
-                .to(`user_${user.id}`)
-                .emit('isAbonnement', hasActiveAbonnement);
+            this.server.to(`user_${user.id}`).emit('isAbonnement', hasActiveAbonnement);
         }
         catch (error) {
             this.logger.error(`IsAbonnement error: ${error.message}`);
@@ -365,9 +461,7 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
                 throw new websockets_1.WsException('Unauthorized');
             }
             const hasActiveAbonnement = await this.abonnementService.isAbonnement(data.userId);
-            this.server
-                .to(`user_${user.id}`)
-                .emit('isAbonnement', hasActiveAbonnement);
+            this.server.to(`user_${user.id}`).emit('isAbonnement', hasActiveAbonnement);
         }
         catch (error) {
             this.logger.error(`CheckIsAbonnementStatus error: ${error.message}`);
@@ -381,9 +475,7 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
                 throw new websockets_1.WsException('Unauthorized');
             }
             const hasActiveAbonnement = await this.abonnementService.createPaymentPoint(data);
-            this.server
-                .to(`user_${user.id}`)
-                .emit('checkPaymentPoint', hasActiveAbonnement);
+            this.server.to(`user_${user.id}`).emit('checkPaymentPoint', hasActiveAbonnement);
         }
         catch (error) {
             this.logger.error(`checkPaymentPoint error: ${error.message}`);
@@ -399,6 +491,7 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
             this.server.emit('userOnlineStatus', {
                 userId: data.userId,
                 isOnline: this.isUserOnline(data.userId),
+                connectionCount: this.userConnections.get(data.userId)?.size || 0
             });
             return { success: true };
         }
@@ -424,12 +517,6 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
             this.logger.error(`HandleCheckMultipleUsersStatus error: ${error.message}`);
             throw new websockets_1.WsException(error.message);
         }
-    }
-    isUserOnline(userId) {
-        return this.connectedUsers.has(userId);
-    }
-    getUserSocket(userId) {
-        return this.connectedUsers.get(userId);
     }
 };
 exports.ChatGateway = ChatGateway;

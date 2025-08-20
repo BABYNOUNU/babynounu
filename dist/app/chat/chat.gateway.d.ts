@@ -2,10 +2,11 @@ import { OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { RoomsService } from '../rooms/rooms.service';
 import { AuthService } from '../auth/auth.service';
+import { OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { MessageService } from '../messages/messages.service';
 import { AbonnementService } from '../abonnement/abonnement.service';
 import { NotificationService } from '../notification/notification.service';
-export declare class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export declare class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, OnModuleInit, OnModuleDestroy {
     private readonly roomService;
     private readonly authService;
     private readonly messageService;
@@ -13,16 +14,25 @@ export declare class ChatGateway implements OnGatewayConnection, OnGatewayDiscon
     private readonly notificationService;
     server: Server;
     private readonly logger;
-    private connectedUsers;
     private userConnections;
     private readonly connectionLock;
+    private cleanupInterval;
+    private readonly MAX_CONNECTIONS_PER_USER;
     constructor(roomService: RoomsService, authService: AuthService, messageService: MessageService, abonnementService: AbonnementService, notificationService: NotificationService);
+    onModuleInit(): void;
+    onModuleDestroy(): void;
     afterInit(server: Server): void;
     handleConnection(client: Socket): Promise<void>;
-    private handleNewConnection;
-    private cleanupSocket;
-    private removeAllListeners;
+    private handleUserConnection;
+    private setupSocketListeners;
     handleDisconnect(client: Socket): void;
+    private cleanupSocketListeners;
+    private cleanupSocket;
+    private cleanupStaleConnections;
+    private cleanupAllConnections;
+    private logMemoryUsage;
+    isUserOnline(userId: string): boolean;
+    getUserSockets(userId: string): Socket[];
     handleJoinRoom(client: Socket, roomId: number): Promise<{
         success: boolean;
         roomId: number;
@@ -87,6 +97,4 @@ export declare class ChatGateway implements OnGatewayConnection, OnGatewayDiscon
         success: boolean;
         onlineStatus: Record<string, boolean>;
     }>;
-    isUserOnline(userId: string): boolean;
-    getUserSocket(userId: string): Socket | undefined;
 }

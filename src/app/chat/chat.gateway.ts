@@ -6,12 +6,14 @@ import {
   ConnectedSocket,
   OnGatewayConnection,
   OnGatewayDisconnect,
-  WsException,
+  WsException
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { RoomsService } from '../rooms/rooms.service';
 import { AuthService } from '../auth/auth.service';
-import { Logger, UseGuards } from '@nestjs/common';
+import { Logger, UseGuards, 
+  OnModuleInit,
+  OnModuleDestroy, } from '@nestjs/common';
 import { WsJwtGuard } from '../auth/ws-auth.guard';
 import { MessageService } from '../messages/messages.service';
 import { AbonnementService } from '../abonnement/abonnement.service';
@@ -27,15 +29,15 @@ import { NotificationService } from '../notification/notification.service';
   maxHttpBufferSize: 1e6,
   connectTimeout: 45000,
 })
-export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, OnModuleInit, OnModuleDestroy {
   @WebSocketServer()
   server: Server;
 
   private readonly logger = new Logger(ChatGateway.name);
-  private connectedUsers: Map<string, Socket> = new Map();
   private userConnections: Map<string, Set<Socket>> = new Map();
-
   private readonly connectionLock = new Map<string, Promise<void>>();
+  private cleanupInterval: NodeJS.Timeout;
+  private readonly MAX_CONNECTIONS_PER_USER = 5;
 
   constructor(
     private readonly roomService: RoomsService,
@@ -45,8 +47,26 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly notificationService: NotificationService,
   ) {}
 
+  onModuleInit() {
+    // Démarrer le nettoyage périodique
+    this.cleanupInterval = setInterval(() => {
+      this.cleanupStaleConnections();
+      this.logMemoryUsage();
+    }, 300000); // Toutes les 5 minutes
+  }
+
+  onModuleDestroy() {
+    // Nettoyer l'intervalle à l'arrêt
+    if (this.cleanupInterval) {
+      clearInterval(this.cleanupInterval);
+    }
+    
+    // Nettoyer toutes les connexions
+    this.cleanupAllConnections();
+  }
+
   afterInit(server: Server) {
-    server.sockets.setMaxListeners(50); // Correction: réduire à 50 comme indiqué dans le commentaire
+    server.sockets.setMaxListeners(50);
   }
 
   async handleConnection(client: Socket) {
@@ -57,97 +77,204 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         return;
       }
 
-      if (!this.connectionLock.has(userId.id)) {
-        const connectionPromise = (async () => {
-          try {
-            await this.handleNewConnection(userId.id, client);
-          } catch (error) {
-            this.logger.error(`Connection error for user ${userId.id}: ${error.message}`);
-            client.disconnect(true);
-          } finally {
-            this.connectionLock.delete(userId.id);
-          }
-        })();
-
-        this.connectionLock.set(userId.id, connectionPromise);
+      const lockKey = `connection_${userId.id}`;
+      if (!this.connectionLock.has(lockKey)) {
+        const connectionPromise = this.handleUserConnection(userId.id, client)
+          .finally(() => {
+            this.connectionLock.delete(lockKey);
+          });
+        
+        this.connectionLock.set(lockKey, connectionPromise);
       }
 
-      await this.connectionLock.get(userId.id);
+      await this.connectionLock.get(lockKey);
     } catch (error) {
       this.logger.error(`HandleConnection error: ${error.message}`);
       client.disconnect(true);
     }
   }
 
-  private async handleNewConnection(userId: string, client: Socket) {
-    // Ajouter cette connexion aux connexions de l'utilisateur
-    if (!this.userConnections.has(userId)) {
-      this.userConnections.set(userId, new Set());
+  private async handleUserConnection(userId: string, client: Socket) {
+    try {
+      // Vérifier et limiter le nombre de connexions
+      const currentConnections = this.userConnections.get(userId) || new Set();
+      
+      if (currentConnections.size >= this.MAX_CONNECTIONS_PER_USER) {
+        // Déconnecter la connexion la plus ancienne
+        const oldestSocket = Array.from(currentConnections)[0];
+        this.cleanupSocket(oldestSocket, 'Too many connections');
+      }
+
+      // Configurer les écouteurs de la socket
+      this.setupSocketListeners(client);
+
+      // Ajouter la nouvelle connexion
+      currentConnections.add(client);
+      this.userConnections.set(userId, currentConnections);
+
+      client.join(`user_${userId}`);
+      this.logger.log(`User ${userId} connected. Total connections: ${currentConnections.size}`);
+
+      // Émettre le statut en ligne
+      this.server.emit('userOnlineStatus', {
+        userId,
+        isOnline: true,
+        connectionCount: currentConnections.size
+      });
+
+    } catch (error) {
+      this.logger.error(`HandleUserConnection error for user ${userId}: ${error.message}`);
+      throw error;
     }
-    this.userConnections.get(userId)!.add(client);
+  }
 
-    // Conserver également la connexion la plus récente pour la compatibilité
-    this.connectedUsers.set(userId, client);
-
-    client.join(`user_${userId}`);
-
-    // Configurer le handler de déconnexion
-    const disconnectHandler = () => {
-      // Supprimer uniquement cette connexion spécifique
-      if (this.userConnections.has(userId)) {
-        this.userConnections.get(userId)!.delete(client);
-        if (this.userConnections.get(userId)!.size === 0) {
-          this.userConnections.delete(userId);
-        }
-      }
-
-      // Si c'était la connexion principale, mettre à jour
-      if (this.connectedUsers.get(userId)?.id === client.id) {
-        const remainingConnections = this.userConnections.get(userId);
-        if (remainingConnections && remainingConnections.size > 0) {
-          // Prendre la première connexion restante comme principale
-          this.connectedUsers.set(userId, Array.from(remainingConnections)[0]);
-        } else {
-          this.connectedUsers.delete(userId);
-        }
-      }
+  private setupSocketListeners(socket: Socket) {
+    const listeners = {
+      disconnect: (reason: string) => {
+        this.logger.debug(`Socket ${socket.id} disconnected: ${reason}`);
+      },
+      error: (error: Error) => {
+        this.logger.error(`Socket ${socket.id} error: ${error.message}`);
+      },
     };
 
-    client.on('disconnect', disconnectHandler);
-    client.data.disconnectHandler = disconnectHandler;
-  }
-
-  private cleanupSocket(socket: Socket) {
-    if (socket.data?.disconnectHandler) {
-      socket.off('disconnect', socket.data.disconnectHandler);
-    }
-    // Nettoyer les autres écouteurs d'événements
-    this.removeAllListeners(socket);
-
-    // Informer le client qu'il a été remplacé par une nouvelle connexion
-    socket.emit('connectionReplaced', {
-      message: 'Votre session a été remplacée par une nouvelle connexion',
+    Object.entries(listeners).forEach(([event, handler]) => {
+      socket.on(event, handler);
     });
 
-    // Déconnecter en douceur (sans forcer)
-    socket.disconnect(false);
-  }
-
-  private removeAllListeners(socket: Socket) {
-    if (socket.data?.listeners) {
-      Object.entries(socket.data.listeners).forEach(([event, handler]) => {
-        socket.off(event, handler as (...args: any[]) => void);
-      });
-      delete socket.data.listeners;
-    }
+    socket.data.listeners = listeners;
   }
 
   handleDisconnect(client: Socket) {
-    this.removeAllListeners(client);
-    if (client.data?.disconnectHandler) {
-      client.off('disconnect', client.data.disconnectHandler);
+    try {
+      this.cleanupSocketListeners(client);
+      
+      // Trouver et supprimer cette socket de toutes les connexions utilisateur
+      for (const [userId, sockets] of this.userConnections.entries()) {
+        if (sockets.has(client)) {
+          sockets.delete(client);
+          
+          if (sockets.size === 0) {
+            this.userConnections.delete(userId);
+            // Émettre un événement de déconnexion
+            this.server.emit('userOffline', { userId });
+          } else {
+            // Mettre à jour le statut avec le nouveau count
+            this.server.emit('userOnlineStatus', {
+              userId,
+              isOnline: true,
+              connectionCount: sockets.size
+            });
+          }
+          break;
+        }
+      }
+      
+      this.logger.debug(`Client ${client.id} disconnected and cleaned up`);
+    } catch (error) {
+      this.logger.error(`Disconnect cleanup error: ${error.message}`);
     }
   }
+
+  private cleanupSocketListeners(socket: Socket) {
+    try {
+      // Nettoyer les écouteurs personnalisés
+      if (socket.data?.listeners) {
+        Object.entries(socket.data.listeners).forEach(([event, handler]) => {
+          socket.off(event, handler as (...args: any[]) => void);
+        });
+        delete socket.data.listeners;
+      }
+      
+      // Nettoyer tous les autres écouteurs
+      socket.removeAllListeners();
+    } catch (error) {
+      this.logger.error(`CleanupSocketListeners error: ${error.message}`);
+    }
+  }
+
+  private cleanupSocket(socket: Socket, reason: string = 'Connection replaced') {
+    try {
+      this.cleanupSocketListeners(socket);
+      
+      // Informer le client qu'il a été déconnecté
+      socket.emit('connectionReplaced', {
+        message: reason,
+        timestamp: new Date().toISOString()
+      });
+
+      // Déconnecter en douceur
+      socket.disconnect(false);
+      
+      this.logger.log(`Socket ${socket.id} cleaned up: ${reason}`);
+    } catch (error) {
+      this.logger.error(`CleanupSocket error: ${error.message}`);
+    }
+  }
+
+  private cleanupStaleConnections() {
+    let cleanedCount = 0;
+    
+    for (const [userId, sockets] of this.userConnections.entries()) {
+      const activeSockets = new Set<Socket>();
+      
+      for (const socket of sockets) {
+        if (socket.connected) {
+          activeSockets.add(socket);
+        } else {
+          cleanedCount++;
+        }
+      }
+      
+      if (activeSockets.size === 0) {
+        this.userConnections.delete(userId);
+        this.server.emit('userOffline', { userId });
+      } else if (activeSockets.size !== sockets.size) {
+        this.userConnections.set(userId, activeSockets);
+        this.server.emit('userOnlineStatus', {
+          userId,
+          isOnline: true,
+          connectionCount: activeSockets.size
+        });
+      }
+    }
+    
+    if (cleanedCount > 0) {
+      this.logger.debug(`Cleaned up ${cleanedCount} stale connections`);
+    }
+  }
+
+  private cleanupAllConnections() {
+    for (const [userId, sockets] of this.userConnections.entries()) {
+      for (const socket of sockets) {
+        this.cleanupSocket(socket, 'Server shutdown');
+      }
+    }
+    this.userConnections.clear();
+    this.connectionLock.clear();
+  }
+
+  private logMemoryUsage() {
+    const memoryUsage = process.memoryUsage();
+    this.logger.debug(`Memory usage - RSS: ${Math.round(memoryUsage.rss / 1024 / 1024)}MB, ` +
+      `HeapTotal: ${Math.round(memoryUsage.heapTotal / 1024 / 1024)}MB, ` +
+      `HeapUsed: ${Math.round(memoryUsage.heapUsed / 1024 / 1024)}MB, ` +
+      `Connections: ${this.userConnections.size} users, ` +
+      `Total sockets: ${Array.from(this.userConnections.values()).reduce((acc, set) => acc + set.size, 0)}`);
+  }
+
+  // Utility methods
+  isUserOnline(userId: string): boolean {
+    return this.userConnections.has(userId) && this.userConnections.get(userId)!.size > 0;
+  }
+
+  getUserSockets(userId: string): Socket[] {
+    return this.userConnections.has(userId) 
+      ? Array.from(this.userConnections.get(userId)!)
+      : [];
+  }
+
+  // Les méthodes @SubscribeMessage restent inchangées mais sont incluses pour la complétude
 
   @SubscribeMessage('joinRoom')
   @UseGuards(WsJwtGuard)
@@ -157,17 +284,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     try {
       const user = await this.authService.getUserFromSocket(client);
-      console.log(user)
       if (!user) {
         throw new WsException('Unauthorized');
       }
 
       const room = await this.roomService.getRoom(roomId, user.id);
       if (!room) {
-        throw new WsException('Room not found'); // Correction: "Room" au lieu de "Rooms"
+        throw new WsException('Room not found');
       }
 
-      // Verify user is part of this room
       if (room.sender.id !== user.id && room.receiver.id !== user.id) {
         throw new WsException('Not a member of this room');
       }
@@ -218,17 +343,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       const room = await this.roomService.getRoom(data.roomId, sender.id);
       if (!room) {
-        throw new WsException('Room not found'); // Correction: "Room" au lieu de "Rooms"
+        throw new WsException('Room not found');
       }
 
-      // Verify user is part of this room
       if (room.sender.id !== sender.id && room.receiver.id !== sender.id) {
         throw new WsException('Not a member of this room');
       }
 
-      const receiverId =
-        room.sender.id === sender.id ? room.receiver.id : room.sender.id;
-      const isReceiverOnline = this.isUserOnline(receiverId);
+      const receiverId = room.sender.id === sender.id ? room.receiver.id : room.sender.id;
       const newMessage = await this.messageService.create({
         content: data.content,
         roomId: data.roomId,
@@ -239,17 +361,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         propositionExpired: data.propositionExpired,
       });
 
-      // Emit to room members
       this.server.to(`room_${data.roomId}`).emit('newMessage', newMessage);
       this.server.to(`user_${room.sender.id}`).emit('newMessageNotify', newMessage);
-      // Update conversation lists
+      
       this.updateConversationList(sender.id);
       this.updateConversationList(receiverId);
 
-      // Handle notifications if receiver is offline
-      // if (!isReceiverOnline) {
-        await this.notifyNewMessage(data.roomId, sender.id);
-      // }
+      await this.notifyNewMessage(data.roomId, sender.id);
 
       return { success: true, message: newMessage };
     } catch (error) {
@@ -265,9 +383,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         .to(`user_${userId}`)
         .emit('conversationsUpdated', conversations);
     } catch (error) {
-      this.logger.error(
-        `UpdateConversationList error for user ${userId}: ${error.message}`,
-      );
+      this.logger.error(`UpdateConversationList error for user ${userId}: ${error.message}`);
     }
   }
 
@@ -375,14 +491,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const room = await this.roomService.getRoom(roomId, senderId);
       if (!room) return;
 
-      const receiverId =
-        room.sender.id === senderId ? room.receiver.id : room.sender.id;
-      const unreadCount = await this.roomService.incrementUnreadCount(
-        roomId,
-        receiverId,
-      );
-      const totalUnread =
-        await this.roomService.getTotalUnreadCount(receiverId);
+      const receiverId = room.sender.id === senderId ? room.receiver.id : room.sender.id;
+      const unreadCount = await this.roomService.incrementUnreadCount(roomId, receiverId);
+      const totalUnread = await this.roomService.getTotalUnreadCount(receiverId);
 
       this.server.to(`user_${receiverId}`).emit('unreadUpdated', {
         roomId,
@@ -408,9 +519,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         throw new WsException('Unauthorized');
       }
 
-      const notifications = await this.notificationService.findAllByUser(
-        data.userId,
-      );
+      const notifications = await this.notificationService.findAllByUser(data.userId);
       this.server.to(`user_${user.id}`).emit('notifications', notifications);
     } catch (error) {
       this.logger.error(`GetNotifications error: ${error.message}`);
@@ -456,9 +565,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         throw new WsException('Unauthorized');
       }
 
-      const unreadCountsNotification =
-        await this.notificationService.getAllCountByReceiverId(data.userId);
-
+      const unreadCountsNotification = await this.notificationService.getAllCountByReceiverId(data.userId);
       client.emit('unreadCountsNotification', unreadCountsNotification);
     } catch (error) {
       this.logger.error(`GetUnreadCountsNotification error: ${error.message}`);
@@ -480,47 +587,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         throw new WsException('Unauthorized');
       }
 
-      const hasActiveAbonnement =
-        await this.abonnementService.createAbonnement(data);
-
-      this.server
-        .to(`user_${user.id}`)
-        .emit('isAbonnement', hasActiveAbonnement);
+      const hasActiveAbonnement = await this.abonnementService.createAbonnement(data);
+      this.server.to(`user_${user.id}`).emit('isAbonnement', hasActiveAbonnement);
     } catch (error) {
       this.logger.error(`IsAbonnement error: ${error.message}`);
       throw new WsException(error.message);
     }
   }
 
-@SubscribeMessage('isAbonnementUser') 
-@UseGuards(WsJwtGuard)
-async checkIsAbonnementStatus(
-  @MessageBody() data: { userId: string },
-  @ConnectedSocket() client: Socket,
-) {
-  try {
-    const user = await this.authService.getUserFromSocket(client);
-    if (!user || user.id !== data.userId) {
-      throw new WsException('Unauthorized');
-    }
-
-    const hasActiveAbonnement = await this.abonnementService.isAbonnement(data.userId);
-
-    this.server
-      .to(`user_${user.id}`)
-      .emit('isAbonnement', hasActiveAbonnement);
-
-  } catch (error) {
-    this.logger.error(`CheckIsAbonnementStatus error: ${error.message}`);
-    throw new WsException(error.message);
-  }
-}
-
-  @SubscribeMessage('checkPaymentPoint')
+  @SubscribeMessage('isAbonnementUser') 
   @UseGuards(WsJwtGuard)
-  async checkPaymentPoint(
-    @MessageBody()
-    data: { userId: string; transactionId: string; points: number },
+  async checkIsAbonnementStatus(
+    @MessageBody() data: { userId: string },
     @ConnectedSocket() client: Socket,
   ) {
     try {
@@ -529,12 +607,29 @@ async checkIsAbonnementStatus(
         throw new WsException('Unauthorized');
       }
 
-      const hasActiveAbonnement =
-        await this.abonnementService.createPaymentPoint(data);
+      const hasActiveAbonnement = await this.abonnementService.isAbonnement(data.userId);
+      this.server.to(`user_${user.id}`).emit('isAbonnement', hasActiveAbonnement);
 
-      this.server
-        .to(`user_${user.id}`)
-        .emit('checkPaymentPoint', hasActiveAbonnement);
+    } catch (error) {
+      this.logger.error(`CheckIsAbonnementStatus error: ${error.message}`);
+      throw new WsException(error.message);
+    }
+  }
+
+  @SubscribeMessage('checkPaymentPoint')
+  @UseGuards(WsJwtGuard)
+  async checkPaymentPoint(
+    @MessageBody() data: { userId: string; transactionId: string; points: number },
+    @ConnectedSocket() client: Socket,
+  ) {
+    try {
+      const user = await this.authService.getUserFromSocket(client);
+      if (!user || user.id !== data.userId) {
+        throw new WsException('Unauthorized');
+      }
+
+      const hasActiveAbonnement = await this.abonnementService.createPaymentPoint(data);
+      this.server.to(`user_${user.id}`).emit('checkPaymentPoint', hasActiveAbonnement);
     } catch (error) {
       this.logger.error(`checkPaymentPoint error: ${error.message}`);
       throw new WsException(error.message);
@@ -553,10 +648,10 @@ async checkIsAbonnementStatus(
         throw new WsException('Unauthorized');
       }
 
-      // Emit online status to all connected users
       this.server.emit('userOnlineStatus', {
         userId: data.userId,
         isOnline: this.isUserOnline(data.userId),
+        connectionCount: this.userConnections.get(data.userId)?.size || 0
       });
 
       return { success: true };
@@ -578,31 +673,16 @@ async checkIsAbonnementStatus(
         throw new WsException('Unauthorized');
       }
 
-      // Create a map of online status for each requested user
-      const onlineStatus = data.userIds.reduce(
-        (acc, userId) => {
-          acc[userId] = this.isUserOnline(userId);
-          return acc;
-        },
-        {} as Record<string, boolean>,
-      );
+      const onlineStatus = data.userIds.reduce((acc, userId) => {
+        acc[userId] = this.isUserOnline(userId);
+        return acc;
+      }, {} as Record<string, boolean>);
 
-      // Send status back to requesting client
       client.emit('multipleUsersStatus', onlineStatus);
-
       return { success: true, onlineStatus };
     } catch (error) {
       this.logger.error(`HandleCheckMultipleUsersStatus error: ${error.message}`);
       throw new WsException(error.message);
     }
-  }
-
-  // Utility methods
-  isUserOnline(userId: string): boolean {
-    return this.connectedUsers.has(userId);
-  }
-
-  getUserSocket(userId: string): Socket | undefined {
-    return this.connectedUsers.get(userId);
   }
 }

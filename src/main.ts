@@ -9,9 +9,10 @@ import bodyParser from 'body-parser';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors({
-    origin: true, // ou spécifie l'URL de ton frontend
+    origin: '*', // accepte toutes les origines
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true,
+    allowedHeaders: '*', // accepte tous les headers
+    credentials: false, 
   });
 
   // Augmente la limite de la taille des requêtes

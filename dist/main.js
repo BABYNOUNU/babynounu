@@ -8,9 +8,10 @@ const database_providers_1 = require("./database/database.providers");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     app.enableCors({
-        origin: true,
+        origin: '*',
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-        credentials: true,
+        allowedHeaders: '*',
+        credentials: false,
     });
     app.useGlobalPipes(new common_1.ValidationPipe({
         exceptionFactory: (validationErrors = []) => {
