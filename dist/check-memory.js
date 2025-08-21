@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const os_1 = require("os");
+const v8_1 = require("v8");
+console.log("==== Node.js Memory Info ====");
+console.log(process.memoryUsage());
+console.log("Max old space size (heap limit) :", v8_1.default.getHeapStatistics().heap_size_limit / 1024 / 1024, "MB");
+console.log("Node.js version:", process.version);
+console.log("==== System Memory ====");
+console.log("Total RAM:", (os_1.default.totalmem() / 1024 / 1024).toFixed(2), "MB");
+console.log("Free RAM:", (os_1.default.freemem() / 1024 / 1024).toFixed(2), "MB");

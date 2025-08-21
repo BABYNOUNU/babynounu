@@ -7,7 +7,7 @@ export const WS_HOST = isProd ? 'https://api.babynounu.com' : process.env.FRONTE
 
 // DATABASE PROVIDER
 const ProdDatabase = (dbProd:string, dbTest:string) => {
-  return isProd ? dbProd : dbTest;
+  return isProd ? dbProd : dbTest; 
 }
 
 export const databaseProviders = [
