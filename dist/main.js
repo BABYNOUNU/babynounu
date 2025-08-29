@@ -7,12 +7,7 @@ const swagger_1 = require("@nestjs/swagger");
 const database_providers_1 = require("./database/database.providers");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
-    app.enableCors({
-        origin: '*',
-        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-        allowedHeaders: '*',
-        credentials: false,
-    });
+    app.enableCors();
     app.useGlobalPipes(new common_1.ValidationPipe({
         exceptionFactory: (validationErrors = []) => {
             return new common_1.BadRequestException(validationErrors.map((error) => ({

@@ -1,7 +1,7 @@
 import { animationFrameScheduler } from 'rxjs';
 import { DataSource } from 'typeorm';
 
-export const isProd:boolean = true;
+export const isProd:boolean = false;
 export const HOST = isProd ? 'https://api.babynounu.com' : 'http://localhost:3000';
 export const WS_HOST = isProd ? 'https://api.babynounu.com' : process.env.FRONTEND_URL;
 

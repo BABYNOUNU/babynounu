@@ -473,13 +473,13 @@ async decrementPoints(id: string, points: number): Promise<ProfilNounus> {
 
     // Appliquer les filtres de base directement dans la requête SQL
     if (fullname) {
-      queryBuilder = queryBuilder.andWhere('nounu.fullname LIKE :fullname', { 
+      queryBuilder = queryBuilder.andWhere('LOWER(nounu.fullname) LIKE LOWER(:fullname)', { 
         fullname: `%${fullname}%` 
       });
     }
 
     if (description) {
-      queryBuilder = queryBuilder.andWhere('nounu.description LIKE :description', { 
+      queryBuilder = queryBuilder.andWhere('LOWER(nounu.description) LIKE LOWER(:description)', { 
         description: `%${description}%` 
       });
     }

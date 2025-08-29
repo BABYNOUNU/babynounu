@@ -11,7 +11,7 @@ import {
   UploadedFiles,
   Query,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiConsumes } from '@nestjs/swagger';
 import { NounusService } from './nounus.service';
 import { CreateNounuDto } from './dtos/create-nounu.dto';
 import { UpdateNounuDto } from './dtos/update-nounu.dto';
@@ -27,6 +27,13 @@ export class NounusController {
   constructor(private readonly nounuService: NounusService) {}
 
   @Post('create')
+  @ApiOperation({ summary: 'Create a new ProfilNounus' })
+  @ApiResponse({
+    status: 201,
+    description: 'ProfilNounus created successfully',
+    type: ProfilNounus,
+  })
+  @ApiConsumes('multipart/form-data')
   @UseInterceptors(
     FileFieldsInterceptor(
       [
@@ -43,17 +50,12 @@ export class NounusController {
       resizeOptions: { width: 400, height: 400, fit: 'cover', quality: 80 },
     }), // Intercepteur personnalisé
   )
-  @ApiOperation({ summary: 'Create a new ProfilNounus' })
-  @ApiResponse({
-    status: 201,
-    description: 'ProfilNounus created successfully',
-    type: ProfilNounus,
-  })
   async create(
     @UploadedFiles()
     files: any,
     @Body() createProfilNounusDto: CreateNounuDto,
   ): Promise<ProfilNounus> {
+    console.log(createProfilNounusDto);
     return await this.nounuService.create(createProfilNounusDto, files);
   }
 

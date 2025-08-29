@@ -29,6 +29,7 @@ let NounusController = class NounusController {
         this.nounuService = nounuService;
     }
     async create(files, createProfilNounusDto) {
+        console.log(createProfilNounusDto);
         return await this.nounuService.create(createProfilNounusDto, files);
     }
     async findAllNotCurrentUser(userId, page, limit) {
@@ -70,6 +71,13 @@ let NounusController = class NounusController {
 exports.NounusController = NounusController;
 __decorate([
     (0, common_1.Post)('create'),
+    (0, swagger_1.ApiOperation)({ summary: 'Create a new ProfilNounus' }),
+    (0, swagger_1.ApiResponse)({
+        status: 201,
+        description: 'ProfilNounus created successfully',
+        type: nounu_model_1.ProfilNounus,
+    }),
+    (0, swagger_1.ApiConsumes)('multipart/form-data'),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileFieldsInterceptor)([
         { name: 'imageNounu', maxCount: 1 },
         { name: 'documents', maxCount: 4 },
@@ -80,12 +88,6 @@ __decorate([
         fields: ['imageNounu'],
         resizeOptions: { width: 400, height: 400, fit: 'cover', quality: 80 },
     })),
-    (0, swagger_1.ApiOperation)({ summary: 'Create a new ProfilNounus' }),
-    (0, swagger_1.ApiResponse)({
-        status: 201,
-        description: 'ProfilNounus created successfully',
-        type: nounu_model_1.ProfilNounus,
-    }),
     __param(0, (0, common_1.UploadedFiles)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),

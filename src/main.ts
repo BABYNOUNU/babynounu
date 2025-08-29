@@ -4,20 +4,13 @@ import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { ValidationError } from 'class-validator';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { isProd } from './database/database.providers';
-import bodyParser from 'body-parser';
+import { json as jsonParser } from 'body-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.enableCors({
-    origin: '*', // accepte toutes les origines
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    allowedHeaders: '*', // accepte tous les headers
-    credentials: false, 
-  });
+  app.enableCors();
 
   // Augmente la limite de la taille des requêtes
-  // app.use(bodyParser.json({ limit: '50mb' }));
-  // app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -50,5 +43,5 @@ async function bootstrap() {
   SwaggerModule.setup('api-docs', app, document);
 
   await app.listen(process.env.PORT || 3000);
-}
+} 
 bootstrap();
