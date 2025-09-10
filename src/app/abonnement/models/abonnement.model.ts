@@ -1,7 +1,7 @@
-import { Paiements } from 'src/app/paiement/models/paiement.model';
-import { Parameter } from 'src/app/parameter/models/parameter.model';
-import { ProfilParents } from 'src/app/parent/models/parent.model';
-import { User } from 'src/app/user/user.model';
+import { Paiements } from '../../paiement/models/paiement.model';
+import { ProfilParents } from '../../parent/models/parent.model';
+import { User } from '../../user/user.model';
+import { Parameter } from '../../parameter/models/parameter.model';
 import {
   Entity,
   ManyToOne,

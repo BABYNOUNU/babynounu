@@ -1,7 +1,7 @@
-// src/job-applications/job-applications.service.ts
+// src/app/job-application/job-application.service.ts
 
-import { Injectable, NotFoundException, Inject } from '@nestjs/common';
-
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JobApplication } from './models/job-application.model';
 import { CreateJobApplicationDto } from './dto/create-job-application.dto';
@@ -13,11 +13,11 @@ import { NotificationService } from '../notification/notification.service';
 @Injectable()
 export class JobApplicationsService {
   constructor(
-    @Inject('JOB_APPLICATION_REPOSITORY')
+    @InjectRepository(JobApplication)
     private readonly jobApplicationRepository: Repository<JobApplication>,
-    @Inject('USER_REPOSITORY')
+    @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    @Inject('JOB_REPOSITORY')
+    @InjectRepository(Job)
     private readonly jobRepository: Repository<Job>,
     private readonly notificationService: NotificationService,
   ) {}
@@ -27,27 +27,29 @@ export class JobApplicationsService {
     'user.nounu',
     'user.medias',
     'user.medias.type_media',
-    'medias',
     'jobs',
-    'user.medias.type_media',
-    'preferences',
-    'preferences.besions_specifiques',
-    'preferences.garde_enfants',
-    'preferences.aide_menagere',
-    'preferences.frequence_des_services',
-    'preferences.horaire_souhaites',
-    'preferences.adress',
-    'preferences.zone_geographique_prestataire',
-    'preferences.competance_specifique',
-    'preferences.langue_parler',
-    'preferences.disponibility_du_prestataire',
-    'preferences.equipement_menager',
-    'preferences.criteres_specifiques',
-    'preferences.criteres_selections',
-    'preferences.certifications_criteres',
-    'preferences.zone_de_travail',
-    'preferences.type_services',
-    'jobApplications',
+    'jobs.medias',
+    'jobs.medias.type_media',
+    'jobs.user',
+    'jobs.user.medias',
+    'jobs.user.medias.type_media',
+    'jobs.preferences',
+    'jobs.preferences.besions_specifiques',
+    'jobs.preferences.garde_enfants',
+    'jobs.preferences.aide_menagere',
+    'jobs.preferences.frequence_des_services',
+    'jobs.preferences.horaire_souhaites',
+    'jobs.preferences.adress',
+    'jobs.preferences.zone_geographique_prestataire',
+    'jobs.preferences.competance_specifique',
+    'jobs.preferences.langue_parler',
+    'jobs.preferences.disponibility_du_prestataire',
+    'jobs.preferences.equipement_menager',
+    'jobs.preferences.criteres_specifiques',
+    'jobs.preferences.criteres_selections',
+    'jobs.preferences.certifications_criteres',
+    'jobs.preferences.zone_de_travail',
+    'jobs.preferences.type_services'
   ];
 
   async findAll(): Promise<JobApplication[]> {
@@ -212,11 +214,14 @@ export class JobApplicationsService {
       }
 
       const _jobApplicationUser = jobApplicationUser.map((data) => {
+        // Vérifier si user et medias existent avant d'accéder à medias
+        const profileImage = data.user && data.user.medias ? 
+          data.user.medias.find(media => media.type_media && media.type_media.slug === 'image-profil') : 
+          null;
+          
         return {
           ...data,
-          image: data.user.medias?.find(
-            (media) => media.type_media.slug === 'image-profil',
-          ),
+          image: profileImage,
         };
       });
 
@@ -246,11 +251,14 @@ export class JobApplicationsService {
       }
 
       const _jobApplicationUser = jobApplicationUser.map((data) => {
+        // Vérifier si user et medias existent avant d'accéder à medias
+        const profileImage = data.user && data.user.medias ? 
+          data.user.medias.find(media => media.type_media && media.type_media.slug === 'image-profil') : 
+          null;
+          
         return {
           ...data,
-          image: data.user.medias?.find(
-            (media) => media.type_media.slug === 'image-profil',
-          ),
+          image: profileImage,
         };
       });
 
@@ -265,18 +273,19 @@ export class JobApplicationsService {
       where: { user: { id: userId } },
       relations: this.RelationShip,
     });
-    if (!jobApplicationUser) {
-      throw new NotFoundException(
-        `JobApplication with ID ${jobApplicationUser} not found`,
-      );
+    if (!jobApplicationUser || jobApplicationUser.length === 0) {
+      return []
     }
 
     const _jobApplicationUser = jobApplicationUser.map((data) => {
+      // Vérifier si user et medias existent avant d'accéder à medias
+      const profileImage = data.user && data.user.medias ? 
+        data.user.medias.find(media => media.type_media && media.type_media.slug === 'image-profil') : 
+        null;
+        
       return {
         ...data,
-        image: data.user.medias?.find(
-          (media) => media.type_media.slug === 'image-profil',
-        ),
+        image: profileImage,
       };
     });
 

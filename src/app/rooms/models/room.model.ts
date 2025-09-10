@@ -6,13 +6,13 @@ import {
   OneToMany,
   Column,
 } from 'typeorm';
-import { User } from 'src/app/user/user.model';
-import { Message } from 'src/app/messages/models/message.model';
+import { User } from '../../user/user.model';
+import { Message } from '../../messages/models/message.model';
 import { Nounu } from 'src/app/nounus/interfaces/nounu.interface';
-import { ProfilParents } from 'src/app/parent/models/parent.model';
-import { ProfilNounus } from 'src/app/nounus/models/nounu.model';
+import { ProfilParents } from '../../parent/models/parent.model';
+import { ProfilNounus } from '../../nounus/models/nounu.model';
 import { RoomMessageCount } from './unreadCount.model';
-import { Contracts } from 'src/app/contracts/models/contracts.model';
+import { Contracts } from '../../contracts/models/contracts.model';
 
 @Entity()
 export class Rooms {

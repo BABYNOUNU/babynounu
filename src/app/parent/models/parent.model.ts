@@ -1,20 +1,23 @@
-import { User } from 'src/app/user/user.model';
+// src/app/parent/models/parent.model.ts
+import { User } from '../../user/user.model';
 import {
+  Entity,
+  PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  DeleteDateColumn,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToMany,
-  OneToOne,
-  PrimaryGeneratedColumn,
   UpdateDateColumn,
+  DeleteDateColumn,
+  OneToOne,
+  JoinColumn,
+  ManyToMany,
+  JoinTable,
+  OneToMany,
+  ManyToOne,
 } from 'typeorm';
-import { Preference } from 'src/app/Preference/models/preference.model';
-import { Medias } from 'src/app/media/models/media.model';
-import { Rooms } from 'src/app/rooms/models/room.model';
-import { Contracts } from 'src/app/contracts/models/contracts.model';
+import { Preference } from '../../Preference/models/preference.model';
+import { Medias } from '../../media/models/media.model';
+import { Rooms } from '../../rooms/models/room.model';
+import { Contracts } from '../../contracts/models/contracts.model';
 
 @Entity()
 export class ProfilParents {

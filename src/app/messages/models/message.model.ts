@@ -1,4 +1,4 @@
-// src/message/message.entity.ts
+// src/app/messages/models/message.model.ts
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -9,9 +9,9 @@ import {
   DeleteDateColumn,
   OneToMany,
 } from 'typeorm';
-import { User } from 'src/app/user/user.model';
-import { Rooms } from 'src/app/rooms/models/room.model';
-import { Contracts } from 'src/app/contracts/models/contracts.model';
+import { User } from '../../user/user.model';
+import { Rooms } from '../../rooms/models/room.model';
+import { Contracts } from '../../contracts/models/contracts.model';
 
 @Entity()
 export class Message {

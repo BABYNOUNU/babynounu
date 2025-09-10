@@ -1,5 +1,5 @@
-// src/message/message.service.ts
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+// src/app/messages/messages.service.ts
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Message } from './models/message.model';
@@ -10,9 +10,9 @@ import { ContractsService } from '../contracts/contracts.service';
 @Injectable()
 export class MessageService {
   constructor(
-    @Inject('MESSAGE_REPOSITORY')
+    @InjectRepository(Message)
     private messageRepository: Repository<Message>,
-    @Inject('ROOMS_REPOSITORY')
+    @InjectRepository(Rooms)
     private roomRepository: Repository<Rooms>,
     private readonly notificationService: NotificationService,
     private readonly contractService: ContractsService,

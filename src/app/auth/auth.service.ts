@@ -1,5 +1,6 @@
 import { use } from 'passport';
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import type { AUTH_SIGN_IN_TYPE, AUTH_SIGN_UP_TYPE } from 'src/types/authTypes';
 import { Repository } from 'typeorm';
 import { User } from '../user/user.model';
@@ -16,11 +17,11 @@ import { UserService } from '../user/user.service';
 @Injectable()
 export class AuthService {
   constructor(
-    @Inject('USER_REPOSITORY')
+    @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    @Inject('ROLE_REPOSITORY')
+    @InjectRepository(Roles)
     private readonly roleRepository: Repository<Roles>,
-    @Inject('PARAMETER_PROFILE_REPOSITORY')
+    @InjectRepository(Parameter)
     private readonly paremeterProfileRepository: Repository<Parameter>,
     private readonly jwtService: JwtService,
     private readonly userService: UserService,

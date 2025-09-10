@@ -1,4 +1,4 @@
-// src/message/message.controller.ts
+// src/app/messages/messages.controller.ts
 import {
     Controller,
     Post,
@@ -11,10 +11,9 @@ import {
   } from '@nestjs/common';
   import { MessageService } from './messages.service';
   import { Message } from './models/message.model';
-  import { UserController } from '../user/user.controller';
   
   @Controller('messages')
-  export class MessageController {
+  export class MessagesController {
     constructor(private readonly messageService: MessageService) {}
   
     @Post()

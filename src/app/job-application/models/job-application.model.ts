@@ -1,3 +1,4 @@
+// src/app/job-application/models/job-application.model.ts
 import {
   Entity,
   Column,
@@ -8,8 +9,8 @@ import {
   ManyToOne,
   OneToMany,
 } from 'typeorm';
-import { User } from 'src/app/user/user.model';
-import { Job } from 'src/app/job/models/job.model';
+import { User } from '../../user/user.model';
+import { Job } from '../../job/models/job.model';
 
 @Entity('job_application') // Nom de la table en minuscules ou snake_case
 export class JobApplication {

@@ -1,7 +1,6 @@
 import { MediaService } from './../media/media.service';
 import {
   BadRequestException,
-  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -17,10 +16,10 @@ import { NounusService } from '../nounus/nounus.service';
 @Injectable()
 export class ParentsService {
   constructor(
-    @Inject('PARENT_REPOSITORY')
+    @InjectRepository(ProfilParents)
     private readonly parentsRepository: Repository<ProfilParents>,
 
-    @Inject('PREFERENCE_REPOSITORY')
+    @InjectRepository(Preference)
     private readonly preferenceRepository: Repository<Preference>,
 
     private readonly mediaService: MediaService,
@@ -213,15 +212,34 @@ export class ParentsService {
       // Mettre à jour l'image si fournie
       if (files.imageParent?.length > 0) {
         const imageParent = files.imageParent[0];
-        await this.mediaService.update(
-          { id: existingParent.user.id, typeMedia: 'image-profil' }, // Critères de recherche pour trouver l'image existante
-          {
-            originalName: imageParent.originalname,
-            filename: imageParent.filename,
-            path: imageParent.path,
-            originalUrl: `${HOST}/uploads/${imageParent.filename}`,
-          },
+        // Check if media exists
+        const existingMedia = await this.mediaService.findImageByUserId( existingParent.user.id
         );
+
+        const mediaData = {
+          originalName: imageParent.originalname,
+          filename: imageParent.filename,
+          path: imageParent.path,
+          originalUrl: `${HOST}/uploads/${imageParent.filename}`,
+        };
+
+         console.log('existingMedia : ', existingMedia);
+
+        if (existingMedia.length > 0) {
+         
+          // Update if exists
+          await this.mediaService.update(
+            { id: existingParent.user.id, typeMedia: 'image-profil' },
+            mediaData
+          );
+        } else {
+          // Create if doesn't exist
+          await this.mediaService.create({
+            ...mediaData,
+            userId: existingParent.user.id,
+            typeMedia: 'image-profil'
+          });
+        }
       }
 
       // Mettre à jour les préférences
@@ -294,38 +312,57 @@ export class ParentsService {
     const pageNum = parseInt(page.toString(), 10) || 1;
     const limitNum = parseInt(limit.toString(), 10) || 10;
 
-    // Récupérer tous les parents avec les relations nécessaires
-    const _parents = await this.parentsRepository.find({
-      relations: [
-        'user',
-        'user.medias',
-        'user.medias.type_media',
-        'preferences',
-        'preferences.garde_enfants',
-        'preferences.horaire_souhaites',
-        'preferences.adress',
-      ],
-    });
+    // Construire une requête optimisée avec QueryBuilder
+    let queryBuilder = this.parentsRepository.createQueryBuilder('parent')
+      .leftJoinAndSelect('parent.user', 'user')
+      .leftJoinAndSelect('user.medias', 'medias')
+      .leftJoinAndSelect('medias.type_media', 'type_media')
+      .leftJoinAndSelect('parent.preferences', 'preferences')
+      .leftJoinAndSelect('preferences.besions_specifiques', 'besions_specifiques')
+      .leftJoinAndSelect('preferences.garde_enfants', 'garde_enfants')
+      .leftJoinAndSelect('preferences.aide_menagere', 'aide_menagere')
+      .leftJoinAndSelect('preferences.frequence_des_services', 'frequence_des_services')
+      .leftJoinAndSelect('preferences.horaire_souhaites', 'horaire_souhaites')
+      .leftJoinAndSelect('preferences.zone_geographique_prestataire', 'zone_geographique_prestataire')
+      .leftJoinAndSelect('preferences.disponibility_du_prestataire', 'disponibility_du_prestataire')
+      .leftJoinAndSelect('preferences.adress', 'adress');
 
+    // Appliquer les filtres de base directement dans la requête SQL
+    if (fullname) {
+      queryBuilder = queryBuilder.andWhere('LOWER(parent.fullname) LIKE LOWER(:fullname)', { 
+        fullname: `%${fullname}%` 
+      });
+    }
+
+    // Obtenir le nombre total avant pagination pour les métadonnées
+    const total = await queryBuilder.getCount();
+
+    // Appliquer la pagination
+    queryBuilder = queryBuilder
+      .skip((pageNum - 1) * limitNum)
+      .take(limitNum)
+      .orderBy('parent.createdAt', 'DESC');
+
+    // Exécuter la requête
+    const _parents = await queryBuilder.getMany();
+
+    // Transformer les résultats avec ReturnN
     const parents = await this.nounuService.ReturnN(_parents, [
       'frequence_des_services',
       'horaire_souhaites',
       'adress',
+      'besions_specifiques',
+      'aide_menagere',
+      'zone_geographique_prestataire',
+      'disponibility_du_prestataire'
     ]);
 
-    // Filtrer les parents en fonction des critères de recherche
+    // Filtrer les parents pour les critères complexes qui ne peuvent pas être
+    // facilement exprimés en SQL
     const filteredParents = parents.filter((parent: any) => {
-      // Filtrer par fullname
-      if (fullname) {
-        const hasMatchingFullname = parent.fullname
-          .toLowerCase()
-          .includes(fullname.toLowerCase());
-        if (!hasMatchingFullname) return false;
-      }
-
       // Filtrer par besoins spécifiques
       if (besions_specifiques && besions_specifiques.length > 0) {
-        const hasMatchingBesoin = parent.preferences.besions_specifiques.some(
+        const hasMatchingBesoin = parent.preferences?.besions_specifiques?.some(
           (besoin: any) => besions_specifiques.includes(besoin.id),
         );
         if (!hasMatchingBesoin) return false;
@@ -333,7 +370,7 @@ export class ParentsService {
 
       // Filtrer par garde d'enfants
       if (garde_enfants && garde_enfants.length > 0) {
-        const hasMatchingGarde = parent.preferences.garde_enfants.some(
+        const hasMatchingGarde = parent.preferences?.garde_enfants?.some(
           (garde: any) => garde_enfants.includes(garde.id),
         );
         if (!hasMatchingGarde) return false;
@@ -341,7 +378,7 @@ export class ParentsService {
 
       // Filtrer par aide ménagère
       if (aide_menagere && aide_menagere.length > 0) {
-        const hasMatchingAide = parent.preferences.aide_menagere.some(
+        const hasMatchingAide = parent.preferences?.aide_menagere?.some(
           (aide: any) => aide_menagere.includes(aide.id),
         );
         if (!hasMatchingAide) return false;
@@ -350,7 +387,7 @@ export class ParentsService {
       // Filtrer par fréquence des services
       if (frequence_des_services && frequence_des_services.length > 0) {
         const hasMatchingFrequence =
-          parent.preferences.frequence_des_services.some((frequence: any) =>
+          parent.preferences?.frequence_des_services?.some((frequence: any) =>
             frequence_des_services.includes(frequence.id),
           );
         if (!hasMatchingFrequence) return false;
@@ -358,7 +395,7 @@ export class ParentsService {
 
       // Filtrer par horaires souhaités
       if (horaire_souhaites && horaire_souhaites.length > 0) {
-        const hasMatchingHoraire = parent.preferences.horaire_souhaites.some(
+        const hasMatchingHoraire = parent.preferences?.horaire_souhaites?.some(
           (horaire: any) => horaire_souhaites.includes(horaire.id),
         );
         if (!hasMatchingHoraire) return false;
@@ -370,7 +407,7 @@ export class ParentsService {
         zone_geographique_prestataire.length > 0
       ) {
         const hasMatchingZone =
-          parent.preferences.zone_geographique_prestataire.some((zone: any) =>
+          parent.preferences?.zone_geographique_prestataire?.some((zone: any) =>
             zone_geographique_prestataire.includes(zone.id),
           );
         if (!hasMatchingZone) return false;
@@ -382,7 +419,7 @@ export class ParentsService {
         disponibility_du_prestataire.length > 0
       ) {
         const hasMatchingDisponibility =
-          parent.preferences.disponibility_du_prestataire.some(
+          parent.preferences?.disponibility_du_prestataire?.some(
             (disponibility: any) =>
               disponibility_du_prestataire.includes(disponibility.id),
           );
@@ -393,17 +430,9 @@ export class ParentsService {
       return true;
     });
 
-    // Calculer le nombre total d'éléments pour la pagination
-    const total = filteredParents.length;
-
-    // Appliquer la pagination
-    const startIndex = (pageNum - 1) * limitNum;
-    const endIndex = pageNum * limitNum;
-    const paginatedData = filteredParents.slice(startIndex, endIndex);
-
     // Retourner les données avec les métadonnées de pagination
     return {
-      data: paginatedData,
+      data: filteredParents,
       pagination: {
         total,
         page: pageNum,

@@ -1,21 +1,30 @@
-import { MediaService } from './../media/media.service';
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { NounusController } from './nounus.controller';
 import { NounusService } from './nounus.service';
-import { NounusProviders } from './nounus';
-import { DatabaseModule } from 'src/database/database.module';
 import { ParameterService } from '../parameter/parameter.service';
 import { ParentsService } from '../parent/parent.service';
 import { PreferenceService } from '../Preference/preference.service';
-import { PreferenceProvider } from '../Preference/preference';
-import { ParentProviders } from '../parent/parent.provider';
-import { MediaProviders } from '../media/media';
-import { ParameterProviders } from '../parameter/parameter';
+import { MediaService } from './../media/media.service';
 import { NotificationService } from '../notification/notification.service';
-import { NotificationProviders } from '../notification/notification';
+import { ProfilNounus } from './models/nounu.model';
+import { Medias } from '../media/models/media.model';
+import { Preference } from '../Preference/models/preference.model';
+import { Parameter } from '../parameter/models/parameter.model';
+import { ProfilParents } from '../parent/models/parent.model';
+import { Notification } from '../notification/models/notification.model';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [
+    TypeOrmModule.forFeature([
+      ProfilNounus,
+      Medias,
+      Preference,
+      Parameter,
+      ProfilParents,
+      Notification
+    ])
+  ],
   controllers: [NounusController],
   providers: [
     NounusService,
@@ -23,12 +32,8 @@ import { NotificationProviders } from '../notification/notification';
     ParameterService,
     MediaService,
     NotificationService,
-    ...NotificationProviders,
-    ...ParentProviders,
-    ...ParameterProviders,
-    ...PreferenceProvider,
-    ...MediaProviders,
-    ...NounusProviders,
+    PreferenceService
   ],
+  exports: [NounusService, TypeOrmModule]
 })
 export class NounusModule {}

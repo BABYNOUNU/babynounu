@@ -1,4 +1,4 @@
-import { ProfilParents } from 'src/app/parent/models/parent.model';
+import { ProfilParents } from '../../parent/models/parent.model';
 import {
   Entity,
   ManyToOne,

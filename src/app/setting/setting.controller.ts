@@ -39,8 +39,8 @@ import { CleaningSuppliesSeeders } from 'src/database/seeders/parameters/cleanin
 import CandidateCriteriaSeeders from 'src/database/seeders/candidateCriteria.seed';
 import { TypeServiceSeeders } from 'src/database/seeders/typeServices.seed';
 
-@ApiTags('Setting')
-@Controller('setting')
+@ApiTags('Settings')
+@Controller('settings')
 export class SettingController {
   constructor(
     @Inject('ROLE_REPOSITORY')

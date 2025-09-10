@@ -7,8 +7,8 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
 } from 'typeorm';
-import { User } from 'src/app/user/user.model';
-import { Job } from 'src/app/job/models/job.model';
+import { User } from '../../user/user.model';
+import { Job } from '../../job/models/job.model';
 
 @Entity()
 export class Notification {

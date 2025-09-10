@@ -7,6 +7,9 @@ import {
   ManyToOne,
   JoinColumn,
   OneToOne,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
 } from 'typeorm';
 import { ProfilParents } from '../parent/models/parent.model';
 import { Roles } from '../role/models/role.model';
@@ -103,7 +106,12 @@ export class User {
   @OneToMany(() => Message, message => message.sender)
   messages: Message[];
 
-  
+  @CreateDateColumn({ type: 'timestamp' })
+  createdAt: Date;
 
-  
+  @UpdateDateColumn({ type: 'timestamp' })
+  updatedAt: Date;
+
+  @DeleteDateColumn({ type: 'timestamp', nullable: true })
+  deletedAt: Date | null;
 }

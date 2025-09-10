@@ -1,40 +1,39 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { ContractsController } from './contracts.controller';
 import { ContractsService } from './contracts.service';
-import { ContractsProviders } from './contracts';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ProfilNounus } from '../nounus/models/nounu.model';
-import { ProfilParents } from '../parent/models/parent.model';
-import { DatabaseModule } from 'src/database/database.module';
-import { DataSource } from 'typeorm';
-import { ParentProviders } from '../parent/parent';
-import { NounusProviders } from '../nounus/nounus';
 import { NotificationService } from '../notification/notification.service';
-import { NotificationProviders } from '../notification/notification';
 import { NounusService } from '../nounus/nounus.service';
 import { MediaService } from '../media/media.service';
-import { ParameterProviders } from '../parameter/parameter';
-import { MediaProviders } from '../media/media';
-import { PreferenceProvider } from '../Preference/preference';
 import { ParameterService } from '../parameter/parameter.service';
+import { Contracts } from './models/contracts.model';
+import { ProfilNounus } from '../nounus/models/nounu.model';
+import { ProfilParents } from '../parent/models/parent.model';
+import { Notification } from '../notification/models/notification.model';
+import { Medias } from '../media/models/media.model';
+import { Parameter } from '../parameter/models/parameter.model';
+import { Preference } from '../Preference/models/preference.model';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [
+    TypeOrmModule.forFeature([
+      Contracts,
+      ProfilNounus,
+      ProfilParents,
+      Notification,
+      Medias,
+      Parameter,
+      Preference
+    ])
+  ],
   controllers: [ContractsController],
   providers: [
     ContractsService,
     NotificationService,
     NounusService,
     MediaService,
-    ParameterService,
-    ...ParameterProviders,
-    ...MediaProviders,
-    ...PreferenceProvider,
-    ...NounusProviders,
-    ...ContractsProviders,
-    ...ParentProviders,
-    ...NounusProviders,
-    ...NotificationProviders,
+    ParameterService
   ],
+  exports: [ContractsService, TypeOrmModule]
 })
 export class ContractsModule {}

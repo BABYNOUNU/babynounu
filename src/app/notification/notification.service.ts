@@ -4,6 +4,7 @@ import {
   BadRequestException,
   NotFoundException,
 } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Not, Repository } from 'typeorm';
 import { Notification } from './models/notification.model';
 import { CreateNotificationDto } from './dtos/create-notification.dto';
@@ -11,7 +12,7 @@ import { CreateNotificationDto } from './dtos/create-notification.dto';
 @Injectable()
 export class NotificationService {
   constructor(
-    @Inject('NOTIFICATION_REPOSITORY')
+    @InjectRepository(Notification)
     private readonly notificationRepository: Repository<Notification>,
     // private readonly notificationGateway: NotificationGateway,
   ) {}

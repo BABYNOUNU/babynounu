@@ -1,3 +1,4 @@
+// src/app/job/models/job.model.ts
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -9,11 +10,11 @@ import {
   DeleteDateColumn,
   JoinColumn,
 } from 'typeorm';
-import { User } from 'src/app/user/user.model';
-import { Notification } from 'src/app/notification/models/notification.model';
-import { JobApplication } from 'src/app/job-application/models/job-application.model';
-import { Preference } from 'src/app/Preference/models/preference.model';
-import { Medias } from 'src/app/media/models/media.model';
+import { User } from '../../user/user.model';
+import { Notification } from '../../notification/models/notification.model';
+import { JobApplication } from '../../job-application/models/job-application.model';
+import { Preference } from '../../Preference/models/preference.model';
+import { Medias } from '../../media/models/media.model';
 
 @Entity('job')
 export class Job {

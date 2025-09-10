@@ -1,4 +1,4 @@
-// src/payments/dto/create-payment.dto.ts
+// src/app/paiement/dtos/update-payment.dto.ts
 
 import { Allow, IsNotEmpty, IsNumber } from 'class-validator';
 

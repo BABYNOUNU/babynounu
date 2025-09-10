@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Preference } from './models/preference.model';
@@ -6,7 +6,7 @@ import { Preference } from './models/preference.model';
 @Injectable()
 export class PreferenceService {
   constructor(
-    @Inject('PREFERENCE_REPOSITORY')
+    @InjectRepository(Preference)
     private readonly preferenceRepository: Repository<Preference>,
   ) {}
 

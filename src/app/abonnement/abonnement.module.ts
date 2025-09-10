@@ -1,25 +1,32 @@
-import { PaiementProviders } from './../paiement/paiement';
-
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AbonnementController } from './abonnement.controller';
 import { AbonnementService } from './abonnement.service';
-import { DatabaseModule } from 'src/database/database.module';
-import { AbonnementProviders } from './abonnement';
+import { Abonnements } from './models/abonnement.model';
+import { Paiements } from '../paiement/models/paiement.model';
+import { Notification } from '../notification/models/notification.model';
+import { ProfilNounus } from '../nounus/models/nounu.model';
+import { Medias } from '../media/models/media.model';
+import { Parameter } from '../parameter/models/parameter.model';
+import { Preference } from '../preference/models/preference.model';
 import { PaymentService } from '../paiement/paiement.service';
 import { NotificationService } from '../notification/notification.service';
-import { NotificationModule } from '../notification/notification.module';
-import { NotificationProviders } from '../notification/notification';
 import { NounusService } from '../nounus/nounus.service';
 import { MediaService } from '../media/media.service';
 import { ParameterService } from '../parameter/parameter.service';
-import { ParameterProviders } from '../parameter/parameter';
-import { MediaProviders } from '../media/media';
-import { PreferenceProvider } from '../Preference/preference';
-import { NounusProviders } from '../nounus/nounus';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [
+    TypeOrmModule.forFeature([
+      Abonnements,
+      Paiements,
+      Notification,
+      ProfilNounus,
+      Medias,
+      Parameter,
+      Preference
+    ])
+  ],
   controllers: [AbonnementController],
   providers: [
     AbonnementService,
@@ -27,14 +34,8 @@ import { NounusProviders } from '../nounus/nounus';
     NotificationService,
     NounusService,
     MediaService,
-    ParameterService,
-    ...ParameterProviders,
-    ...MediaProviders,
-    ...PreferenceProvider,
-    ...NounusProviders,
-    ...NotificationProviders,
-    ...PaiementProviders,
-    ...AbonnementProviders,
+    ParameterService
   ],
+  exports: [AbonnementService, TypeOrmModule]
 })
 export class AbonnementModule {}

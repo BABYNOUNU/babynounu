@@ -1,4 +1,5 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.model';
 import { Socket } from 'socket.io';
@@ -8,7 +9,7 @@ export class UserService {
   // Map pour stocker les connexions socket des utilisateurs
   private userSockets = new Map<number, string>(); // userID -> socketID
   constructor(
-    @Inject('USER_REPOSITORY') private userRepository: Repository<User>,
+    @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
 
   async user(slug: any): Promise<User | null> {

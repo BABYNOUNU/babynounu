@@ -17,7 +17,7 @@ import type {
 } from 'src/types/authTypes';
 import { SginInAuthDto } from './dto/signIn.dto';
 import { SginUpAuthDto } from './dto/signUp.dto';
-import { JwtAuthGuard } from './auh.guard';
+import { JwtAuthGuard } from './auth.guard';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Authentification')

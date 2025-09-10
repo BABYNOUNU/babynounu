@@ -21,8 +21,8 @@ import {
 } from '@nestjs/swagger';
 import { UpdatePaymentDto } from './dtos/update-payment.dto';
 
-@ApiTags('payments') // Tag pour regrouper les endpoints dans Swagger UI
-@Controller('payments')
+@ApiTags('paiements') // Tag pour regrouper les endpoints dans Swagger UI
+@Controller('paiements')
 export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}
 

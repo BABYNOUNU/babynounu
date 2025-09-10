@@ -1,11 +1,10 @@
-import { use } from 'passport';
 import { Controller, Get, Post, Body, Param, Delete, Put, UseGuards, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { JobApplicationsService } from './job-application.service';
 import { CreateJobApplicationDto } from './dto/create-job-application.dto';
 import { UpdateJobApplicationDto } from './dto/update-job-application.dto';
 import { JobApplication } from './models/job-application.model';
-import { JwtAuthGuard } from '../auth/auh.guard';
+import { JwtAuthGuard } from '../auth/auth.guard';
 
 @ApiTags('Job Applications')
 @Controller('job-applications')
@@ -27,6 +26,15 @@ export class JobApplicationController {
     return this.jobApplicationService.findAll();
   }
 
+  @Get('user/:userId')
+  @ApiOperation({ summary: 'Récupérer les candidatures par ID utilisateur' })
+  @ApiParam({ name: 'userId', type: String }) // Paramètre de route
+  @ApiResponse({ status: 200, description: 'Candidatures récupérées avec succès' })
+  @ApiResponse({ status: 404, description: 'Utilisateur non trouvé ou aucune candidature' })
+  async getJobApplyByUserId(@Param('userId') userId: string) {
+    return this.jobApplicationService.GetJobApplyByUserId(userId);
+  }
+  
   @Get(':id')
   @ApiOperation({ summary: 'Récupérer une candidature par ID' })
   @ApiParam({ name: 'id', description: 'ID de la candidature', example: '1' })

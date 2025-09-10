@@ -9,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { JwtAuthGuard } from '../auth/auh.guard';
+import { JwtAuthGuard } from '../auth/auth.guard';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 type UserBody = {

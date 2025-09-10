@@ -1,6 +1,5 @@
 import {
   BadRequestException,
-  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -16,9 +15,9 @@ import { HOST } from 'src/database/database.providers';
 @Injectable()
 export class JobsService {
   constructor(
-    @Inject('JOB_REPOSITORY')
+    @InjectRepository(Job)
     private jobRepository: Repository<Job>,
-    @Inject('PREFERENCE_REPOSITORY')
+    @InjectRepository(Preference)
     private readonly preferenceRepository: Repository<Preference>,
     private readonly mediaService: MediaService,
   ) {}
@@ -189,7 +188,6 @@ export class JobsService {
       throw new NotFoundException(`Job with ID ${jobUser} not found`);
     }
 
-    console.log(jobUser);
     const DataJob = await this.ReturnN(jobUser, this.preferenceKeys);
     return DataJob;
   }

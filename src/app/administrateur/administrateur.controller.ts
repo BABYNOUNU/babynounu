@@ -41,8 +41,8 @@ class ToggleActiveDto {
   isActive: boolean;
 }
 
-@ApiTags('Administrateur')
-@Controller('administrateur')
+@ApiTags('Administrateurs')
+@Controller('administrateurs')
 export class AdministrateurController {
   constructor(private readonly administrateurService: AdministrateurService) {}
 

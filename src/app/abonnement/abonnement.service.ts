@@ -5,9 +5,10 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Abonnements } from './models/abonnement.model';
-import { CreateAbonnementDto } from './dtos/create-abonnement.dto';
+import { CreateAbonnementDto } from './dto/create-abonnement.dto';
 import { PaymentService } from '../paiement/paiement.service';
 import axios from 'axios';
 import { Paiements } from '../paiement/models/paiement.model';
@@ -19,9 +20,9 @@ export class AbonnementService {
   private readonly SUBSCRIPTION_DURATION_DAYS = 30;
 
   constructor(
-    @Inject('ABONNEMENT_REPOSITORY')
+    @InjectRepository(Abonnements)
     private readonly abonnementRepository: Repository<Abonnements>,
-    @Inject('PAYMENT_REPOSITORY')
+    @InjectRepository(Paiements)
     private readonly paymentRepository: Repository<Paiements>,
     private readonly paymentService: PaymentService,
     private readonly notificationService: NotificationService,

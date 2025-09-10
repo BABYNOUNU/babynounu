@@ -1,3 +1,4 @@
+// src/app/job/dtos/update-job.dto.ts
 import { IsString, IsOptional, IsNotEmpty } from 'class-validator';
 
 export class UpdateJobDto {

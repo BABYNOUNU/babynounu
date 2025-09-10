@@ -1,43 +1,48 @@
 import { Module } from '@nestjs/common';
-import { MessageController } from './messages.controller';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { MessagesController } from './messages.controller';
 import { MessageService } from './messages.service';
-import { MessageProviders } from './messages';
-import { DatabaseModule } from 'src/database/database.module';
-import { RoomProviders } from '../rooms/rooms';
 import { ChatGateway } from '../chat/chat.gateway';
 import { NotificationService } from '../notification/notification.service';
-import { NotificationProviders } from '../notification/notification';
-import { ContractsProviders } from '../contracts/contracts';
 import { ContractsService } from '../contracts/contracts.service';
-import { NounusProviders } from '../nounus/nounus';
-import { ParentProviders } from '../parent/parent';
 import { NounusService } from '../nounus/nounus.service';
 import { MediaService } from '../media/media.service';
 import { ParameterService } from '../parameter/parameter.service';
-import { ParameterProviders } from '../parameter/parameter';
-import { MediaProviders } from '../media/media';
-import { PreferenceProvider } from '../Preference/preference';
+
+// Entity imports
+import { Message } from './models/message.model';
+import { Rooms } from '../rooms/models/room.model';
+import { Notification } from '../notification/models/notification.model';
+import { Contracts } from '../contracts/models/contracts.model';
+import { ProfilNounus } from '../nounus/models/nounu.model';
+import { ProfilParents } from '../parent/models/parent.model';
+import { Parameter } from '../parameter/models/parameter.model';
+import { Medias } from '../media/models/media.model';
+import { Preference } from '../Preference/models/preference.model';
 
 @Module({
-  imports: [DatabaseModule],
-  controllers: [MessageController],
+  imports: [
+    TypeOrmModule.forFeature([
+      Message,
+      Rooms,
+      Notification,
+      Contracts,
+      ProfilNounus,
+      ProfilParents,
+      Parameter,
+      Medias,
+      Preference,
+    ]),
+  ],
+  controllers: [MessagesController],
   providers: [
     MessageService,
     NotificationService,
-    ...NotificationProviders,
     ContractsService,
     NounusService,
     MediaService,
     ParameterService,
-    ...ParameterProviders,
-    ...MediaProviders,
-    ...PreferenceProvider,
-    ...NounusProviders,
-    ...NounusProviders,
-    ...ParentProviders,
-    ...ContractsProviders,
-    ...MessageProviders,
-    ...RoomProviders,
   ],
+  exports: [MessageService, TypeOrmModule],
 })
 export class MessagesModule {}

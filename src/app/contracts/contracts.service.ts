@@ -1,7 +1,6 @@
 import { NounusService } from './../nounus/nounus.service';
 import {
   BadRequestException,
-  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -17,11 +16,11 @@ import { NotificationService } from '../notification/notification.service';
 @Injectable()
 export class ContractsService {
   constructor(
-    @Inject('CONTRACTS_REPOSITORY')
+    @InjectRepository(Contracts)
     private readonly contractsRepository: Repository<Contracts>,
-    @Inject('NOUNUS_REPOSITORY')
+    @InjectRepository(ProfilNounus)
     private readonly nounusRepository: Repository<ProfilNounus>,
-    @Inject('PARENT_REPOSITORY')
+    @InjectRepository(ProfilParents)
     private readonly parentsRepository: Repository<ProfilParents>,
     private readonly notificationService: NotificationService,
     private readonly nounusService: NounusService

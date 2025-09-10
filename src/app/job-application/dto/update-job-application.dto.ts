@@ -1,4 +1,4 @@
-// src/job-applications/dto/update-job-application.dto.ts
+// src/app/job-application/dto/update-job-application.dto.ts
 
 import { IsOptional, IsString } from 'class-validator';
 

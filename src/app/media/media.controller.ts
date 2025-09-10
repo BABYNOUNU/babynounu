@@ -23,7 +23,7 @@ import {
   storageMedia,
 } from 'src/config/media.config';
 
-@ApiTags('media')
+@ApiTags('medias')
 @Controller('media')
 export class MediaController {
   constructor(private readonly mediaService: MediaService) {}

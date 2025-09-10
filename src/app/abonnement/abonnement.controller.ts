@@ -9,7 +9,7 @@ import {
     UseGuards,
   } from '@nestjs/common';
   import { AbonnementService } from './abonnement.service';
-  import { CreateAbonnementDto } from './dtos/create-abonnement.dto';
+  import { CreateAbonnementDto } from './dto/create-abonnement.dto';
   import {
     ApiTags,
     ApiOperation,
@@ -17,14 +17,14 @@ import {
     ApiBody,
     ApiParam,
   } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/auh.guard';
+import { JwtAuthGuard } from '../auth/auth.guard';
   
   @ApiTags('abonnements') // Tag pour regrouper les endpoints dans Swagger UI
   @Controller('abonnements')
   export class AbonnementController {
     constructor(private readonly abonnementService: AbonnementService) {}
   
-    @Post('comfirm')
+    @Post('confirm')
     @ApiOperation({ summary: 'Create a new subscription' }) // Description de l'opération
     @ApiBody({ type: CreateAbonnementDto }) // Documenter le corps de la requête
     @ApiResponse({

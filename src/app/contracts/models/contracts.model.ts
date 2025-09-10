@@ -1,4 +1,4 @@
-// src/message/message.entity.ts
+// src/app/contracts/models/contracts.model.ts
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -9,9 +9,9 @@ import {
   DeleteDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from 'src/app/user/user.model';
-import { Rooms } from 'src/app/rooms/models/room.model';
-import { Message } from 'src/app/messages/models/message.model';
+import { User } from '../../user/user.model';
+import { Rooms } from '../../rooms/models/room.model';
+import { Message } from '../../messages/models/message.model';
 
 @Entity()
 export class Contracts {

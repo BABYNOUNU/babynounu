@@ -1,4 +1,4 @@
-// src/chat/chat.controller.ts
+// src/app/chat/chat.controller.ts
 import {
   Body,
   Controller,
@@ -8,7 +8,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/auh.guard';
+import { JwtAuthGuard } from '../auth/auth.guard';
 import { User } from '../user/user.model';
 import { MessageService } from '../messages/messages.service';
 import { GetUser } from '../auth/getUser';

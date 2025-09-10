@@ -1,15 +1,15 @@
-import { Injectable, Inject, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Paiements } from './models/paiement.model';
 import { CreatePaymentDto } from './dtos/create-payment.dto';
 import axios from 'axios';
 import { UpdatePaymentDto } from './dtos/update-payment.dto';
-import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class PaymentService {
   constructor(
-    @Inject('PAYMENT_REPOSITORY')
+    @InjectRepository(Paiements)
     private readonly paymentRepository: Repository<Paiements>,
     // private readonly notificationGateway: NotificationGateway,
   ) {}

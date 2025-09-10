@@ -1,6 +1,7 @@
-import { Abonnements } from 'src/app/abonnement/models/abonnement.model';
-import { ProfilParents } from 'src/app/parent/models/parent.model';
-import { User } from 'src/app/user/user.model';
+// src/app/paiement/models/paiement.model.ts
+import { Abonnements } from '../../abonnement/models/abonnement.model';
+import { ProfilParents } from '../../parent/models/parent.model';
+import { User } from '../../user/user.model';
 import {
   Entity,
   ManyToOne,

@@ -1,8 +1,9 @@
-import { Contracts } from 'src/app/contracts/models/contracts.model';
-import { Medias } from 'src/app/media/models/media.model';
-import { Preference } from 'src/app/Preference/models/preference.model';
-import { Rooms } from 'src/app/rooms/models/room.model';
-import { User } from 'src/app/user/user.model';
+// src/app/nounus/models/nounu.model.ts
+import { Contracts } from '../../contracts/models/contracts.model';
+import { Medias } from '../../media/models/media.model';
+import { Preference } from '../../Preference/models/preference.model';
+import { Rooms } from '../../rooms/models/room.model';
+import { User } from '../../user/user.model';
 import {
   Entity,
   PrimaryGeneratedColumn,

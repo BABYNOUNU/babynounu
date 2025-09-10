@@ -1,16 +1,25 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { JobsController } from './job.controller';
 import { JobsService } from './job.service';
-import { JobProviders } from './job';
-import { DatabaseModule } from 'src/database/database.module';
+import { Job } from './models/job.model';
+import { Preference } from '../Preference/models/preference.model';
+import { Medias } from '../media/models/media.model';
+import { Parameter } from '../parameter/models/parameter.model';
 import { MediaService } from '../media/media.service';
-import { MediaProviders } from '../media/media';
-import { ParameterProviders } from '../parameter/parameter';
 import { ParameterService } from '../parameter/parameter.service';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [
+    TypeOrmModule.forFeature([
+      Job,
+      Preference,
+      Medias,
+      Parameter
+    ])
+  ],
   controllers: [JobsController],
-  providers: [JobsService, MediaService, ParameterService, ...MediaProviders, ...ParameterProviders, ...JobProviders]
+  providers: [JobsService, MediaService, ParameterService],
+  exports: [JobsService, TypeOrmModule]
 })
 export class JobModule {}

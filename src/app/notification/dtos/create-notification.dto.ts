@@ -1,3 +1,4 @@
+// src/app/notification/dtos/create-notification.dto.ts
 export class CreateNotificationDto {
     type: string; // 'chat', 'job', 'follow'
     message: string; // Contenu de la notification

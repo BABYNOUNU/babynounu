@@ -1,4 +1,5 @@
-import { Inject, Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateApp } from './models/updateApp.model';
 import { Repository, Like } from 'typeorm';
 
@@ -22,7 +23,7 @@ interface UpdateUpdateAppDto {
 @Injectable()
 export class AdministrateurService {
   constructor(
-    @Inject('ADMINISTRATEUR_APP_REPOSITORY')
+    @InjectRepository(UpdateApp)
     private readonly updateAppRepository: Repository<UpdateApp>,
   ) {}
 

@@ -1,4 +1,4 @@
-// src/job-applications/dto/create-job-application.dto.ts
+// src/app/job-application/dto/create-job-application.dto.ts
 
 import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
 

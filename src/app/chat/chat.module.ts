@@ -1,35 +1,55 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { ChatController } from './chat.controller';
 import { ChatService } from './chat.service';
 import { ChatGateway } from './chat.gateway';
 import { RoomsService } from '../rooms/rooms.service';
 import { UserService } from '../user/user.service';
 import { MessageService } from '../messages/messages.service';
-import { DatabaseModule } from 'src/database/database.module';
-import { RoomProviders } from '../rooms/rooms';
-import { MessageProviders } from '../messages/messages';
-import { UserProviders } from '../user/user.providers';
 import { AuthService } from '../auth/auth.service';
 import { AbonnementService } from '../abonnement/abonnement.service';
-import { RoleProviders } from '../role/role';
-import { ParameterProviders } from '../parameter/parameter';
-import { AuthProviders } from '../auth/auth.providers';
-import { AbonnementProviders } from '../abonnement/abonnement';
-import { PaiementProviders } from '../paiement/paiement';
 import { PaymentService } from '../paiement/paiement.service';
 import { NotificationService } from '../notification/notification.service';
-import { NotificationProviders } from '../notification/notification';
 import { ContractsService } from '../contracts/contracts.service';
-import { ContractsProviders } from '../contracts/contracts';
-import { NounusProviders } from '../nounus/nounus';
 import { NounusService } from '../nounus/nounus.service';
 import { MediaService } from '../media/media.service';
 import { ParameterService } from '../parameter/parameter.service';
-import { MediaProviders } from '../media/media';
-import { PreferenceProvider } from '../Preference/preference';
+
+// Entity imports
+import { Rooms } from '../rooms/models/room.model';
+import { RoomMessageCount } from '../rooms/models/unreadCount.model';
+import { Message } from '../messages/models/message.model';
+import { User } from '../user/user.model';
+import { Roles } from '../role/models/role.model';
+import { Abonnements } from '../abonnement/models/abonnement.model';
+import { Paiements } from '../paiement/models/paiement.model';
+import { Notification } from '../notification/models/notification.model';
+import { Contracts } from '../contracts/models/contracts.model';
+import { ProfilNounus } from '../nounus/models/nounu.model';
+import { ProfilParents } from '../parent/models/parent.model';
+import { Parameter } from '../parameter/models/parameter.model';
+import { Medias } from '../media/models/media.model';
+import { Preference } from '../Preference/models/preference.model';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [
+    TypeOrmModule.forFeature([
+      Rooms,
+      RoomMessageCount,
+      Message,
+      User,
+      Roles,
+      Abonnements,
+      Paiements,
+      Notification,
+      Contracts,
+      ProfilNounus,
+      ProfilParents,
+      Parameter,
+      Medias,
+      Preference,
+    ]),
+  ],
   controllers: [ChatController],
   providers: [
     ChatService,
@@ -45,22 +65,7 @@ import { PreferenceProvider } from '../Preference/preference';
     NounusService,
     MediaService,
     ParameterService,
-    ...ParameterProviders,
-    ...MediaProviders,
-    ...PreferenceProvider,
-    ...NounusProviders,
-    ...ContractsProviders,
-    ...NounusProviders,
-    ...PaiementProviders,
-    ...NotificationProviders,
-    ...AbonnementProviders,
-    ...PaiementProviders,
-    ...AuthProviders,
-    ...ParameterProviders,
-    ...RoleProviders,
-    ...RoomProviders,
-    ...MessageProviders,
-    ...UserProviders,
   ],
+  exports: [ChatService, ChatGateway, TypeOrmModule],
 })
 export class ChatModule {}

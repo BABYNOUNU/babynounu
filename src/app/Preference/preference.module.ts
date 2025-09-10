@@ -1,14 +1,21 @@
-import { Module , Inject } from '@nestjs/common';
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { PreferenceController } from './preference.controller';
 import { PreferenceService } from './preference.service';
-import { PreferenceProvider } from './preference';
-import { DatabaseModule } from 'src/database/database.module';
-import { MediaService } from '../media/media.service';
-import { NounusService } from '../nounus/nounus.service';
+import { Preference } from './models/preference.model';
+import { User } from '../user/user.model';
+import { TypeParameter } from '../parameter/models/parameter_type.model';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [
+    TypeOrmModule.forFeature([
+      Preference,
+      User,
+      TypeParameter
+    ])
+  ],
   controllers: [PreferenceController],
-  providers: [PreferenceService, ...PreferenceProvider]
+  providers: [PreferenceService],
+  exports: [PreferenceService, TypeOrmModule]
 })
 export class PreferenceModule {}

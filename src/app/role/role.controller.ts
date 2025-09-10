@@ -5,7 +5,7 @@ import { RoleBody } from './types/role.type';
 import { RoleDto } from './dto/role.dto';
 
 @ApiTags('Roles')
-@Controller('role')
+@Controller('roles')
 export class RoleController {
 
     constructor(private readonly roleService: RoleService){

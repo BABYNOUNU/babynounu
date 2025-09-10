@@ -13,12 +13,12 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiConsumes } from '@nestjs/swagger';
 import { NounusService } from './nounus.service';
-import { CreateNounuDto } from './dtos/create-nounu.dto';
-import { UpdateNounuDto } from './dtos/update-nounu.dto';
+import { CreateNounuDto } from './dto/create-nounu.dto';
+import { UpdateNounuDto } from './dto/update-nounu.dto';
 import { ProfilNounus } from './models/nounu.model';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { storageMedia } from 'src/config/media.config';
-import { SearchNounuCriteriaDto } from './dtos/search-nounu-criteria.dto';
+import { SearchNounuCriteriaDto } from './dto/search-nounu-criteria.dto';
 import { SharpTransform } from 'src/utils/sharpTransform';
 
 @ApiTags('nounu') // Tag pour Swagger

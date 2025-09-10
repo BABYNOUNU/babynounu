@@ -1,3 +1,4 @@
+// src/app/parameter/models/parameter.model.ts
 import {
   ManyToOne,
   Entity,
@@ -8,11 +9,11 @@ import {
   DeleteDateColumn,
   OneToMany,
 } from 'typeorm';
-import { Preference } from 'src/app/Preference/models/preference.model';
+import { Preference } from '../../Preference/models/preference.model';
 import { TypeParameter } from './parameter_type.model';
-import { User } from 'src/app/user/user.model';
-import { Abonnements } from 'src/app/abonnement/models/abonnement.model';
-import { Medias } from 'src/app/media/models/media.model';
+import { User } from '../../user/user.model';
+import { Abonnements } from '../../abonnement/models/abonnement.model';
+import { Medias } from '../../media/models/media.model';
 
 @Entity('parameters')
 export class Parameter {

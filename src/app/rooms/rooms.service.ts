@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, MoreThan } from 'typeorm';
 import { UserService } from '../user/user.service';
@@ -9,11 +9,11 @@ import { Message } from '../messages/models/message.model';
 @Injectable()
 export class RoomsService {
   constructor(
-    @Inject('ROOMS_REPOSITORY')
+    @InjectRepository(Rooms)
     private roomRepository: Repository<Rooms>,
-    @Inject('MESSAGE_REPOSITORY')
+    @InjectRepository(Message)
     private readonly messageRepository: Repository<Message>,
-    @Inject('UNREAD_REPOSITORY')
+    @InjectRepository(RoomMessageCount)
     private readonly unreadCountRepository: Repository<RoomMessageCount>,
   ) {}
 

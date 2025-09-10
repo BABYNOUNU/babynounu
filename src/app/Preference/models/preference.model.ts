@@ -6,10 +6,10 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
 } from 'typeorm';
-import { Parameter } from 'src/app/parameter/models/parameter.model';
-import { ProfilParents } from 'src/app/parent/models/parent.model';
-import { Job } from 'src/app/job/models/job.model';
-import { ProfilNounus } from 'src/app/nounus/models/nounu.model';
+import { Parameter } from '../../parameter/models/parameter.model';
+import { ProfilParents } from '../../parent/models/parent.model';
+import { Job } from '../../job/models/job.model';
+import { ProfilNounus } from '../../nounus/models/nounu.model';
 
 @Entity('user_preferences')
 export class Preference {

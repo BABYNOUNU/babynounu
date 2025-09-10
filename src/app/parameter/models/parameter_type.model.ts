@@ -1,5 +1,5 @@
 import { Parameter } from "./parameter.model";
-import { Preference } from 'src/app/Preference/models/preference.model';
+import { Preference } from '../../Preference/models/preference.model';
 import { OneToMany, Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from "typeorm"
 
 

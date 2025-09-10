@@ -1,14 +1,20 @@
-import { Module , Inject } from '@nestjs/common';
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { ParameterController } from './parameter.controller';
 import { ParameterService } from './parameter.service';
-import { ParameterProviders } from './parameter';
-import { DatabaseModule } from 'src/database/database.module';
+import { Parameter } from './models/parameter.model';
+import { Medias } from '../media/models/media.model';
 import { MediaService } from '../media/media.service';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [
+    TypeOrmModule.forFeature([
+      Parameter,
+      Medias
+    ])
+  ],
   controllers: [ParameterController],
-  providers: [ParameterService, ...ParameterProviders],
-  exports: [ParameterService],
+  providers: [ParameterService],
+  exports: [ParameterService, TypeOrmModule]
 })
 export class ParameterModule {}

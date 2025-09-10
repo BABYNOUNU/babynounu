@@ -67,12 +67,17 @@ export class ParentController {
     FileFieldsInterceptor([{ name: 'imageParent', maxCount: 4 }], {
       storage: storageMedia,
     }),
+    SharpTransform({
+      fields: ['imageParent'],
+      resizeOptions: { width: 400, height: 400, fit: 'cover', quality: 80 },
+    }), // Intercepteur personnalisé
   )
   UpdateParent(
     @Param('id') id: string,
     @Body() updateParentDto: UpdateParentDto,
     @UploadedFiles() files,
   ) {
+    console.log(files);
     return this.parentService.update(id, updateParentDto, files);
   }
 

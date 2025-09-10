@@ -1,15 +1,14 @@
 import { NotificationService } from './../notification/notification.service';
 import {
   BadRequestException,
-  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, In, Like, Not, Repository } from 'typeorm';
 import { ProfilNounus } from './models/nounu.model';
-import { CreateNounuDto } from './dtos/create-nounu.dto';
-import { UpdateNounuDto } from './dtos/update-nounu.dto';
+import { CreateNounuDto } from './dto/create-nounu.dto';
+import { UpdateNounuDto } from './dto/update-nounu.dto';
 import { MediaService } from '../media/media.service';
 import { HOST } from 'src/database/database.providers';
 import { Preference } from '../Preference/models/preference.model';
@@ -17,9 +16,9 @@ import { Preference } from '../Preference/models/preference.model';
 @Injectable()
 export class NounusService {
   constructor(
-    @Inject('NOUNUS_REPOSITORY')
+    @InjectRepository(ProfilNounus)
     private readonly nounuRepository: Repository<ProfilNounus>,
-    @Inject('PREFERENCE_REPOSITORY')
+    @InjectRepository(Preference)
     private readonly preferenceRepository: Repository<Preference>,
     private readonly notificationService: NotificationService,
     private readonly mediaService: MediaService,
@@ -438,11 +437,11 @@ async decrementPoints(id: string, points: number): Promise<ProfilNounus> {
   async search(
     searchCriteria: any,
     page: number = 1,
-    limit: number = 1
+    limit: number = 30
   ): Promise<{ data: any[], pagination: any }> {
 
     page = parseInt(page.toString(), 10) || 1;
-    limit = parseInt(limit.toString(), 10) || 1;
+    limit = parseInt(limit.toString(), 10) || 30;
 
 
 

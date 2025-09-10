@@ -14,7 +14,7 @@ import axios from 'axios';
 @Injectable()
 export class MediaService {
   constructor(
-    @Inject('MEDIA_REPOSITORY')
+    @InjectRepository(Medias)
     private readonly mediaRepository: Repository<Medias>,
     private readonly parameterService: ParameterService,
     // private readonly nounusService: NounusService,
@@ -85,6 +85,20 @@ export class MediaService {
       const documents = await this.mediaRepository.find({
         where: {
           type_media: { slug: 'document-verification' },
+          user: { id: userId },
+        },
+      });
+      return documents;
+    } catch (error) {
+      throw new Error(`Failed to find documents for user: ${error.message}`);
+    }
+  }
+
+  async findImageByUserId(userId: string): Promise<Medias[]> {
+    try {
+      const documents = await this.mediaRepository.find({
+        where: {
+          type_media: { slug: 'image-profil' },
           user: { id: userId },
         },
       });

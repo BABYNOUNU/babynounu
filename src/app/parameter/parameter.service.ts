@@ -1,13 +1,13 @@
 import { Parameter } from './models/parameter.model';
-import { Injectable, NotFoundException, Inject } from '@nestjs/common';
-
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateParameterDto } from './dto/parameter.dto';
 
 @Injectable()
 export class ParameterService {
   constructor(
-    @Inject('PARAMETER_REPOSITORY')
+    @InjectRepository(Parameter)
     private readonly parameterRepository: Repository<Parameter>,
   ) {}
 

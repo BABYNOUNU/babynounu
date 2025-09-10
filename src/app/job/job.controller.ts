@@ -19,8 +19,8 @@ import {
   import { JobsService } from './job.service';
   import { CreateJobDto } from './dtos/create-job.dto';
   import { UpdateJobDto } from './dtos/update-job.dto';
-import { JwtAuthGuard } from '../auth/auh.guard';
-import { storageMedia } from 'src/config/media.config';
+import { JwtAuthGuard } from '../auth/auth.guard';
+import { storageMedia } from '../../config/media.config';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
   
   @ApiTags('jobs') // Tag pour Swagger
@@ -108,12 +108,5 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
       return this.jobsService.deleteJob(id);
     }
 
-@Get('job-applications/user/:userId')
-@ApiOperation({ summary: 'Get job applications by user ID' })
-@ApiParam({ name: 'userId', type: String }) // Paramètre de route
-@ApiResponse({ status: 200, description: 'Job applications retrieved successfully' })
-@ApiResponse({ status: 404, description: 'User not found or no job applications' })
-async getJobApplyByUserId(@Param('userId') userId: string) {
-  return this.jobsService.getJobApplyByUserId(userId);
-}
+
   }
