@@ -31,7 +31,7 @@ async function bootstrap() {
     .setDescription('Your API description')
     .setVersion('0.3.51')
     .addServer(
-      isProd ? 'https://api.babynounu.com/' : 'http://localhost:3001/',
+      isProd ? 'https://api.babynounu.com/' : 'http://localhost:3000/',
       'Local environment',
     )
     .addServer('https://staging.yourapi.com/', 'Staging')
@@ -42,8 +42,8 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api-docs', app, document);
 
-  // Utiliser le port 3001 pour éviter les conflits
-  const port = process.env.PORT || 3001;
+  // Utiliser le port 3000 pour éviter les conflits
+  const port = process.env.PORT || 3000;
   await app.listen(port);
   console.log(`Application démarrée sur le port ${port}`);
 } 

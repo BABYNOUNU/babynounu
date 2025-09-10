@@ -1,7 +1,7 @@
 import { DataSource } from 'typeorm';
 
 export const isProd:boolean = process.env.NODE_ENV === 'production';
-export const HOST = isProd ? process.env.API_URL || 'https://api.babynounu.com' : `${process.env.HOST_URL_LOCAL || 'http://localhost'}:3001`;
+export const HOST = isProd ? process.env.API_URL || 'https://api.babynounu.com' : `${process.env.HOST_URL_LOCAL || 'http://localhost'}:3000`;
 export const WS_HOST = isProd ? 'https://api.babynounu.com' : process.env.FRONTEND_URL;
 
 // DATABASE PROVIDER
